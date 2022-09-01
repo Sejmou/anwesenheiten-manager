@@ -14,14 +14,9 @@ const Header: React.FC = () => {
     <div className="left">
       <Link href="/">
         <a className="bold" data-active={isActive('/')}>
-          Feed
+          Anwesenheiten
         </a>
       </Link>
-      {session && (
-        <Link href="/drafts">
-          <a data-active={isActive('/drafts')}>My drafts</a>
-        </Link>
-      )}
       <style jsx>{`
         .bold {
           font-weight: bold;
@@ -64,15 +59,10 @@ const Header: React.FC = () => {
         {session ? (
           <>
             <p>
-              {session.user.name} ({session.user.email})
+              Willkommen, {session?.user?.name} ({session?.user?.email})
             </p>
-            <Link href="/create">
-              <button>
-                <a>New post</a>
-              </button>
-            </Link>
             <button onClick={() => signOut()}>
-              <a>Log out</a>
+              <a>Ausloggen</a>
             </button>
           </>
         ) : (

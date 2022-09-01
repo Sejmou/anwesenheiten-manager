@@ -1,9 +1,10 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { FormEventHandler, useState } from 'react';
+import { getCsrfToken, getSession, signIn } from 'next-auth/react';
 
 type Props = {};
-const Register: NextPage = (props: Props) => {
+const SignIn: NextPage = (props: Props) => {
   const router = useRouter();
   const [error, setError] = useState(false);
 
@@ -56,7 +57,7 @@ const Register: NextPage = (props: Props) => {
     </>
   );
 };
-export default Register;
+export default SignIn;
 
 function getFormElementValue(form: HTMLFormElement, name: string) {
   return form[name].value;

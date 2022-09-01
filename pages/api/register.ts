@@ -28,11 +28,11 @@ const registerHandler: NextApiHandler = async (req, res) => {
       await prisma.user.create({
         data: { email, name, passwordHash },
       });
-      res.send(200);
+      res.end();
     }
   } catch (error) {
     console.error(error);
-    res.send(400);
+    res.status(400).end(400);
   }
 };
 

@@ -35,6 +35,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (passwordCorrect) {
+          user.passwordHash = ''; // not sure if this is really necessary
           return user;
         }
 
@@ -45,6 +46,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     // need to use JWT for storing sessions, otherwise CredentialsProvider won't fire session callback - see https://github.com/nextauthjs/next-auth/issues/3970
     // could also implement workaround for using strategy: 'database', but don't care at this point - see https://github.com/nextauthjs/next-auth/discussions/4394#discussioncomment-3293618
+    // NOTE: for now, DON'T change this to 'database'; withAuth() Middleware only works with 'jwt'! https://next-auth.js.org/tutorials/securing-pages-and-api-routes#nextjs-middleware
     strategy: 'jwt',
   },
   adapter: PrismaAdapter(prisma),
