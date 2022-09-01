@@ -1,3 +1,4 @@
+import { Box, Typography } from '@mui/material';
 import { NextPage } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -25,11 +26,13 @@ const Register: NextPage = (props: Props) => {
     // too lazy to handle form properly at this point, should probably use Formik or something later
     const target = event.target as typeof event.target & {
       email: { value: string };
-      name: { value: string };
+      firstName: { value: string };
+      lastName: { value: string };
       password: { value: string };
     };
     const formValue = {
-      name: target.name.value,
+      firstName: target.firstName.value,
+      lastName: target.lastName.value,
       email: target.email.value,
       password: target.password.value,
     };
@@ -42,7 +45,6 @@ const Register: NextPage = (props: Props) => {
       method: 'POST',
       body: JSON.stringify(registrationData),
     });
-    console.log('here');
     if (!res.ok) {
       setError(true);
     } else {
@@ -56,7 +58,6 @@ const Register: NextPage = (props: Props) => {
           password: registrationData.password,
           redirect: false,
         });
-        console.log(signInRes);
         router.replace('/');
       }, 2500);
     }
@@ -64,20 +65,24 @@ const Register: NextPage = (props: Props) => {
 
   return (
     <>
-      <h1>Registrierung</h1>
+      <Typography variant="h2">Registrierung</Typography>
       <form onSubmit={submitHandler}>
-        <div className="">
-          <label>Name</label>
-          <input type="text" name="name" />
-        </div>
-        <div className="">
+        <Box>
+          <label>Vorname</label>
+          <input type="text" name="firstName" />
+        </Box>
+        <Box>
+          <label>Nachname</label>
+          <input type="text" name="lastName" />
+        </Box>
+        <Box>
           <label>Email</label>
           <input type="email" name="email" />
-        </div>
-        <div className="">
-          <label>Password</label>
+        </Box>
+        <Box>
+          <label>Passwort</label>
           <input type="password" name="password" />
-        </div>
+        </Box>
         {error && <b>Registrierung fehlgeschlagen.</b>}
         <button type="submit">Submit</button>
         {success && (

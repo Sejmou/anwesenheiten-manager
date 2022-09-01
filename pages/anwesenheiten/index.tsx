@@ -1,7 +1,6 @@
 import React from 'react';
-import { GetStaticProps, NextPage } from 'next';
-import Layout from '../../components/Layout';
-import prisma from '../../lib/prisma';
+import { NextPage } from 'next';
+import Typography from '@mui/material/Typography';
 
 // TODO: fetch choir practice schedule or something else from DB
 // export const getStaticProps: GetStaticProps = async () => {
@@ -15,12 +14,12 @@ type Props = {};
 
 const Anwesenheiten: NextPage = (props: Props) => {
   return (
-    <Layout>
-      <div className="page">
-        <h1>Anwesenheiten</h1>
-        TODO
-      </div>
-    </Layout>
+    <>
+      <Typography variant="body1">
+        Auf dieser Seite wird es bald die Möglichkeit geben, Probenanwesenheiten
+        einzutragen.
+      </Typography>
+    </>
   );
 };
 

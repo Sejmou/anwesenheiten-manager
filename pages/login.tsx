@@ -28,7 +28,6 @@ const Login: NextPage = (props: Props) => {
       email: target.email.value,
       password: target.password.value,
     };
-    console.log(formValue);
     const result = await signIn('credentials', {
       ...formValue,
       redirect: false,

@@ -8,7 +8,8 @@ export interface InviteToken {
   used: boolean;
   usedBy?: {
     // TODO: smarter typing of this
-    name?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
     email?: string | null;
   };
 }
@@ -27,7 +28,9 @@ const tokenRequestHandler: NextApiHandler = async (
   try {
     const { method } = req;
     if (method === 'GET') {
+      const onlyAvailable = req.query.available !== undefined;
       const tokensDB = await prisma.inviteToken.findMany({
+        where: { used: onlyAvailable ? false : undefined },
         include: { usedBy: true },
       });
       const tokens: InviteToken[] = tokensDB.map(t => ({
@@ -35,12 +38,12 @@ const tokenRequestHandler: NextApiHandler = async (
         used: t.used,
         usedBy: {
           email: t.usedBy?.email,
-          name: t.usedBy?.name,
+          firstName: t.usedBy?.firstName,
+          lastName: t.usedBy?.lastName,
         },
       }));
       res.send(tokens);
-    }
-    if (method === 'POST') {
+    } else if (method === 'POST') {
       const token = await bcrypt.hash('super secret token', 10);
       await prisma.inviteToken.create({ data: { token } });
     } else {

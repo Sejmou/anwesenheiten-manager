@@ -7,7 +7,8 @@ import { User } from '@prisma/client';
 const RegistrationDataValidator = z.object({
   email: z.string().email(),
   password: z.string().min(6),
-  name: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
   inviteToken: z.string().optional(),
 });
 
@@ -47,7 +48,7 @@ const registerHandler: NextApiHandler = async (req, res) => {
 export default registerHandler;
 
 async function registerUser(
-  { email, name, password, inviteToken }: RegistrationData,
+  { email, firstName, lastName, password, inviteToken }: RegistrationData,
   checkInviteToken = true
 ) {
   const passwordHash = await bcrypt.hash(password, 10);
@@ -65,7 +66,7 @@ async function registerUser(
       let user: User;
       try {
         user = await prisma.user.create({
-          data: { email, name, passwordHash },
+          data: { email, firstName, lastName, passwordHash },
         });
       } catch (error) {
         throw Error('Could not create user!');
@@ -88,6 +89,6 @@ async function registerUser(
 
   console.log('Creating new user in database');
   await prisma.user.create({
-    data: { email, name, passwordHash },
+    data: { email, firstName, lastName, passwordHash },
   });
 }
