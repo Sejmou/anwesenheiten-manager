@@ -38,7 +38,8 @@ const Header = ({ sx }: Props) => {
       href: '/anwesenheiten',
       text: 'Anwesenheiten',
     },
-    { href: '/proben', text: 'Chorproben' },
+    { href: '/proben', text: 'Probentermine' },
+    { href: '/mitglieder', text: 'Mitglieder' },
     { href: '/admins', text: 'Admins' },
   ];
 
