@@ -2,7 +2,7 @@ import { getToken } from 'next-auth/jwt';
 import { NextApiHandler, NextApiResponse } from 'next/types';
 import prisma from '../../../lib/prisma';
 
-interface Admin {
+export interface Admin {
   firstName: string;
   lastName: string;
   email: string;

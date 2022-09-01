@@ -1,8 +1,9 @@
 import { Button, Typography } from '@mui/material';
-import { NextPage } from 'next';
+import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { NextPageWithLayout } from '../_app';
 
 type Props = {};
-const Proben: NextPage<Props> = () => {
+const ChoirPractice: NextPageWithLayout<Props> = () => {
   return (
     <>
       <Typography variant="body1">
@@ -16,4 +17,7 @@ const Proben: NextPage<Props> = () => {
     </>
   );
 };
-export default Proben;
+
+ChoirPractice.getLayout = getAuthenticatedPageLayout;
+
+export default ChoirPractice;

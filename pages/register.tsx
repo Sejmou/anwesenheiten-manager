@@ -1,12 +1,27 @@
-import { Box, Typography } from '@mui/material';
-import { NextPage } from 'next';
+import {
+  Box,
+  Button,
+  Card,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { GetServerSideProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
+import {
+  getAuthenticatedPageLayout,
+  getNonAuthenticatedPageLayout,
+} from '../components/layout/get-page-layouts';
+import prisma from '../lib/prisma';
 import { RegistrationData } from './api/register';
+import { NextPageWithLayout } from './_app';
 
-type Props = {};
-const Register: NextPage = (props: Props) => {
+type Props = { inviteToken: string | null };
+const Register: NextPageWithLayout<Props> = ({ inviteToken }: Props) => {
   const router = useRouter();
   const session = useSession();
 
@@ -15,8 +30,6 @@ const Register: NextPage = (props: Props) => {
     // TODO: figure out if this can be done in cleaner way with middleware, i.e. not delivering this page to clients at all if already authenticated and redirecting instead
     router.replace('/');
   }
-
-  const inviteToken = router.query.token;
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -36,10 +49,9 @@ const Register: NextPage = (props: Props) => {
       email: target.email.value,
       password: target.password.value,
     };
-    const registrationData: RegistrationData =
-      inviteToken && typeof inviteToken === 'string'
-        ? { ...formValue, inviteToken }
-        : formValue;
+    const registrationData: RegistrationData = !!inviteToken
+      ? { ...formValue, inviteToken }
+      : formValue;
 
     const res = await fetch('/api/register', {
       method: 'POST',
@@ -58,38 +70,90 @@ const Register: NextPage = (props: Props) => {
           password: registrationData.password,
           redirect: false,
         });
-        router.replace('/');
+        if (signInRes?.ok) router.replace('/');
+        else console.error(signInRes);
       }, 2500);
     }
   };
 
   return (
-    <>
-      <Typography variant="h2">Registrierung</Typography>
-      <form onSubmit={submitHandler}>
-        <Box>
-          <label>Vorname</label>
-          <input type="text" name="firstName" />
-        </Box>
-        <Box>
-          <label>Nachname</label>
-          <input type="text" name="lastName" />
-        </Box>
-        <Box>
-          <label>Email</label>
-          <input type="email" name="email" />
-        </Box>
-        <Box>
-          <label>Passwort</label>
-          <input type="password" name="password" />
-        </Box>
-        {error && <b>Registrierung fehlgeschlagen.</b>}
-        <button type="submit">Submit</button>
-        {success && (
-          <b>Registrierung erfolgreich! Du wirst in Kürze weitergeleitet...</b>
-        )}
-      </form>
-    </>
+    <Container
+      maxWidth="sm"
+      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+    >
+      <Card sx={{ p: 2, width: '100%' }}>
+        <Stack spacing={1}>
+          <Typography variant="h4">Registrierung</Typography>
+          <Stack
+            width="100%"
+            spacing={2}
+            component="form"
+            onSubmit={submitHandler}
+          >
+            <TextField label="Vorname" name="firstName" />
+            <TextField label="Nachname" name="lastName" />
+            <TextField
+              label="E-Mail"
+              name="email"
+              type="email"
+              placeholder="deine.email@tuwien.ac.at"
+            />
+            <TextField label="Passwort" type="password" name="password" />
+            {error && (
+              <Typography variant="subtitle1">
+                Registrierung fehlgeschlagen :/
+              </Typography>
+            )}
+            {success && (
+              <Typography variant="subtitle1">
+                Registrierung erfolgreich! Du wirst in Kürze weitergeleitet...
+              </Typography>
+            )}
+            <Button type="submit">Registrieren</Button>
+          </Stack>
+        </Stack>
+      </Card>
+    </Container>
   );
 };
+
+Register.getLayout = getNonAuthenticatedPageLayout;
+
 export default Register;
+
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const redirect = {
+    redirect: {
+      destination: '/',
+      permanent: false,
+    },
+  };
+  if ((await prisma.user.count()) == 0) return { props: { inviteToken: null } };
+  const token = await getValidatedToken(query);
+  if (!token) {
+    return redirect;
+  }
+  return { props: { inviteToken: token } };
+};
+
+async function getValidatedToken(query: ParsedUrlQuery) {
+  if (typeof query.token !== 'string' || !query.token) {
+    return false;
+  }
+
+  const token = query.token;
+
+  try {
+    const tokenInDB = await prisma.inviteToken.findFirstOrThrow({
+      where: { token },
+    });
+    if (tokenInDB.used) {
+      // token already used!
+      return;
+    }
+    return token;
+  } catch (error) {
+    // token invalid
+    return;
+  }
+}

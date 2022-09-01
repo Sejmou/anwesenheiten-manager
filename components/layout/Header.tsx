@@ -19,9 +19,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/router';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import { signOut, useSession } from 'next-auth/react';
 
 type Props = { sx: SxProps };
 const Header = ({ sx }: Props) => {
+  const session = useSession();
+
+  const handleLogout = () => {
+    signOut();
+  };
+
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const router = useRouter();
@@ -109,6 +116,11 @@ const Header = ({ sx }: Props) => {
                         />
                       </ListItemButton>
                     ))}
+                    {session && (
+                      <ListItemButton onClick={handleLogout}>
+                        Logout
+                      </ListItemButton>
+                    )}
                   </List>
                 </Box>
               </Drawer>
@@ -128,6 +140,11 @@ const Header = ({ sx }: Props) => {
                   {link.text}
                 </Button>
               ))}
+              {session && (
+                <Button variant="contained" onClick={handleLogout}>
+                  Logout
+                </Button>
+              )}
             </Stack>
           )}
         </Toolbar>

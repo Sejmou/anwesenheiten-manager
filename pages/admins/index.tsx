@@ -1,18 +1,32 @@
 import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps } from 'next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { InviteToken } from '../api/invite-tokens';
 import { Box, Button, Grid, Typography } from '@mui/material';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Admin } from '../api/admins';
+import { NextPageWithLayout } from '../_app';
+import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 
 type Props = { inviteLinkBaseUrl: string };
+
+const adminTableCols: GridColDef[] = [
+  { field: 'firstName', headerName: 'Vorname' },
+  { field: 'secondName', headerName: 'Nachname' },
+  { field: 'email', headerName: 'Email' },
+  { field: 'createdAt', headerName: 'Beigetreten am' },
+];
 
 const getAvailableTokens = () =>
   fetch('/api/invite-tokens?available').then(data => data.json());
 const generateToken = () => fetch('/api/invite-tokens', { method: 'POST' });
-const getAdmins = () => fetch('/api/admins').then(data => data.json());
+const getAdminRows = () =>
+  fetch('/api/admins')
+    .then(data => data.json() as Promise<Admin[]>)
+    .then(admins => admins.map((admin, i) => ({ ...admin, id: i })));
 
-const Admins: NextPage<Props> = ({ inviteLinkBaseUrl }: Props) => {
+const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
   const { data: tokens, isLoading: tokensLoading } = useQuery<InviteToken[]>(
     ['tokens'],
     getAvailableTokens,
@@ -20,9 +34,9 @@ const Admins: NextPage<Props> = ({ inviteLinkBaseUrl }: Props) => {
       initialData: [],
     }
   );
-  const { data: admins, isLoading: adminsLoading } = useQuery<InviteToken[]>(
+  const { data: admins, isLoading: adminsLoading } = useQuery<Admin[]>(
     ['admins'],
-    getAdmins,
+    getAdminRows,
     {
       initialData: [],
     }
@@ -70,6 +84,15 @@ const Admins: NextPage<Props> = ({ inviteLinkBaseUrl }: Props) => {
         <Typography variant="body1">
           Ein paar wichtige Features fehlen noch. Sie kommen noch, irgendwann :)
         </Typography>
+        {adminsLoading ? (
+          'Lade Admin-Daten...'
+        ) : (
+          <>
+            {/*Note: hideFooter hides pagination too */}
+            <Typography>Admins</Typography>
+            <DataGrid columns={adminTableCols} rows={admins} hideFooter />
+          </>
+        )}
         <ResponsiveContainer title="Offene Invites">
           {invitesList}
         </ResponsiveContainer>
@@ -80,6 +103,8 @@ const Admins: NextPage<Props> = ({ inviteLinkBaseUrl }: Props) => {
     </>
   );
 };
+
+Admins.getLayout = getAuthenticatedPageLayout;
 
 export default Admins;
 

@@ -1,6 +1,7 @@
 import React from 'react';
-import { NextPage } from 'next';
 import Typography from '@mui/material/Typography';
+import { NextPageWithLayout } from '../_app';
+import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 
 // TODO: fetch choir practice schedule or something else from DB
 // export const getStaticProps: GetStaticProps = async () => {
@@ -12,7 +13,7 @@ import Typography from '@mui/material/Typography';
 
 type Props = {};
 
-const Anwesenheiten: NextPage = (props: Props) => {
+const Attendance: NextPageWithLayout = (props: Props) => {
   return (
     <>
       <Typography variant="body1">
@@ -23,4 +24,6 @@ const Anwesenheiten: NextPage = (props: Props) => {
   );
 };
 
-export default Anwesenheiten;
+Attendance.getLayout = getAuthenticatedPageLayout;
+
+export default Attendance;
