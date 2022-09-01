@@ -13,10 +13,15 @@ const Header: React.FC = () => {
   const left = (
     <div className="left">
       <Link href="/">
-        <a className="bold" data-active={isActive('/')}>
+        <a className="bold" data-active={isActive('/anwesenheiten')}>
           Anwesenheiten
         </a>
       </Link>
+      {session && (
+        <Link href="/invites">
+          <a data-active={isActive('/invites')}>Invites</a>
+        </Link>
+      )}
       <style jsx>{`
         .bold {
           font-weight: bold;

@@ -39,6 +39,8 @@ Now that we've installed the dependencies and the database is set up, the applic
 
 Then, navigate to `localhost:3000/register` to create a user with a name, email and password of your choice. The credentials will be stored in the database (passwords are encrypted/hashed using `bcrypt`, so they should be quite safe, even if the database were compromised).
 
+After registering, you should be logged in and see the main page. All other users that try to register will need an invitation link. To generate those, you can click on 'Invites'.
+
 ## How actual deployment on a self-hosted server could work
 
 Here I keep track of what I found out about how to do an actual production deployment.
