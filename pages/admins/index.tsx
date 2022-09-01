@@ -89,9 +89,9 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
           Diese Seite dient dem Verwalten der Admins für diese Website.
         </Typography>
         <Typography variant="body1">
-          Ein paar wichtige Features fehlen noch. Sie kommen noch, irgendwann :)
+          Ein paar wichtige Features fehlen noch. Sie kommen, irgendwann :)
         </Typography>
-        <Stack mt={2} spacing={2}>
+        <Stack mt={2} spacing={{ xs: 0, md: 2 }}>
           {adminsLoading ? (
             'Lade Admin-Daten...'
           ) : (
