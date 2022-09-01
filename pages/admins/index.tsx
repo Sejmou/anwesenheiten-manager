@@ -2,7 +2,7 @@ import React from 'react';
 import { GetServerSideProps } from 'next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { InviteToken } from '../api/invite-tokens';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Button, Grid, Stack, Typography } from '@mui/material';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Admin } from '../api/admins';
@@ -12,10 +12,10 @@ import { getAuthenticatedPageLayout } from '../../components/layout/get-page-lay
 type Props = { inviteLinkBaseUrl: string };
 
 const adminTableCols: GridColDef[] = [
-  { field: 'firstName', headerName: 'Vorname' },
-  { field: 'secondName', headerName: 'Nachname' },
-  { field: 'email', headerName: 'Email' },
-  { field: 'createdAt', headerName: 'Beigetreten am' },
+  { field: 'firstName', headerName: 'Vorname', flex: 1 },
+  { field: 'lastName', headerName: 'Nachname', flex: 1 },
+  { field: 'email', headerName: 'Email', flex: 1 },
+  { field: 'createdAt', headerName: 'Beigetreten am', flex: 1 },
 ];
 
 const getAvailableTokens = () =>
@@ -24,7 +24,12 @@ const generateToken = () => fetch('/api/invite-tokens', { method: 'POST' });
 const getAdminRows = () =>
   fetch('/api/admins')
     .then(data => data.json() as Promise<Admin[]>)
-    .then(admins => admins.map((admin, i) => ({ ...admin, id: i })));
+    .then(admins =>
+      admins.map((admin, i) => ({
+        ...admin,
+        id: i,
+      }))
+    );
 
 const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
   const { data: tokens, isLoading: tokensLoading } = useQuery<InviteToken[]>(
@@ -41,6 +46,8 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
       initialData: [],
     }
   );
+
+  console.log(admins);
 
   const client = useQueryClient();
 
@@ -77,26 +84,31 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
 
   return (
     <>
-      <Box>
+      <Stack>
         <Typography variant="body1">
           Diese Seite dient dem Verwalten der Admins für diese Website.
         </Typography>
         <Typography variant="body1">
           Ein paar wichtige Features fehlen noch. Sie kommen noch, irgendwann :)
         </Typography>
-        {adminsLoading ? (
-          'Lade Admin-Daten...'
-        ) : (
-          <>
-            {/*Note: hideFooter hides pagination too */}
-            <Typography>Admins</Typography>
-            <DataGrid columns={adminTableCols} rows={admins} hideFooter />
-          </>
-        )}
-        <ResponsiveContainer title="Offene Invites">
-          {invitesList}
-        </ResponsiveContainer>
-      </Box>
+        <Stack mt={2} spacing={2}>
+          {adminsLoading ? (
+            'Lade Admin-Daten...'
+          ) : (
+            <ResponsiveContainer title="Admins">
+              <DataGrid
+                autoHeight
+                columns={adminTableCols}
+                rows={admins}
+                hideFooter
+              />
+            </ResponsiveContainer>
+          )}
+          <ResponsiveContainer title="Ungenutzte Invite-Links">
+            {invitesList}
+          </ResponsiveContainer>
+        </Stack>
+      </Stack>
       <Button onClick={() => newTokenMutation.mutate()}>
         Neuen Link generieren
       </Button>
