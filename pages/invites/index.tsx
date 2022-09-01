@@ -28,7 +28,7 @@ const Invites: NextPage<Props> = ({ inviteLinkBaseUrl }: Props) => {
     : tokens.length > 0
     ? tokens.map(t => (
         <>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div key={t.token} style={{ display: 'flex', gap: '10px' }}>
             <div>
               <span>{`${inviteLinkBaseUrl}?token=${t.token}`}</span>
             </div>

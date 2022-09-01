@@ -18,9 +18,14 @@ const Header: React.FC = () => {
         </a>
       </Link>
       {session && (
-        <Link href="/invites">
-          <a data-active={isActive('/invites')}>Invites</a>
-        </Link>
+        <>
+          <Link href="/invites">
+            <a data-active={isActive('/invites')}>Invites</a>
+          </Link>
+          <Link href="/proben">
+            <a data-active={isActive('/proben')}>Proben</a>
+          </Link>
+        </>
       )}
       <style jsx>{`
         .bold {
