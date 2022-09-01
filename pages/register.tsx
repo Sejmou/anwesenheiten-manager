@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import { getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormEventHandler, useState } from 'react';
 
@@ -58,6 +59,18 @@ const Register: NextPage = (props: Props) => {
 };
 export default Register;
 
-function getFormElementValue(form: HTMLFormElement, name: string) {
-  return form[name].value;
-}
+Register.getInitialProps = async ({ res, req }) => {
+  const session = await getSession({ req });
+  console.log('HERE');
+
+  if (session && res) {
+    // redirect user if they are already logged in
+    res.writeHead(302, {
+      Location: '/',
+    });
+    res.end();
+    return {};
+  }
+
+  return {};
+};
