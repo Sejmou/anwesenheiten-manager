@@ -2,6 +2,7 @@ import { NextApiHandler } from 'next';
 import { z } from 'zod';
 import prisma from '../../lib/prisma';
 import bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
 
 const RegistrationDataValidator = z.object({
   email: z.string().email(),
@@ -10,7 +11,7 @@ const RegistrationDataValidator = z.object({
   inviteToken: z.string().optional(),
 });
 
-type RegistrationData = z.infer<typeof RegistrationDataValidator>;
+export type RegistrationData = z.infer<typeof RegistrationDataValidator>;
 
 const registerHandler: NextApiHandler = async (req, res) => {
   try {
@@ -21,6 +22,8 @@ const registerHandler: NextApiHandler = async (req, res) => {
     const firstUser = (await prisma.user.count()) === 0;
     if (firstUser) {
       registerUser(registrationData, false);
+      res.end();
+      return;
     }
 
     const emailTaken = !!(await prisma.user.findUnique({
@@ -32,7 +35,7 @@ const registerHandler: NextApiHandler = async (req, res) => {
       throw Error(`Email ${email} already taken!`);
     }
 
-    registerUser(registrationData);
+    await registerUser(registrationData);
 
     res.end();
   } catch (error) {
@@ -47,30 +50,43 @@ async function registerUser(
   { email, name, password, inviteToken }: RegistrationData,
   checkInviteToken = true
 ) {
-  console.log('Creating new user in database');
   const passwordHash = await bcrypt.hash(password, 10);
   if (checkInviteToken) {
-    // TODO: find cleaner way to figure out if token exists, and, if it does, whether it is still usable
+    // TODO: rewrite this once Prisma offers proper support for interactive transactions (with access to intermediate results)
     try {
-      await prisma.inviteToken.findFirstOrThrow({
+      const token = await prisma.inviteToken.findFirstOrThrow({
         where: { token: inviteToken },
       });
+      if (token.used) {
+        throw Error('Token already used!');
+      }
+
+      console.log('Creating new user in database, updating token status');
+      let user: User;
+      try {
+        user = await prisma.user.create({
+          data: { email, name, passwordHash },
+        });
+      } catch (error) {
+        throw Error('Could not create user!');
+      }
+      try {
+        await prisma.inviteToken.update({
+          where: { token: inviteToken },
+          data: { used: true, usedAt: new Date(), userId: user.id },
+        });
+        return;
+      } catch (error) {
+        // revert user creation
+        prisma.user.delete({ where: { id: user.id } });
+        throw Error('Could not update token status after creating user!');
+      }
     } catch (error) {
       throw Error('Invalid token!');
     }
-
-    // unfortunately, cannot use non-unique fields together with unique ones in where of update(): https://github.com/prisma/prisma/issues/7290
-    const { count } = await prisma.inviteToken.updateMany({
-      where: { token: inviteToken, used: false },
-      data: { used: true, usedAt: new Date() },
-    });
-    if (count === 0) {
-      // no rows affected by update -> no matching valid token found in database
-      // as we already checked if token exists, we know that the reason must be that the token was already used
-      throw Error('Token already used!');
-    }
   }
 
+  console.log('Creating new user in database');
   await prisma.user.create({
     data: { email, name, passwordHash },
   });
