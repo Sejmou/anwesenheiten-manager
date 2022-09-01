@@ -49,6 +49,9 @@ export const authOptions: NextAuthOptions = {
     // NOTE: for now, DON'T change this to 'database'; withAuth() Middleware only works with 'jwt'! https://next-auth.js.org/tutorials/securing-pages-and-api-routes#nextjs-middleware
     strategy: 'jwt',
   },
+  pages: {
+    signIn: '/login',
+  },
   adapter: PrismaAdapter(prisma),
   secret: process.env.SECRET,
 };

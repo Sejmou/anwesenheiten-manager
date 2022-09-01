@@ -1,10 +1,10 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { FormEventHandler, useState } from 'react';
-import { getCsrfToken, getSession, signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 
 type Props = {};
-const SignIn: NextPage = (props: Props) => {
+const Login: NextPage = (props: Props) => {
   const router = useRouter();
   const [error, setError] = useState(false);
 
@@ -14,35 +14,28 @@ const SignIn: NextPage = (props: Props) => {
     // too lazy to handle form properly at this point, should probably use Formik or something later
     const target = event.target as typeof event.target & {
       email: { value: string };
-      name: { value: string };
       password: { value: string };
     };
     const formValue = {
-      name: target.name.value,
       email: target.email.value,
       password: target.password.value,
     };
     console.log(formValue);
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      body: JSON.stringify(formValue),
+    const result = await signIn('credentials', {
+      ...formValue,
+      redirect: false,
     });
-    if (!res.ok) {
+    if (!result || (!result.ok && result?.error)) {
       setError(true);
     } else {
-      setError(false);
       router.replace('/');
     }
   };
 
   return (
     <>
-      <h1>Register</h1>
+      <h1>Login</h1>
       <form onSubmit={submitHandler}>
-        <div className="">
-          <label>Name</label>
-          <input type="text" name="name" />
-        </div>
         <div className="">
           <label>Email</label>
           <input type="email" name="email" />
@@ -51,14 +44,28 @@ const SignIn: NextPage = (props: Props) => {
           <label>Password</label>
           <input type="password" name="password" />
         </div>
-        {error && <b>Signup failed. Please try again</b>}
+        {error && (
+          <b>Login war nicht erfolgreich. Stimmen Email und Passwort?</b>
+        )}
         <button type="submit">Submit</button>
       </form>
     </>
   );
 };
-export default SignIn;
+export default Login;
 
-function getFormElementValue(form: HTMLFormElement, name: string) {
-  return form[name].value;
-}
+Login.getInitialProps = async ({ res, req }) => {
+  const session = await getSession({ req });
+  console.log('HERE');
+
+  if (session && res) {
+    // redirect user if they are already logged in
+    res.writeHead(302, {
+      Location: '/',
+    });
+    res.end();
+    return {};
+  }
+
+  return {};
+};
