@@ -31,12 +31,28 @@ const ResponsiveContainer = ({
   title,
   children,
   sx,
-  contentWrapperSx,
-  contentWrapperSxNarrow,
-  contentWrapperSxWide,
+  contentWrapperSx: contentWrapperSxProp,
+  contentWrapperSxNarrow: contentWrapperSxNarrowProp,
+  contentWrapperSxWide: contentWrapperSxWideProp,
 }: Props) => {
   const theme = useTheme();
   const narrowViewport = useMediaQuery(theme.breakpoints.down('md'));
+
+  const contentWrapperSx: SxProps = {
+    maxHeight: '250px',
+    overflow: 'auto',
+    ...(contentWrapperSxProp ?? {}),
+  };
+
+  const contentWrapperSxNarrow = {
+    ...contentWrapperSx,
+    ...(contentWrapperSxNarrowProp ?? {}),
+  };
+
+  const contentWrapperSxWide = {
+    ...contentWrapperSx,
+    ...(contentWrapperSxWideProp ?? {}),
+  };
 
   return narrowViewport ? (
     <Accordion sx={sx}>
@@ -44,16 +60,7 @@ const ResponsiveContainer = ({
         <Typography>{title}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Box
-          sx={{
-            maxHeight: 250,
-            overflow: 'auto',
-            ...contentWrapperSx,
-            ...contentWrapperSxNarrow,
-          }}
-        >
-          {children}
-        </Box>
+        <Box sx={contentWrapperSxNarrow}>{children}</Box>
       </AccordionDetails>
     </Accordion>
   ) : (
@@ -61,16 +68,7 @@ const ResponsiveContainer = ({
       <Typography variant="h4" sx={{ mb: 1 }}>
         {title}
       </Typography>
-      <Paper
-        sx={{
-          maxHeight: '250px',
-          overflow: 'auto',
-          ...contentWrapperSx,
-          ...contentWrapperSxWide,
-        }}
-      >
-        {children}
-      </Paper>
+      <Paper sx={contentWrapperSxWide}>{children}</Paper>
     </Box>
   );
 };
