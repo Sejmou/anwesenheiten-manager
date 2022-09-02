@@ -16,6 +16,7 @@ type Props = {
   title: string;
   children: React.ReactNode;
   sx?: SxProps;
+  contentWrapperSx?: SxProps;
   contentWrapperSxNarrow?: SxProps;
   contentWrapperSxWide?: SxProps;
 };
@@ -30,6 +31,7 @@ const ResponsiveContainer = ({
   title,
   children,
   sx,
+  contentWrapperSx,
   contentWrapperSxNarrow,
   contentWrapperSxWide,
 }: Props) => {
@@ -43,7 +45,12 @@ const ResponsiveContainer = ({
       </AccordionSummary>
       <AccordionDetails>
         <Box
-          sx={{ maxHeight: 250, overflow: 'auto', ...contentWrapperSxNarrow }}
+          sx={{
+            maxHeight: 250,
+            overflow: 'auto',
+            ...contentWrapperSx,
+            ...contentWrapperSxNarrow,
+          }}
         >
           {children}
         </Box>
@@ -55,7 +62,12 @@ const ResponsiveContainer = ({
         {title}
       </Typography>
       <Paper
-        sx={{ maxHeight: '250px', overflow: 'auto', ...contentWrapperSxWide }}
+        sx={{
+          maxHeight: '250px',
+          overflow: 'auto',
+          ...contentWrapperSx,
+          ...contentWrapperSxWide,
+        }}
       >
         {children}
       </Paper>

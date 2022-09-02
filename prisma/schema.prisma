@@ -71,3 +71,26 @@ model InviteToken {
   userId    String?   @unique @map("user_id")
   usedBy    User?     @relation(fields: [userId], references: [id])
 }
+
+model Singer {
+  id            String        @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String?       @unique
+  createdAt     DateTime      @default(now())
+  voiceGroup    VoiceGroup
+}
+
+enum VoiceGroup {
+  S1
+  S2
+  S2_M
+  A1_M
+  A1
+  A2
+  T1
+  T2
+  B1
+  B2
+  D
+}

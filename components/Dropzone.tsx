@@ -1,21 +1,26 @@
-import { Box, Button, List, ListItem } from '@mui/material';
+import { Box, Button, List, ListItem, Stack, Typography } from '@mui/material';
 import { DropzoneRootProps, useDropzone } from 'react-dropzone';
 
 type Props = {
   text: string;
   dragText?: string;
+  note?: string;
   fileTypesAndExtensions?: {
     [mimeType: string]: string[];
   };
+  onFileAdded: (files: File[]) => void;
 } & DropzoneRootProps;
-const CustomDropzone = ({ text, dragText, fileTypesAndExtensions }: Props) => {
-  const onDrop = (acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
-  };
+const CustomDropzone = ({
+  text,
+  dragText,
+  note,
+  fileTypesAndExtensions,
+  onFileAdded,
+}: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: fileTypesAndExtensions,
     useFsAccessApi: false, // needed to make it work on Ubuntu: https://github.com/react-dropzone/react-dropzone/issues/1223
-    onDrop,
+    onDrop: onFileAdded,
   });
 
   return (
@@ -34,8 +39,16 @@ const CustomDropzone = ({ text, dragText, fileTypesAndExtensions }: Props) => {
       {...getRootProps()}
       className="container"
     >
-      <input {...getInputProps({ className: 'dropzone' })} />
-      <Button>{isDragActive ? dragText ?? text : text}</Button>
+      <Stack spacing={1}>
+        <input
+          style={{ display: 'none' }}
+          {...getInputProps({ className: 'dropzone' })}
+        />
+        <Typography color="primary" textTransform="uppercase">
+          {isDragActive ? dragText ?? text : text}
+        </Typography>
+        <Typography>{note}</Typography>
+      </Stack>
     </Box>
   );
 };
