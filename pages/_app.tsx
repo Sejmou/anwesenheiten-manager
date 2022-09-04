@@ -7,6 +7,9 @@ import './globals.css';
 import { ReactElement, ReactNode } from 'react';
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
+import globalMessageStore from '../lib/message-store';
+import { StoreProvider } from 'easy-peasy';
+import GlobalMessageSnackbar from '../components/GlobalMessageSnackbar';
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,10 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+// workaround for broken easy peasy StoreProvider typing in React 18: https://github.com/ctrlplusb/easy-peasy/issues/741#issuecomment-1110810689
+// TODO: get a better understanding of what is actually the problem lol
+const StoreProviderOverride = StoreProvider as any;
+
 // for some reason, typing the input object as AppProps (and also AppPropsWithLayout) returns a super-weird error
 const App = ({ Component, pageProps }: any) => {
   // Use the layout defined at the page level, if available
@@ -35,17 +42,22 @@ const App = ({ Component, pageProps }: any) => {
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={pageProps.session}>
         <ThemeProvider theme={theme}>
-          <Box
-            sx={{
-              minHeight: '100vh',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <CssBaseline />
-            {getLayout(<Component {...pageProps} />)}
-            <Footer sx={{ flex: '0 1 auto' }} />
-          </Box>
+          <StoreProviderOverride store={globalMessageStore}>
+            <>
+              <Box
+                sx={{
+                  minHeight: '100vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <CssBaseline />
+                {getLayout(<Component {...pageProps} />)}
+                <Footer sx={{ flex: '0 1 auto' }} />
+              </Box>
+              <GlobalMessageSnackbar />
+            </>
+          </StoreProviderOverride>
         </ThemeProvider>
       </SessionProvider>
     </QueryClientProvider>

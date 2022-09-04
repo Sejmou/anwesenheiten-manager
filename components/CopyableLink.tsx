@@ -1,18 +1,20 @@
 import { IconButton, Stack, Typography } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { MouseEventHandler } from 'react';
+import { useStoreActions } from '../lib/message-store';
 
-type Props = { link: string };
-const CopyableLink = ({ link }: Props) => {
+type Props = { link: string; message: string };
+const CopyableLink = ({ link, message }: Props) => {
+  const addMessage = useStoreActions(actions => actions.addMessage);
+
   const clickHandler: MouseEventHandler<HTMLButtonElement> = event => {
     navigator.clipboard.writeText(link);
+    addMessage(message);
   };
-
-  console.log(link);
 
   return (
     <Stack direction="row" overflow="hidden" alignItems="center">
-      <Typography noWrap textOverflow="ellipsis">
+      <Typography variant="body2" noWrap textOverflow="ellipsis">
         {link}
       </Typography>
       <IconButton onClick={clickHandler}>

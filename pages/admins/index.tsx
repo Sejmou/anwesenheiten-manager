@@ -61,7 +61,12 @@ const inviteLinkTableCols: InviteLinkTableColDef[] = [
       if (params.value == null) {
         return '';
       }
-      return <CopyableLink link={params.value} />;
+      return (
+        <CopyableLink
+          link={params.value}
+          message="Link wurde in die Zwischenablage kopiert!"
+        />
+      );
     },
   },
   {
@@ -116,8 +121,6 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
       initialData: [],
     }
   );
-
-  console.log(admins);
 
   const client = useQueryClient();
 
