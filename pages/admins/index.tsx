@@ -4,20 +4,21 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  QueryFunctionContext,
   QueryFunction,
 } from '@tanstack/react-query';
 import { InviteToken } from '../api/invite-tokens';
-import { Button, Grid, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import {
   DataGrid,
   GridColDef,
+  GridRenderCellParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
 import { Admin } from '../api/admins';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import CopyableLink from '../../components/CopyableLink';
 
 type Props = { inviteLinkBaseUrl: string };
 
@@ -52,7 +53,17 @@ type InviteLinkTableColDef = GridColDef & {
 };
 
 const inviteLinkTableCols: InviteLinkTableColDef[] = [
-  { field: 'link', headerName: 'Link', flex: 1.8 },
+  {
+    field: 'link',
+    headerName: 'Link',
+    flex: 1.8,
+    renderCell: (params: GridRenderCellParams<string>) => {
+      if (params.value == null) {
+        return '';
+      }
+      return <CopyableLink link={params.value} />;
+    },
+  },
   {
     field: 'createdAt',
     headerName: 'Erstellungsdatum',
