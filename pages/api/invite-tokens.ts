@@ -12,6 +12,7 @@ export interface InviteToken {
     lastName?: string | null;
     email?: string | null;
   };
+  createdAt: Date;
 }
 
 const tokenRequestHandler: NextApiHandler = async (
@@ -41,6 +42,7 @@ const tokenRequestHandler: NextApiHandler = async (
           firstName: t.usedBy?.firstName,
           lastName: t.usedBy?.lastName,
         },
+        createdAt: t.createdAt,
       }));
       res.send(tokens);
     } else if (method === 'POST') {

@@ -128,8 +128,8 @@ const Members: NextPageWithLayout = () => {
             ['B1', 'Bass 1'],
             ['B2', 'Bass 2'],
             ['D', 'Dirigent'],
-          ].map(row => (
-            <li>
+          ].map((row, i) => (
+            <li key={i}>
               {row[0]} ({row[1]})
             </li>
           ))}

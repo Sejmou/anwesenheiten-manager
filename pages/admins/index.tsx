@@ -1,10 +1,20 @@
 import React from 'react';
 import { GetServerSideProps } from 'next';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryFunctionContext,
+  QueryFunction,
+} from '@tanstack/react-query';
 import { InviteToken } from '../api/invite-tokens';
 import { Button, Grid, Stack, Typography } from '@mui/material';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridValueFormatterParams,
+} from '@mui/x-data-grid';
 import { Admin } from '../api/admins';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
@@ -15,13 +25,64 @@ const adminTableCols: GridColDef[] = [
   { field: 'firstName', headerName: 'Vorname', flex: 1 },
   { field: 'lastName', headerName: 'Nachname', flex: 1 },
   { field: 'email', headerName: 'Email', flex: 1 },
-  { field: 'createdAt', headerName: 'Beigetreten am', flex: 1 },
+  {
+    field: 'createdAt',
+    headerName: 'Beitrittsdatum',
+    flex: 1,
+    valueFormatter: (params: GridValueFormatterParams<Date>) => {
+      if (params.value == null) {
+        return '';
+      }
+
+      const date = new Date(params.value);
+
+      const valueFormatted = date.toLocaleString('de-AT');
+      return valueFormatted;
+    },
+  },
 ];
 
-const getAvailableTokens = () =>
-  fetch('/api/invite-tokens?available').then(data => data.json());
+type InviteLinkTableRow = Pick<InviteToken, 'createdAt'> & {
+  link: string;
+  id: number;
+};
+
+type InviteLinkTableColDef = GridColDef & {
+  field: keyof InviteLinkTableRow;
+};
+
+const inviteLinkTableCols: InviteLinkTableColDef[] = [
+  { field: 'link', headerName: 'Link', flex: 1.8 },
+  {
+    field: 'createdAt',
+    headerName: 'Erstellungsdatum',
+    flex: 1,
+    valueFormatter: (params: GridValueFormatterParams<Date>) => {
+      if (params.value == null) {
+        return '';
+      }
+
+      const date = new Date(params.value);
+
+      const valueFormatted = date.toLocaleString('de-AT');
+      return valueFormatted;
+    },
+  },
+];
+
+const getInviteLinkRows: QueryFunction<InviteLinkTableRow[]> = ({ queryKey }) =>
+  fetch('/api/invite-tokens?available')
+    .then(data => data.json() as Promise<InviteToken[]>)
+    .then(tokens =>
+      tokens.map((t, i) => ({
+        link: `${queryKey[1]}?token=${t.token}`, // second el. in queryKey is the base URL to use for the link
+        createdAt: t.createdAt,
+        id: i,
+      }))
+    );
+
 const generateToken = () => fetch('/api/invite-tokens', { method: 'POST' });
-const getAdminRows = () =>
+const getAdminRows: QueryFunction<Admin[]> = () =>
   fetch('/api/admins')
     .then(data => data.json() as Promise<Admin[]>)
     .then(admins =>
@@ -32,13 +93,11 @@ const getAdminRows = () =>
     );
 
 const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
-  const { data: tokens, isLoading: tokensLoading } = useQuery<InviteToken[]>(
-    ['tokens'],
-    getAvailableTokens,
-    {
-      initialData: [],
-    }
-  );
+  const { data: inviteLinks, isLoading: inviteLinksLoading } = useQuery<
+    InviteLinkTableRow[]
+  >(['tokens', inviteLinkBaseUrl], getInviteLinkRows, {
+    initialData: [],
+  });
   const { data: admins, isLoading: adminsLoading } = useQuery<Admin[]>(
     ['admins'],
     getAdminRows,
@@ -55,29 +114,15 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
     onSuccess: () => client.invalidateQueries(['tokens']),
   });
 
-  const invitesList = tokensLoading ? (
+  const invitesList = inviteLinksLoading ? (
     'Lade Daten...'
-  ) : tokens.length > 0 ? (
-    <Grid container spacing={1} padding={1}>
-      {tokens.map(t => (
-        <>
-          <Grid
-            item
-            // xs={8}
-            sx={{ whiteSpace: 'nowrap', overflowX: 'auto' }}
-          >
-            <Typography>{`${inviteLinkBaseUrl}?token=${t.token}`}</Typography>
-          </Grid>
-          {/* <Grid item xs={4}>
-            <Typography sx={{ whiteSpace: 'nowrap' }}>
-              {!t.used
-                ? 'noch nicht verwendet'
-                : `verwendet von ${t.usedBy?.name}, (${t.usedBy?.email})`}
-            </Typography>
-          </Grid> */}
-        </>
-      ))}
-    </Grid>
+  ) : inviteLinks.length > 0 ? (
+    <DataGrid
+      autoHeight
+      columns={inviteLinkTableCols}
+      rows={inviteLinks}
+      hideFooter
+    />
   ) : (
     'Es gibt keine noch nicht eingelösten Links.'
   );
