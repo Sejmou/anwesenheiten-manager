@@ -4,7 +4,7 @@ import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 import CustomDropzone from '../../components/Dropzone';
 import Papa from 'papaparse';
-import { Box, Button, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { VoiceGroup } from '@prisma/client';
 import {
   DataGrid,

@@ -94,3 +94,13 @@ enum VoiceGroup {
   B2
   D
 }
+
+model ChoirEvent {
+  id            String        @id
+  summary       String
+  description   String?
+  location      String?
+  lastSyncAt    DateTime
+  start         DateTime
+  end           DateTime
+}
