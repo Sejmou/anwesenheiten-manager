@@ -2,6 +2,7 @@ import { NextApiHandler } from 'next';
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
+// import GitHubProvider from 'next-auth/providers/github';
 import prisma from '../../../lib/prisma';
 import bcrypt from 'bcrypt';
 
@@ -29,19 +30,25 @@ export const authOptions: NextAuthOptions = {
         });
         if (!user || !user.passwordHash) return null; // user not yet registered or not yet registered with password
 
+        console.log(user);
+
         const passwordCorrect = await bcrypt.compare(
           credentials.password,
           user.passwordHash
         );
 
         if (passwordCorrect) {
-          user.passwordHash = ''; // not sure if this is really necessary
+          // user.passwordHash = ''; // not sure if this is really necessary
           return user;
         }
 
         return null;
       },
     }),
+    // GitHubProvider({
+    //   clientId: process.env.GITHUB_ID!!,
+    //   clientSecret: process.env.GITHUB_SECRET!!,
+    // }),
   ],
   session: {
     // need to use JWT for storing sessions, otherwise CredentialsProvider won't fire session callback - see https://github.com/nextauthjs/next-auth/issues/3970
@@ -53,5 +60,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
 };
