@@ -9,23 +9,28 @@ import { useRouter } from 'next/router';
 import prisma from '../../lib/prisma';
 import { Event as EventDB } from '@prisma/client';
 
-type Event = Omit<EventDB, 'start' | 'end' | 'lastSyncAt'> & {
+export type Event = Omit<EventDB, 'start' | 'end' | 'lastSyncAt'> & {
   start: string;
   end: string;
+  lastSyncAt: string;
+  inPast: boolean;
 };
 
-export const getStaticProps: GetStaticProps = async () => {
+export function eventFromDBEvent(e: EventDB): Event {
   const now = new Date();
+  return {
+    ...e,
+    start: e.start.toLocaleString('de-AT'),
+    end: e.end.toLocaleString('de-AT'),
+    lastSyncAt: e.lastSyncAt.toLocaleString('de-AT'),
+    inPast: e.end.getTime() < now.getTime(),
+  };
+}
 
+export const getStaticProps: GetStaticProps = async () => {
   const events = (await prisma.event.findMany())
     .sort((a, b) => a.start.getTime() - b.start.getTime())
-    .map(e => ({
-      ...e,
-      start: e.start.toLocaleString('de-AT'),
-      end: e.end.toLocaleString('de-AT'),
-      inPast: e.end.getTime() < now.getTime(),
-      lastSyncAt: null, // we don't need that on the client
-    }));
+    .map(e => eventFromDBEvent(e));
 
   const pastEvents = events.filter(e => e.inPast);
   const currentEvents = events.filter(e => !e.inPast);
