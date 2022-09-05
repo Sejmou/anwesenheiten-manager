@@ -95,7 +95,7 @@ enum VoiceGroup {
   D
 }
 
-model ChoirEvent {
+model Event {
   id            String        @id
   summary       String
   description   String?

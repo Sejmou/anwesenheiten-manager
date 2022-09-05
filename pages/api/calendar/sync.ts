@@ -89,7 +89,7 @@ export const calendarUpdateRequestHandler: NextApiHandler = async (
 
       await Promise.allSettled(
         parsedEvents.map(({ id, description, start, end, location, summary }) =>
-          prisma.choirEvent.upsert({
+          prisma.event.upsert({
             where: { id },
             update: {
               description,

@@ -1,11 +1,11 @@
 import { NextApiHandler, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
 import prisma from '../../../lib/prisma';
-import { ChoirEvent } from '@prisma/client';
+import { Event } from '@prisma/client';
 
 export const calendarRequestHandler: NextApiHandler = async (
   req,
-  res: NextApiResponse<ChoirEvent[]>
+  res: NextApiResponse<Event[]>
 ) => {
   const token = await getToken({ req });
   if (!token) {
@@ -17,7 +17,7 @@ export const calendarRequestHandler: NextApiHandler = async (
   try {
     const { method } = req;
     if (method === 'GET') {
-      const events = await prisma.choirEvent.findMany();
+      const events = await prisma.event.findMany();
       res.send(events);
     } else {
       throw Error('HTTP method ' + method + ' not supported by this endpoint!');

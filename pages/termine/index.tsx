@@ -4,7 +4,7 @@ import {
   GridColDef,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
-import { ChoirEvent } from '@prisma/client';
+import { Event } from '@prisma/client';
 import {
   QueryFunction,
   useMutation,
@@ -16,10 +16,10 @@ import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { NextPageWithLayout } from '../_app';
 
 const syncWithGoogleCalendar = () => fetch('/api/calendar/sync');
-const getEvents: QueryFunction<ChoirEvent[]> = () =>
-  fetch('/api/calendar').then(data => data.json() as Promise<ChoirEvent[]>);
+const getEvents: QueryFunction<Event[]> = () =>
+  fetch('/api/calendar').then(data => data.json() as Promise<Event[]>);
 
-type EventTableColDef = GridColDef & { field: keyof ChoirEvent };
+type EventTableColDef = GridColDef & { field: keyof Event };
 
 const dateStringFormatter: (
   params: GridValueFormatterParams<Date>
@@ -47,8 +47,8 @@ const eventTableCols: EventTableColDef[] = [
 ];
 
 type Props = {};
-const ChoirPractice: NextPageWithLayout<Props> = () => {
-  const { data: events, isLoading: eventsLoading } = useQuery<ChoirEvent[]>(
+const Calendar: NextPageWithLayout<Props> = () => {
+  const { data: events, isLoading: eventsLoading } = useQuery<Event[]>(
     ['events'],
     getEvents,
     {
@@ -118,6 +118,6 @@ const ChoirPractice: NextPageWithLayout<Props> = () => {
   );
 };
 
-ChoirPractice.getLayout = getAuthenticatedPageLayout;
+Calendar.getLayout = getAuthenticatedPageLayout;
 
-export default ChoirPractice;
+export default Calendar;
