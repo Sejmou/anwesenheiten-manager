@@ -103,7 +103,6 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
       >
         <MenuItem value="all">Alle Stimmgruppen</MenuItem>
         {Object.keys(VoiceGroup).map((val, i) => {
-          console.log(val);
           return (
             <MenuItem key={i} value={val}>
               {VoiceGroupToDescriptionString[val]}

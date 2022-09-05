@@ -72,7 +72,6 @@ const Members: NextPageWithLayout = () => {
   >([]);
 
   const handleFiles = async (files: File[]) => {
-    console.log(files);
     const { data } = (await parsePromise(files[0], true)) as {
       data: { [key: string]: string }[];
     };

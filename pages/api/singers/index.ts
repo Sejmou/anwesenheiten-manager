@@ -52,8 +52,7 @@ const singerRequestHandler: NextApiHandler = async (
         }
       }
       const validatedSingers = newSingers as Singer[];
-      const result = await prisma.singer.createMany({ data: validatedSingers });
-      console.log(result);
+      await prisma.singer.createMany({ data: validatedSingers });
     } else {
       throw Error('HTTP method ' + method + ' not supported by this endpoint!');
     }

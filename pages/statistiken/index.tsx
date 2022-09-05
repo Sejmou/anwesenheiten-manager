@@ -81,8 +81,6 @@ const Stats: NextPageWithLayout<Props> = ({
     ([voiceGroup, count], id) => ({ voiceGroup, count, id })
   );
 
-  console.log(attendanceBySinger);
-
   const singersAttendanceRows = allSingers.map(s => {
     const attendanceCount =
       attendanceBySinger.find(obj => obj.singer.id === s.id)?.total ?? 0;
@@ -193,7 +191,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     const [group, count] = Array.from(Object.entries(obj))[0];
     singersByVoiceGroup[group] = count;
   });
-  console.log(singersByVoiceGroup);
 
   const allSingers = (await prisma.singer.findMany()).map(s => ({
     ...s,
