@@ -20,6 +20,7 @@ import { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/router';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import { signOut, useSession } from 'next-auth/react';
+import TUIcon from './TUIcon';
 
 type Props = { sx: SxProps };
 const Header = ({ sx }: Props) => {
@@ -66,13 +67,14 @@ const Header = ({ sx }: Props) => {
       <Container maxWidth="xl">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
-            startIcon={<LibraryMusicIcon />}
+            startIcon={<TUIcon />}
             color="inherit"
+            size="large"
             onClick={() => {
               router.push('/');
             }}
           >
-            Chorproben-Anwesenheitsmanager
+            Chor-Anwesenheitsmanager
           </Button>
           {matches ? (
             <Box>
