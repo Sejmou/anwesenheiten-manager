@@ -16,6 +16,8 @@ export type RegistrationData = z.infer<typeof RegistrationDataValidator>;
 
 const registerHandler: NextApiHandler = async (req, res) => {
   try {
+    console.log('Is NEXTAUTH_SECRET present?', !!process.env.NEXTAUTH_SECRET);
+
     const requestBody = JSON.parse(req.body);
     const registrationData = RegistrationDataValidator.parse(requestBody);
     const { email } = registrationData;
