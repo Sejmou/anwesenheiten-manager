@@ -22,9 +22,7 @@ const Footer = ({ sx }: Props) => {
         ...sx,
       }}
     >
-      <Typography variant="body2">
-        Erstellt von Samo Kolter ({new Date().getUTCFullYear()})
-      </Typography>
+      <Typography variant="body2">Erstellt von Samo Kolter (2022)</Typography>
       <Box>
         <Link href="https://www.linkedin.com/in/samo-k/" target="_blank">
           <IconButton>
