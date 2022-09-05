@@ -39,7 +39,7 @@ const ResponsiveContainer = ({
   const narrowViewport = useMediaQuery(theme.breakpoints.down('md'));
 
   const contentWrapperSx: SxProps = {
-    maxHeight: '250px',
+    maxHeight: { xs: '400px', md: '600px' },
     overflow: 'auto',
     ...(contentWrapperSxProp ?? {}),
   };

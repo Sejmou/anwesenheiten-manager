@@ -195,9 +195,14 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
         </Button>
       </Stack>
       {attendances && (
-        <>
-          <Card sx={{ py: 2, px: 1 }}>{voiceGroupSelect}</Card>
-          <ResponsiveContainer sx={{ mt: 2 }} title="Anwesenheiten">
+        <Stack sx={{ gap: { md: 2 } }}>
+          <ResponsiveContainer
+            contentWrapperSx={{ px: 1, py: 2 }}
+            title="Stimmgruppe"
+          >
+            {voiceGroupSelect}
+          </ResponsiveContainer>
+          <ResponsiveContainer title="Anwesenheiten">
             <DataGrid
               autoHeight
               columns={attendanceTableCols}
@@ -207,7 +212,7 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
               rowsPerPageOptions={[]}
             />
           </ResponsiveContainer>
-        </>
+        </Stack>
       )}
     </>
   );

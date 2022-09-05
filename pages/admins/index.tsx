@@ -138,7 +138,9 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
       hideFooter
     />
   ) : (
-    'Es gibt keine noch nicht eingelösten Links.'
+    <Typography py={2} px={1}>
+      Es gibt keine noch nicht eingelösten Links.
+    </Typography>
   );
 
   return (

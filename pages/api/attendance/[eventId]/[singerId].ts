@@ -1,4 +1,3 @@
-import { Singer } from '@prisma/client';
 import { getToken } from 'next-auth/jwt';
 import { NextApiHandler, NextApiRequest } from 'next/types';
 import prisma from '../../../../lib/prisma';

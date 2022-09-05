@@ -4,7 +4,7 @@ import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 import { GetStaticProps } from 'next';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
-import { List, ListItemButton, ListItemText } from '@mui/material';
+import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import prisma from '../../lib/prisma';
 import { Event as EventDB } from '@prisma/client';
@@ -50,7 +50,7 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
   const router = useRouter();
 
   const getResponsiveEventList = (events: Event[], title: string) => (
-    <ResponsiveContainer sx={{ my: 1 }} title={title}>
+    <ResponsiveContainer title={title}>
       {events.length > 0 ? (
         <List>
           {events.map((event, i) => (
@@ -79,9 +79,11 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
         Bitte wähle zuerst eine Probe/Veranstaltung, für die du Anwesenheiten
         eintragen möchtest.
       </Typography>
-      {currentEvents &&
-        getResponsiveEventList(currentEvents, 'Aktuelle Termine')}
-      {pastEvents && getResponsiveEventList(pastEvents, 'Vergangene Termine')}
+      <Stack spacing={{ md: 2 }}>
+        {currentEvents &&
+          getResponsiveEventList(currentEvents, 'Aktuelle Termine')}
+        {pastEvents && getResponsiveEventList(pastEvents, 'Vergangene Termine')}
+      </Stack>
     </>
   );
 };
