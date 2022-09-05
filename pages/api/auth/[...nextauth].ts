@@ -53,5 +53,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   adapter: PrismaAdapter(prisma),
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: 'This ioasdf a a fadsöfnerönioöpansdf joke I hatea it',
 };
