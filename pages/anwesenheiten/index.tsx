@@ -2,12 +2,13 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps, GetStaticProps } from 'next';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import prisma from '../../lib/prisma';
 import { Event as EventDB } from '@prisma/client';
+import { serversideAuthGuard } from '../../frontend-utils';
 
 export type Event = Omit<EventDB, 'start' | 'end' | 'lastSyncAt'> & {
   start: string;
@@ -40,6 +41,12 @@ export const getStaticProps: GetStaticProps = async () => {
     revalidate: 10, // enables Incremental Static Site Generation; will trigger update of served static page content if more than 10 seconds passed since last request by some client
   };
 };
+
+// export const getServerSideProps: GetServerSideProps<{}> = async context => {
+//   const redirect = await serversideAuthGuard(context);
+//   if (redirect) return redirect;
+//   return { props: {} };
+// };
 
 type Props = { pastEvents: Event[]; currentEvents: Event[] };
 
