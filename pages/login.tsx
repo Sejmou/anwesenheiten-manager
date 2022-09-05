@@ -19,8 +19,8 @@ const Login: NextPageWithLayout = (props: Props) => {
   const router = useRouter();
   const session = useSession();
 
-  if (typeof window !== 'undefined' && !session) {
-    // this should only run on client, not during SSR/SSG
+  if (typeof window !== 'undefined' && session.status === 'authenticated') {
+    // redirect user away from this page if already authenticated
     // TODO: figure out if this can be done in cleaner way with middleware, i.e. not delivering this page to clients at all if already authenticated and redirecting instead
     router.replace('/');
   }
