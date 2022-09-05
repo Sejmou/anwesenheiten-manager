@@ -3,6 +3,9 @@ import { getAuthenticatedPageLayout } from '../../../components/layout/get-page-
 import { GetServerSideProps } from 'next';
 import prisma from '../../../lib/prisma';
 import { eventFromDBEvent } from '../';
+import Link from 'next/link';
+import { Button, Stack, Typography } from '@mui/material';
+import { Event } from '../';
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const redirect = {
@@ -29,8 +32,20 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 type Props = { event: Event };
 
-const EventAttendance: NextPageWithLayout<Props> = ({}: Props) => {
-  return <div>TODO: add logic for managing event attendance</div>;
+const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack>
+        <Typography variant="h4">{event.summary}</Typography>
+        <Typography variant="subtitle1">{`${
+          event.location ? event.location + ', ' : ''
+        }${event.start}`}</Typography>
+      </Stack>
+      <Button>
+        <Link href="/anwesenheiten">Zurück zur Termin-Übersicht</Link>
+      </Button>
+    </Stack>
+  );
 };
 
 EventAttendance.getLayout = getAuthenticatedPageLayout;
