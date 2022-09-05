@@ -19,7 +19,6 @@ import { Admin } from '../api/admins';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 import CopyableLink from '../../components/CopyableLink';
-import { serversideAuthGuard } from '../../frontend-utils';
 
 type Props = { inviteLinkBaseUrl: string };
 
@@ -183,9 +182,6 @@ Admins.getLayout = getAuthenticatedPageLayout;
 export default Admins;
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
-  const redirect = await serversideAuthGuard(context);
-  if (redirect) return redirect;
-
   const { req } = context;
   if (!req.headers.host) {
     throw Error('Could not retrieve base URL for invites page!');
