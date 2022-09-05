@@ -29,7 +29,7 @@ export function eventFromDBEvent(e: EventDB): Event {
 
 export const getStaticProps: GetStaticProps = async () => {
   const events = (await prisma.event.findMany())
-    .sort((a, b) => a.start.getTime() - b.start.getTime())
+    .sort((a, b) => b.start.getTime() - a.start.getTime())
     .map(e => eventFromDBEvent(e));
 
   const pastEvents = events.filter(e => e.inPast);
