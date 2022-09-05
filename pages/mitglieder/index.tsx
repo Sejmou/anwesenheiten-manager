@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
-import CustomDropzone from '../../components/Dropzone';
+import CustomDropzone from '../../components/CustomDropzone';
 import Papa from 'papaparse';
 import { Button, Stack } from '@mui/material';
 import { VoiceGroup } from '@prisma/client';
@@ -216,7 +216,7 @@ const Members: NextPageWithLayout = () => {
                   text="CSV hochladen (hier klicken oder hineinziehen)"
                   dragText="Einfach loslassen :)"
                   fileTypesAndExtensions={{ 'text/csv': ['.csv'] }}
-                  onFileAdded={handleFiles}
+                  onFilesAdded={handleFiles}
                 />
               ) : (
                 <>

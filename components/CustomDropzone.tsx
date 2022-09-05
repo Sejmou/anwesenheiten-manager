@@ -1,4 +1,4 @@
-import { Box, Button, List, ListItem, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { DropzoneRootProps, useDropzone } from 'react-dropzone';
 
 type Props = {
@@ -8,19 +8,21 @@ type Props = {
   fileTypesAndExtensions?: {
     [mimeType: string]: string[];
   };
-  onFileAdded: (files: File[]) => void;
+  onFilesAdded: (files: File[]) => void;
 } & DropzoneRootProps;
 const CustomDropzone = ({
   text,
   dragText,
   note,
   fileTypesAndExtensions,
-  onFileAdded,
+  onFilesAdded,
 }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: fileTypesAndExtensions,
     useFsAccessApi: false, // needed to make it work on Ubuntu: https://github.com/react-dropzone/react-dropzone/issues/1223
-    onDrop: onFileAdded,
+    onDrop: (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) onFilesAdded(acceptedFiles);
+    },
   });
 
   return (
