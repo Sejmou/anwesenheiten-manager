@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
-import { GetServerSideProps, GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -33,7 +33,7 @@ export const getStaticProps: GetStaticProps = async () => {
     .map(e => eventFromDBEvent(e));
 
   const pastEvents = events.filter(e => e.inPast);
-  const currentEvent = events.filter(e => !e.inPast)[0];
+  const currentEvent = events.filter(e => !e.inPast)[0] ?? null;
 
   return {
     props: { pastEvents, currentEvent },

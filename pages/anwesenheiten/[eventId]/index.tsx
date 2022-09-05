@@ -6,7 +6,6 @@ import { eventFromDBEvent } from '../';
 import Link from 'next/link';
 import {
   Button,
-  Card,
   Checkbox,
   FormControl,
   FormHelperText,
