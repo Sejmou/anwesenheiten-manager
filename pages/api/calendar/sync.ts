@@ -26,7 +26,7 @@ export const calendarUpdateRequestHandler: NextApiHandler = async (
       });
       const apiRes = await calendar.events.list({
         calendarId: choirCalendarId,
-        timeMin: new Date(2022, 9).toISOString(),
+        timeMin: new Date(2022, 2).toISOString(),
         maxResults: 2500, //largest possible value
         singleEvents: true, // important to make sure recurring events are returned as separate events
       });

@@ -12,10 +12,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
-import {
-  getAuthenticatedPageLayout,
-  getNonAuthenticatedPageLayout,
-} from '../components/layout/get-page-layouts';
+import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
 import prisma from '../lib/prisma';
 import { RegistrationData } from './api/register';
 import { NextPageWithLayout } from './_app';

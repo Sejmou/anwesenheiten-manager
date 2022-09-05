@@ -1,9 +1,7 @@
-import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { FormEventHandler, useState } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import {
-  Box,
   Button,
   Card,
   Container,

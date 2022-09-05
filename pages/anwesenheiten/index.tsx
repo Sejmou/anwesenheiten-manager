@@ -33,18 +33,18 @@ export const getStaticProps: GetStaticProps = async () => {
     .map(e => eventFromDBEvent(e));
 
   const pastEvents = events.filter(e => e.inPast);
-  const currentEvents = events.filter(e => !e.inPast);
+  const currentEvent = events.filter(e => !e.inPast)[0];
 
   return {
-    props: { pastEvents, currentEvents },
+    props: { pastEvents, currentEvent },
     revalidate: 10, // enables Incremental Static Site Generation; will trigger update of served static page content if more than 10 seconds passed since last request by some client
   };
 };
 
-type Props = { pastEvents: Event[]; currentEvents: Event[] };
+type Props = { pastEvents: Event[]; currentEvent: Event };
 
 const AttendanceEventOverview: NextPageWithLayout<Props> = ({
-  currentEvents,
+  currentEvent,
   pastEvents,
 }: Props) => {
   const router = useRouter();
@@ -80,8 +80,8 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
         eintragen möchtest.
       </Typography>
       <Stack spacing={{ md: 2 }}>
-        {currentEvents &&
-          getResponsiveEventList(currentEvents, 'Aktuelle Termine')}
+        {currentEvent &&
+          getResponsiveEventList([currentEvent], 'Nächster Termin')}
         {pastEvents && getResponsiveEventList(pastEvents, 'Vergangene Termine')}
       </Stack>
     </>
