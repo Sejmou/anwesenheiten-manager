@@ -2,6 +2,7 @@ import { Button, Link, Stack, Typography } from '@mui/material';
 import {
   DataGrid,
   GridColDef,
+  GridSortModel,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
 import { Event } from '@prisma/client';
@@ -11,6 +12,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { useState } from 'react';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { NextPageWithLayout } from '../_app';
@@ -66,13 +68,27 @@ const Calendar: NextPageWithLayout<Props> = () => {
 
   const lastSync = events?.[0]?.lastSyncAt;
 
+  // needed to make sure events are sorted in ascending order per default
+  const [eventSortModel, setEventSortModel] = useState<GridSortModel>([
+    {
+      field: 'start',
+      sort: 'asc',
+    },
+  ]);
+
   return (
     <>
       {eventsLoading ? (
         'Lade Termine'
       ) : events.length > 0 ? (
         <ResponsiveContainer title="Termine">
-          <DataGrid autoHeight columns={eventTableCols} rows={events} />
+          <DataGrid
+            autoHeight
+            columns={eventTableCols}
+            rows={events}
+            sortModel={eventSortModel}
+            onSortModelChange={newModel => setEventSortModel(newModel)}
+          />
         </ResponsiveContainer>
       ) : (
         ''
