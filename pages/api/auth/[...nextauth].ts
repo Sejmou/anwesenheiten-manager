@@ -53,4 +53,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET,
 };
