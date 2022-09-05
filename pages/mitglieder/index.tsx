@@ -133,11 +133,6 @@ const Members: NextPageWithLayout = () => {
 
   return (
     <Stack spacing={1}>
-      <Typography variant="body1">
-        Auf dieser Seite wird es bald die Möglichkeit geben, Chormitglieder
-        hinzuzufügen und ggf. zu bearbeiten sowie Statistiken etc. einzusehen.
-      </Typography>
-
       <Stack mt={2} spacing={{ xs: 0, md: 2 }}>
         {singersLoading ? (
           'Lade Sänger:innen-Liste...'
