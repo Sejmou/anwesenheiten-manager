@@ -53,5 +53,4 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   adapter: PrismaAdapter(prisma),
-  secret: 'This ioasdf a a fadsöfnerönioöpansdf joke I hatea it',
 };
