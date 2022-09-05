@@ -18,7 +18,6 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/router';
-import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import { signOut, useSession } from 'next-auth/react';
 import TUIcon from './TUIcon';
 
@@ -39,8 +38,9 @@ const Header = ({ sx }: Props) => {
       href: '/anwesenheiten',
       text: 'Anwesenheiten',
     },
-    { href: '/termine', text: 'Termine' },
+    { href: '/statistiken', text: 'Statistiken' },
     { href: '/mitglieder', text: 'Mitglieder' },
+    { href: '/termine', text: 'Termine' },
     { href: '/admins', text: 'Admins' },
   ];
 

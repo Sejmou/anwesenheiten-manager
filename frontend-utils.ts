@@ -1,12 +1,5 @@
-import {
-  GetServerSideProps,
-  GetServerSidePropsContext,
-  GetServerSidePropsResult,
-  PreviewData,
-  Redirect,
-} from 'next';
-import { getSession } from 'next-auth/react';
-import { ParsedUrlQuery } from 'querystring';
+import { GridValueFormatterParams } from '@mui/x-data-grid';
+import { VoiceGroup } from '@prisma/client';
 
 export const VoiceGroupToDescriptionString: { [voiceGroup: string]: string } = {
   S1: 'Sopran 1',
@@ -21,3 +14,10 @@ export const VoiceGroupToDescriptionString: { [voiceGroup: string]: string } = {
   B2: 'Bass 2',
   D: 'Dirigent',
 };
+
+export function voiceGroupGridValueFormatter(
+  params: GridValueFormatterParams<VoiceGroup>
+) {
+  if (!params.value) return '-';
+  return VoiceGroupToDescriptionString[params.value] ?? '-';
+}
