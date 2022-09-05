@@ -79,6 +79,7 @@ model Singer {
   email         String?       @unique
   createdAt     DateTime      @default(now())
   voiceGroup    VoiceGroup
+  attendances   EventAttendance[]
 }
 
 enum VoiceGroup {
@@ -103,4 +104,13 @@ model Event {
   lastSyncAt    DateTime
   start         DateTime
   end           DateTime
+  attendances   EventAttendance[]
+}
+
+model EventAttendance {
+  @@id([singerId, eventId])
+  singer    Singer    @relation(fields: [singerId], references: [id])
+  event     Event     @relation(fields: [eventId], references: [id])
+  singerId  String
+  eventId   String
 }
