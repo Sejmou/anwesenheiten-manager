@@ -33,7 +33,7 @@ export const getStaticProps: GetStaticProps = async () => {
     .map(e => eventFromDBEvent(e));
 
   const pastEvents = events.filter(e => e.inPast);
-  const currentEvent = events.filter(e => !e.inPast)[0] ?? null;
+  const currentEvent = events.filter(e => !e.inPast).at(-1) ?? null;
 
   return {
     props: { pastEvents, currentEvent },
