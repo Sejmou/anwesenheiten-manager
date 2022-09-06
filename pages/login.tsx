@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
 import type { NextPageWithLayout } from './_app';
+import PageHead from 'components/PageHead';
 
 type Props = {};
 const Login: NextPageWithLayout = (props: Props) => {
@@ -49,36 +50,42 @@ const Login: NextPageWithLayout = (props: Props) => {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    >
-      <Card sx={{ p: 2, width: '100%' }}>
-        <Stack spacing={1}>
-          <Typography variant="h4">Login</Typography>
-          <Stack
-            width="100%"
-            spacing={2}
-            component="form"
-            onSubmit={submitHandler}
-          >
-            <TextField
-              label="E-Mail"
-              name="email"
-              type="email"
-              placeholder="deine.email@tuwien.ac.at"
-            />
-            <TextField label="Passwort" name="password" type="password" />
-            {error && (
-              <Typography variant="subtitle1">
-                Login war nicht erfolgreich. Stimmen Email und Passwort?
-              </Typography>
-            )}
-            <Button type="submit">Einloggen</Button>
+    <>
+      <PageHead
+        title="Login"
+        description="Login für TU Wien Chor AdministratorInnen"
+      />
+      <Container
+        maxWidth="sm"
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Card sx={{ p: 2, width: '100%' }}>
+          <Stack spacing={1}>
+            <Typography variant="h4">Login</Typography>
+            <Stack
+              width="100%"
+              spacing={2}
+              component="form"
+              onSubmit={submitHandler}
+            >
+              <TextField
+                label="E-Mail"
+                name="email"
+                type="email"
+                placeholder="deine.email@tuwien.ac.at"
+              />
+              <TextField label="Passwort" name="password" type="password" />
+              {error && (
+                <Typography variant="subtitle1">
+                  Login war nicht erfolgreich. Stimmen Email und Passwort?
+                </Typography>
+              )}
+              <Button type="submit">Einloggen</Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </>
   );
 };
 

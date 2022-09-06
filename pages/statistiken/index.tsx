@@ -6,6 +6,7 @@ import {
   Singer as SingerDB,
   VoiceGroup,
 } from '@prisma/client';
+import PageHead from 'components/PageHead';
 import { voiceGroupGridValueFormatter } from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';
@@ -90,70 +91,73 @@ const Stats: NextPageWithLayout<Props> = ({
   });
 
   return (
-    <Stack>
-      <Typography>
-        Hier werden verschiedene Statistiken über den Chor und die
-        Probenanwesenheiten gesammelt.
-      </Typography>
+    <>
+      <PageHead title="Statistiken" />
       <Stack>
-        <Typography variant="h3">Probenanwesenheiten</Typography>
         <Typography>
-          Insgesamt gab es bisher {events.length} Proben, für die Anwesenheiten
-          eingetragen wurden.
+          Hier werden verschiedene Statistiken über den Chor und die
+          Probenanwesenheiten gesammelt.
         </Typography>
-        <Stack spacing={{ md: 1 }}>
-          <ResponsiveContainer title="Fehlproben-Übersicht">
+        <Stack>
+          <Typography variant="h3">Probenanwesenheiten</Typography>
+          <Typography>
+            Insgesamt gab es bisher {events.length} Proben, für die
+            Anwesenheiten eingetragen wurden.
+          </Typography>
+          <Stack spacing={{ md: 1 }}>
+            <ResponsiveContainer title="Fehlproben-Übersicht">
+              <DataGrid
+                autoHeight
+                columns={[
+                  { field: 'firstName', headerName: 'Vorname', flex: 1 },
+                  { field: 'lastName', headerName: 'Nachname', flex: 1 },
+                  {
+                    field: 'voiceGroup',
+                    headerName: 'Stimmgruppe',
+                    valueFormatter: voiceGroupGridValueFormatter,
+                    flex: 1,
+                  },
+                  { field: 'absenceCount', headerName: 'Fehlproben', flex: 1 },
+                ]}
+                rows={singersAttendanceRows}
+                hideFooter
+              />
+            </ResponsiveContainer>
+            <ResponsiveContainer title='Proben-"Besucherzahlen"'>
+              <DataGrid
+                autoHeight
+                columns={[
+                  { field: 'summary', headerName: 'Name/Anlass', flex: 1 },
+                  { field: 'start', headerName: 'Datum', flex: 1 },
+                  { field: 'count', headerName: 'Anwesend', flex: 0.5 },
+                ]}
+                rows={eventAttendanceRows}
+                hideFooter
+              />
+            </ResponsiveContainer>
+          </Stack>
+          <Typography variant="h3" mt={2}>
+            Allgemeines
+          </Typography>
+          <ResponsiveContainer title="SängerInnen nach Stimmgruppen">
             <DataGrid
               autoHeight
               columns={[
-                { field: 'firstName', headerName: 'Vorname', flex: 1 },
-                { field: 'lastName', headerName: 'Nachname', flex: 1 },
                 {
                   field: 'voiceGroup',
                   headerName: 'Stimmgruppe',
                   valueFormatter: voiceGroupGridValueFormatter,
                   flex: 1,
                 },
-                { field: 'absenceCount', headerName: 'Fehlproben', flex: 1 },
+                { field: 'count', headerName: '# SängerInnen', flex: 1 },
               ]}
-              rows={singersAttendanceRows}
-              hideFooter
-            />
-          </ResponsiveContainer>
-          <ResponsiveContainer title='Proben-"Besucherzahlen"'>
-            <DataGrid
-              autoHeight
-              columns={[
-                { field: 'summary', headerName: 'Name/Anlass', flex: 1 },
-                { field: 'start', headerName: 'Datum', flex: 1 },
-                { field: 'count', headerName: 'Anwesend', flex: 0.5 },
-              ]}
-              rows={eventAttendanceRows}
+              rows={singersByVoiceGroupRows}
               hideFooter
             />
           </ResponsiveContainer>
         </Stack>
-        <Typography variant="h3" mt={2}>
-          Allgemeines
-        </Typography>
-        <ResponsiveContainer title="SängerInnen nach Stimmgruppen">
-          <DataGrid
-            autoHeight
-            columns={[
-              {
-                field: 'voiceGroup',
-                headerName: 'Stimmgruppe',
-                valueFormatter: voiceGroupGridValueFormatter,
-                flex: 1,
-              },
-              { field: 'count', headerName: '# SängerInnen', flex: 1 },
-            ]}
-            rows={singersByVoiceGroupRows}
-            hideFooter
-          />
-        </ResponsiveContainer>
       </Stack>
-    </Stack>
+    </>
   );
 };
 

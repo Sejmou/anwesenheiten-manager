@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import PageHead from 'components/PageHead';
 import { GetServerSideProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -74,43 +75,46 @@ const Register: NextPageWithLayout<Props> = ({ inviteToken }: Props) => {
   };
 
   return (
-    <Container
-      maxWidth="sm"
-      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-    >
-      <Card sx={{ p: 2, width: '100%' }}>
-        <Stack spacing={1}>
-          <Typography variant="h4">Registrierung</Typography>
-          <Stack
-            width="100%"
-            spacing={2}
-            component="form"
-            onSubmit={submitHandler}
-          >
-            <TextField label="Vorname" name="firstName" />
-            <TextField label="Nachname" name="lastName" />
-            <TextField
-              label="E-Mail"
-              name="email"
-              type="email"
-              placeholder="deine.email@tuwien.ac.at"
-            />
-            <TextField label="Passwort" type="password" name="password" />
-            {error && (
-              <Typography variant="subtitle1">
-                Registrierung fehlgeschlagen :/
-              </Typography>
-            )}
-            {success && (
-              <Typography variant="subtitle1">
-                Registrierung erfolgreich! Du wirst in Kürze weitergeleitet...
-              </Typography>
-            )}
-            <Button type="submit">Registrieren</Button>
+    <>
+      <PageHead title="Registrierung" />
+      <Container
+        maxWidth="sm"
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Card sx={{ p: 2, width: '100%' }}>
+          <Stack spacing={1}>
+            <Typography variant="h4">Registrierung</Typography>
+            <Stack
+              width="100%"
+              spacing={2}
+              component="form"
+              onSubmit={submitHandler}
+            >
+              <TextField label="Vorname" name="firstName" />
+              <TextField label="Nachname" name="lastName" />
+              <TextField
+                label="E-Mail"
+                name="email"
+                type="email"
+                placeholder="deine.email@tuwien.ac.at"
+              />
+              <TextField label="Passwort" type="password" name="password" />
+              {error && (
+                <Typography variant="subtitle1">
+                  Registrierung fehlgeschlagen :/
+                </Typography>
+              )}
+              {success && (
+                <Typography variant="subtitle1">
+                  Registrierung erfolgreich! Du wirst in Kürze weitergeleitet...
+                </Typography>
+              )}
+              <Button type="submit">Registrieren</Button>
+            </Stack>
           </Stack>
-        </Stack>
-      </Card>
-    </Container>
+        </Card>
+      </Container>
+    </>
   );
 };
 

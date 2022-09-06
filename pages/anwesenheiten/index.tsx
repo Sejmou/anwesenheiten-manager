@@ -8,6 +8,7 @@ import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import prisma from '../../lib/prisma';
 import { Event as EventDB } from '@prisma/client';
+import PageHead from 'components/PageHead';
 
 export type Event = Omit<EventDB, 'start' | 'end' | 'lastSyncAt'> & {
   start: string;
@@ -75,6 +76,7 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
 
   return (
     <>
+      <PageHead title="Anwesenheitsliste" />
       <Typography>
         Bitte wähle zuerst einen Termin, für den du Anwesenheiten eintragen
         möchtest.

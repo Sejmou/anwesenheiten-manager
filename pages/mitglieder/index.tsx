@@ -20,6 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import PageHead from 'components/PageHead';
 
 const parsePromise = function (file: File, header: boolean) {
   return new Promise(function (complete, error) {
@@ -118,125 +119,128 @@ const Members: NextPageWithLayout = () => {
   const [csvDataImported, setCsvDataImported] = useState(false);
 
   return (
-    <Stack spacing={1}>
-      <Stack mt={2} spacing={{ xs: 0, md: 2 }}>
-        {singersLoading ? (
-          'Lade Sänger:innen-Liste...'
-        ) : singers.length === 0 ? (
-          <Stack>
-            <Typography variant="h4">Chor-Mitglieder</Typography>
-            <Typography>
-              Aktuell sind noch keine Mitglieder in der Datenbank eingetragen.
-            </Typography>
-          </Stack>
-        ) : (
-          <ResponsiveContainer
-            title="Chor-Mitglieder"
-            description="Folgende Personen sind derzeit als Chor-Mitglieder vermerkt:"
-          >
-            <DataGrid autoHeight columns={singerTableCols} rows={singers} />
-          </ResponsiveContainer>
-        )}
-        <Stack>
-          <Typography variant="h4">CSV-Import</Typography>
-          {csvDataImported ? (
+    <>
+      <PageHead title="Mitglieder" />
+      <Stack spacing={1}>
+        <Stack mt={2} spacing={{ xs: 0, md: 2 }}>
+          {singersLoading ? (
+            'Lade Sänger:innen-Liste...'
+          ) : singers.length === 0 ? (
             <Stack>
-              <Typography>Daten erfolgreich importiert!</Typography>
-              <Stack alignItems="center">
-                <Button
-                  variant="contained"
-                  onClick={() => setCsvDataImported(false)}
-                >
-                  Weitere Daten importieren
-                </Button>
-              </Stack>
+              <Typography variant="h4">Chor-Mitglieder</Typography>
+              <Typography>
+                Aktuell sind noch keine Mitglieder in der Datenbank eingetragen.
+              </Typography>
             </Stack>
           ) : (
-            <>
-              <Stack>
-                <Typography>
-                  Hier kann ein CSV-File mit den Namen und Stimmgruppen aller
-                  Chormitglieder hochgeladen werden.
-                </Typography>
-                <Typography>
-                  Das CSV muss 3 Spalten (Vorname, Nachname, Stimmgruppe),
-                  getrennt durch Kommas enthalten.
-                </Typography>
-                <Typography mt={1}>
-                  Für die Stimmgruppen-Spalte werden nur folgende Werte
-                  akzeptiert:
-                </Typography>
-                <ul>
-                  {[
-                    ['S1', 'Sopran 1'],
-                    ['S2', 'Sopran 2'],
-                    ['S2/M', 'Sopran 2/Mezzo'],
-                    ['A1', 'Alt 1'],
-                    ['A1/M', 'Alt 1/Mezzo'],
-                    ['A2', 'Alt 2'],
-                    ['T1', 'Tenor 1'],
-                    ['T2', 'Tenor 2'],
-                    ['B1', 'Bass 1'],
-                    ['B2', 'Bass 2'],
-                    ['D', 'Dirigent'],
-                  ].map((row, i) => (
-                    <li key={i}>
-                      {row[0]} ({row[1]})
-                    </li>
-                  ))}
-                </ul>
-                <Typography>
-                  Zeilen mit fehlendem Vor-/Nachnamen oder ungültiger
-                  Stimmgruppe werden herausgefiltert.
-                </Typography>
-              </Stack>
-              {importedSingerTableRows.length === 0 ? (
-                <CustomDropzone
-                  text="CSV hochladen (hier klicken oder hineinziehen)"
-                  dragText="Einfach loslassen :)"
-                  fileTypesAndExtensions={{ 'text/csv': ['.csv'] }}
-                  onFilesAdded={handleFiles}
-                />
-              ) : (
-                <>
-                  <ResponsiveContainer
-                    title="Importierte Zeilen"
-                    contentWrapperSx={{ height: 300 }}
-                  >
-                    <DataGrid
-                      columns={singerTableCols}
-                      rows={importedSingerTableRows}
-                      hideFooter
-                    />
-                  </ResponsiveContainer>
-                  <Stack alignItems="center">
-                    <Typography>
-                      Es wurden {importedSingerTableRows.length} Zeilen
-                      importiert.
-                    </Typography>
-                    <Typography>
-                      Stimmen die Daten? Wenn ja, dann einfach
-                    </Typography>
-                    <Stack alignItems="center" my={1}>
-                      <Button
-                        variant="contained"
-                        onClick={importConfirmHandler}
-                      >
-                        Bestätigen
-                      </Button>
-                    </Stack>
-                    <Typography textAlign="center" variant="body2">
-                      (Mit Klick auf den Button werden die Daten in die
-                      Datenbank geschrieben.)
-                    </Typography>
-                  </Stack>
-                </>
-              )}
-            </>
+            <ResponsiveContainer
+              title="Chor-Mitglieder"
+              description="Folgende Personen sind derzeit als Chor-Mitglieder vermerkt:"
+            >
+              <DataGrid autoHeight columns={singerTableCols} rows={singers} />
+            </ResponsiveContainer>
           )}
+          <Stack>
+            <Typography variant="h4">CSV-Import</Typography>
+            {csvDataImported ? (
+              <Stack>
+                <Typography>Daten erfolgreich importiert!</Typography>
+                <Stack alignItems="center">
+                  <Button
+                    variant="contained"
+                    onClick={() => setCsvDataImported(false)}
+                  >
+                    Weitere Daten importieren
+                  </Button>
+                </Stack>
+              </Stack>
+            ) : (
+              <>
+                <Stack>
+                  <Typography>
+                    Hier kann ein CSV-File mit den Namen und Stimmgruppen aller
+                    Chormitglieder hochgeladen werden.
+                  </Typography>
+                  <Typography>
+                    Das CSV muss 3 Spalten (Vorname, Nachname, Stimmgruppe),
+                    getrennt durch Kommas enthalten.
+                  </Typography>
+                  <Typography mt={1}>
+                    Für die Stimmgruppen-Spalte werden nur folgende Werte
+                    akzeptiert:
+                  </Typography>
+                  <ul>
+                    {[
+                      ['S1', 'Sopran 1'],
+                      ['S2', 'Sopran 2'],
+                      ['S2/M', 'Sopran 2/Mezzo'],
+                      ['A1', 'Alt 1'],
+                      ['A1/M', 'Alt 1/Mezzo'],
+                      ['A2', 'Alt 2'],
+                      ['T1', 'Tenor 1'],
+                      ['T2', 'Tenor 2'],
+                      ['B1', 'Bass 1'],
+                      ['B2', 'Bass 2'],
+                      ['D', 'Dirigent'],
+                    ].map((row, i) => (
+                      <li key={i}>
+                        {row[0]} ({row[1]})
+                      </li>
+                    ))}
+                  </ul>
+                  <Typography>
+                    Zeilen mit fehlendem Vor-/Nachnamen oder ungültiger
+                    Stimmgruppe werden herausgefiltert.
+                  </Typography>
+                </Stack>
+                {importedSingerTableRows.length === 0 ? (
+                  <CustomDropzone
+                    text="CSV hochladen (hier klicken oder hineinziehen)"
+                    dragText="Einfach loslassen :)"
+                    fileTypesAndExtensions={{ 'text/csv': ['.csv'] }}
+                    onFilesAdded={handleFiles}
+                  />
+                ) : (
+                  <>
+                    <ResponsiveContainer
+                      title="Importierte Zeilen"
+                      contentWrapperSx={{ height: 300 }}
+                    >
+                      <DataGrid
+                        columns={singerTableCols}
+                        rows={importedSingerTableRows}
+                        hideFooter
+                      />
+                    </ResponsiveContainer>
+                    <Stack alignItems="center">
+                      <Typography>
+                        Es wurden {importedSingerTableRows.length} Zeilen
+                        importiert.
+                      </Typography>
+                      <Typography>
+                        Stimmen die Daten? Wenn ja, dann einfach
+                      </Typography>
+                      <Stack alignItems="center" my={1}>
+                        <Button
+                          variant="contained"
+                          onClick={importConfirmHandler}
+                        >
+                          Bestätigen
+                        </Button>
+                      </Stack>
+                      <Typography textAlign="center" variant="body2">
+                        (Mit Klick auf den Button werden die Daten in die
+                        Datenbank geschrieben.)
+                      </Typography>
+                    </Stack>
+                  </>
+                )}
+              </>
+            )}
+          </Stack>
         </Stack>
       </Stack>
-    </Stack>
+    </>
   );
 };
 

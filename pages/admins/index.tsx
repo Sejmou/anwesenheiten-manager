@@ -19,6 +19,8 @@ import { Admin } from '../api/admins';
 import { NextPageWithLayout } from '../_app';
 import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
 import CopyableLink from '../../components/CopyableLink';
+import Head from 'next/head';
+import PageHead from 'components/PageHead';
 
 type Props = { inviteLinkBaseUrl: string };
 
@@ -145,6 +147,7 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
 
   return (
     <>
+      <PageHead title="Admins" />
       <Stack>
         <Typography variant="body1">
           Diese Seite dient dem Verwalten der Admins für diese Website.
