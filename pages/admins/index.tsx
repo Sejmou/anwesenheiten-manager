@@ -28,7 +28,7 @@ const adminTableCols: GridColDef[] = [
   { field: 'email', headerName: 'Email', flex: 1 },
   {
     field: 'createdAt',
-    headerName: 'Beitrittsdatum',
+    headerName: 'beigetreten am',
     flex: 1,
     valueFormatter: (params: GridValueFormatterParams<Date>) => {
       if (params.value == null) {
