@@ -76,8 +76,8 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
   return (
     <>
       <Typography>
-        Bitte wähle zuerst eine Probe/Veranstaltung, für die du Anwesenheiten
-        eintragen möchtest.
+        Bitte wähle zuerst einen Termin, für den du Anwesenheiten eintragen
+        möchtest.
       </Typography>
       <Stack spacing={{ md: 2 }}>
         {currentEvent &&

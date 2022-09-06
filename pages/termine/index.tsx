@@ -95,8 +95,7 @@ const Calendar: NextPageWithLayout<Props> = () => {
       )}
       <Stack my={2} spacing={1}>
         <Typography>
-          Der Chorproben-Anwesenheitsmanager verwendet Termine aus dem
-          öffentlichen{' '}
+          Das TU-Chor-Admin-Dashboard verwendet Termine aus dem öffentlichen{' '}
           <Link
             href="https://calendar.google.com/calendar/embed?src=qshfu0pshf6u7emr0f7pn80a3c%40group.calendar.google.com&ctz=Europe%2FVienna"
             target="_blank"

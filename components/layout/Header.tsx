@@ -36,7 +36,7 @@ const Header = ({ sx }: Props) => {
   const links: { href: string; text: string }[] = [
     {
       href: '/anwesenheiten',
-      text: 'Anwesenheiten',
+      text: 'Anwesenheitsliste',
     },
     { href: '/statistiken', text: 'Statistiken' },
     { href: '/mitglieder', text: 'Mitglieder' },
@@ -74,7 +74,7 @@ const Header = ({ sx }: Props) => {
               router.push('/');
             }}
           >
-            Chor-Anwesenheitsmanager
+            Chor-Dashboard
           </Button>
           {matches ? (
             <Box>
