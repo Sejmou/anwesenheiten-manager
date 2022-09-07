@@ -10,6 +10,7 @@ import {
 import PageHead from 'components/PageHead';
 import { GetServerSideProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
@@ -110,6 +111,18 @@ const Register: NextPageWithLayout<Props> = ({ inviteToken }: Props) => {
                 </Typography>
               )}
               <Button type="submit">Registrieren</Button>
+              <Stack direction="row">
+                <Typography
+                  variant="caption"
+                  display="flex"
+                  alignItems="center"
+                >
+                  Bereits registriert?
+                </Typography>
+                <Link href="/login">
+                  <Button size="small">Zum Login</Button>
+                </Link>
+              </Stack>
             </Stack>
           </Stack>
         </Card>

@@ -12,9 +12,12 @@ import {
 import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
 import type { NextPageWithLayout } from './_app';
 import PageHead from 'components/PageHead';
+import { GetServerSideProps } from 'next';
+import prisma from 'lib/prisma';
+import Link from 'next/link';
 
-type Props = {};
-const Login: NextPageWithLayout = (props: Props) => {
+type Props = { noUsersInDB: boolean };
+const Login: NextPageWithLayout<Props> = ({ noUsersInDB }: Props) => {
   const router = useRouter();
   const session = useSession();
 
@@ -81,6 +84,20 @@ const Login: NextPageWithLayout = (props: Props) => {
                 </Typography>
               )}
               <Button type="submit">Einloggen</Button>
+              {noUsersInDB && (
+                <Stack direction="row">
+                  <Typography
+                    variant="caption"
+                    display="flex"
+                    alignItems="center"
+                  >
+                    Noch nicht registriert?
+                  </Typography>
+                  <Link href="/register">
+                    <Button size="small">Registrieren</Button>
+                  </Link>
+                </Stack>
+              )}
             </Stack>
           </Stack>
         </Card>
@@ -90,5 +107,26 @@ const Login: NextPageWithLayout = (props: Props) => {
 };
 
 Login.getLayout = getNonAuthenticatedPageLayout;
+
+export const getServerSideProps: GetServerSideProps<Props> = async context => {
+  try {
+    const userCount = await prisma.user.count();
+    return {
+      props: {
+        noUsersInDB: userCount == 0,
+      },
+    };
+  } catch (error) {
+    console.error(
+      'An error occurred while accessing DB before generating login page',
+      error
+    );
+    return {
+      props: {
+        noUsersInDB: false,
+      },
+    };
+  }
+};
 
 export default Login;
