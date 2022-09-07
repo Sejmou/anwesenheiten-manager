@@ -1,4 +1,5 @@
-import { Button, Link, Stack, Typography } from '@mui/material';
+import { Link, Stack, Typography } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import {
   DataGrid,
   GridColDef,
@@ -67,6 +68,8 @@ const Calendar: NextPageWithLayout<Props> = () => {
     },
   });
 
+  const { isLoading: syncInProgress } = calendarSyncMutation;
+
   const lastSync = events?.[0]?.lastSyncAt;
 
   // needed to make sure events are sorted in ascending order per default
@@ -123,12 +126,13 @@ const Calendar: NextPageWithLayout<Props> = () => {
           )}
         </Stack>
         <Stack my={1} alignItems="center">
-          <Button
+          <LoadingButton
             variant="contained"
             onClick={() => calendarSyncMutation.mutate()}
+            loading={syncInProgress}
           >
             Mit Google Kalender synchronisieren
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
     </>
