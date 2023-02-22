@@ -20,6 +20,7 @@ type Props = {
   contentWrapperSx?: SxProps;
   contentWrapperSxNarrow?: SxProps;
   contentWrapperSxWide?: SxProps;
+  heightEqualsMaxHeight?: boolean;
 };
 
 /**
@@ -36,12 +37,14 @@ const ResponsiveContainer = ({
   contentWrapperSx: contentWrapperSxProp,
   contentWrapperSxNarrow: contentWrapperSxNarrowProp,
   contentWrapperSxWide: contentWrapperSxWideProp,
+  heightEqualsMaxHeight,
 }: Props) => {
   const theme = useTheme();
   const narrowViewport = useMediaQuery(theme.breakpoints.down('md'));
 
   const contentWrapperSx: SxProps = {
     maxHeight: { xs: '400px', md: '600px' },
+    height: heightEqualsMaxHeight ? { xs: '400px', md: '600px' } : undefined,
     overflow: 'auto',
     ...(contentWrapperSxProp ?? {}),
   };

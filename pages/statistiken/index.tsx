@@ -105,9 +105,11 @@ const Stats: NextPageWithLayout<Props> = ({
             Anwesenheiten eingetragen wurden.
           </Typography>
           <Stack spacing={{ md: 1 }}>
-            <ResponsiveContainer title="Fehlproben-Übersicht">
+            <ResponsiveContainer
+              title="Fehlproben-Übersicht"
+              heightEqualsMaxHeight
+            >
               <DataGrid
-                autoHeight
                 columns={[
                   { field: 'firstName', headerName: 'Vorname', flex: 1 },
                   { field: 'lastName', headerName: 'Nachname', flex: 1 },
@@ -123,9 +125,11 @@ const Stats: NextPageWithLayout<Props> = ({
                 hideFooter
               />
             </ResponsiveContainer>
-            <ResponsiveContainer title='Proben-"Besucherzahlen"'>
+            <ResponsiveContainer
+              title='Proben-"Besucherzahlen"'
+              heightEqualsMaxHeight
+            >
               <DataGrid
-                autoHeight
                 columns={[
                   { field: 'summary', headerName: 'Name/Anlass', flex: 1 },
                   { field: 'start', headerName: 'Datum', flex: 1 },

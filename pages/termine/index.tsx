@@ -86,9 +86,8 @@ const Calendar: NextPageWithLayout<Props> = () => {
       {eventsLoading ? (
         'Lade Termine'
       ) : events.length > 0 ? (
-        <ResponsiveContainer title="Termine">
+        <ResponsiveContainer title="Termine" heightEqualsMaxHeight>
           <DataGrid
-            autoHeight
             columns={eventTableCols}
             rows={events}
             sortModel={eventSortModel}
