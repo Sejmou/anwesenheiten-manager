@@ -6,6 +6,7 @@ import { eventFromDBEvent } from '../';
 import Link from 'next/link';
 import {
   Button,
+  Card,
   Checkbox,
   FormControl,
   FormHelperText,
@@ -92,26 +93,33 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
   const [voiceGroupFilter, setVoiceGroupFilter] = useState<string>('');
 
   const voiceGroupSelect = (
-    <FormControl fullWidth>
-      <InputLabel id="voicegroup-select">Stimmgruppe</InputLabel>
-      <Select
-        labelId="voicegorup-select-label"
-        id="voicegroup-select"
-        value={voiceGroupFilter}
-        label="Stimmgruppe"
-        onChange={ev => setVoiceGroupFilter(ev.target.value as string)}
-      >
-        <MenuItem value="all">Alle Stimmgruppen</MenuItem>
-        {Object.keys(VoiceGroup).map((val, i) => {
-          return (
-            <MenuItem key={i} value={val}>
-              {VoiceGroupToDescriptionString[val]}
-            </MenuItem>
-          );
-        })}
-      </Select>
-      <FormHelperText>Filtere nach Stimmgruppe</FormHelperText>
-    </FormControl>
+    <Card
+      style={{
+        padding: 8,
+        paddingTop: 16,
+      }}
+    >
+      <FormControl fullWidth>
+        <InputLabel id="voicegroup-select">Stimmgruppe</InputLabel>
+        <Select
+          labelId="voicegorup-select-label"
+          id="voicegroup-select"
+          value={voiceGroupFilter}
+          label="Stimmgruppe"
+          onChange={ev => setVoiceGroupFilter(ev.target.value as string)}
+        >
+          <MenuItem value="all">Alle Stimmgruppen</MenuItem>
+          {Object.keys(VoiceGroup).map((val, i) => {
+            return (
+              <MenuItem key={i} value={val}>
+                {VoiceGroupToDescriptionString[val]}
+              </MenuItem>
+            );
+          })}
+        </Select>
+        <FormHelperText>Filtere nach Stimmgruppe</FormHelperText>
+      </FormControl>
+    </Card>
   );
 
   const filterModel: GridFilterModel = {
@@ -193,13 +201,8 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
         </Button>
       </Stack>
       {attendances && (
-        <Stack sx={{ gap: { md: 2 } }}>
-          <ResponsiveContainer
-            contentWrapperSx={{ px: 1, py: 2 }}
-            title="Stimmgruppe"
-          >
-            {voiceGroupSelect}
-          </ResponsiveContainer>
+        <Stack sx={{ gap: 2 }}>
+          {voiceGroupSelect}
           <ResponsiveContainer title="Anwesenheiten">
             <DataGrid
               autoHeight
