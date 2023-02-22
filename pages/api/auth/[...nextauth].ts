@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
         });
         if (!user || !user.passwordHash) return null; // user not yet registered or not yet registered with password
 
-        console.log(user);
+        // console.log(user);
 
         const passwordCorrect = await bcrypt.compare(
           credentials.password,

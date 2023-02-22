@@ -9,6 +9,7 @@ const NonAuthHeader = (props: Props) => {
         <Container maxWidth="xs">
           <Image
             src="/tu-chor-improv-admin-logo_breit.png"
+            alt="TU CHOR Admin Logo"
             layout="responsive"
             width={1064}
             height={358}

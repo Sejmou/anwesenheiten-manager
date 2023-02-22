@@ -1,12 +1,11 @@
-# Anwesenheiten-Manager
-
-TODO: description
+# TU Wien Chor Dashboard
+This is a prototype for an application for administrative tasks concerning the university choir of TU Wien.
 
 ## Installing the project locally
 
 This guide only explains how to do this on Ubuntu. Things might be different for Windows or MacOS.
 
-1. Make sure Node and yarn are installed on the machine. This should be as simple as running `sudo apt update && sudo apt install nodejs && sudo apt install yarn`.
+1. Make sure Node and yarn are installed on the machine. This should be as simple as running `sudo apt update && sudo apt install nodejs && sudo apt install yarn`. IMPORTANT: Prisma currently crashes on Debian systems when using Node 18 and PostgreSQL (https://github.com/prisma/prisma/issues/10649). As this project also uses PostgreSQL, a downgrade to Node version 16 is the easiest fix. You can use the [Node Version Manager](https://github.com/nvm-sh/nvm) to install multiple versions of Node on the same machine and switch between them as needed.
 2. Run `yarn`. This will install all the Node modules used by this NextJS project.
 
 ### Local Test Database Config (Ubuntu)

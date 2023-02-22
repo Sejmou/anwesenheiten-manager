@@ -1,14 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
-  referentialIntegrity = "prisma"
 }
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity"]
 }
 
 model Account {
@@ -41,13 +39,13 @@ model Session {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String       @id @default(cuid())
   firstName     String
   lastName      String
-  email         String?       @unique
+  email         String?      @unique
   passwordHash  String?
   emailVerified DateTime?
-  createdAt     DateTime      @default(now())
+  createdAt     DateTime     @default(now())
   image         String?
   accounts      Account[]
   sessions      Session[]
@@ -75,13 +73,13 @@ model InviteToken {
 }
 
 model Singer {
-  id            String        @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String?       @unique
-  createdAt     DateTime      @default(now())
-  voiceGroup    VoiceGroup
-  attendances   EventAttendance[]
+  id          String            @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?           @unique
+  createdAt   DateTime          @default(now())
+  voiceGroup  VoiceGroup
+  attendances EventAttendance[]
 }
 
 enum VoiceGroup {
@@ -99,20 +97,21 @@ enum VoiceGroup {
 }
 
 model Event {
-  id            String        @id
-  summary       String
-  description   String?
-  location      String?
-  lastSyncAt    DateTime
-  start         DateTime
-  end           DateTime
-  attendances   EventAttendance[]
+  id          String            @id
+  summary     String
+  description String?
+  location    String?
+  lastSyncAt  DateTime
+  start       DateTime
+  end         DateTime
+  attendances EventAttendance[]
 }
 
 model EventAttendance {
+  singer   Singer @relation(fields: [singerId], references: [id])
+  event    Event  @relation(fields: [eventId], references: [id])
+  singerId String
+  eventId  String
+
   @@id([singerId, eventId])
-  singer    Singer    @relation(fields: [singerId], references: [id])
-  event     Event     @relation(fields: [eventId], references: [id])
-  singerId  String
-  eventId   String
 }
