@@ -2,7 +2,7 @@
 This is a prototype for an application for administrative tasks concerning the university choir of TU Wien.
 
 ## Live demo with dummy data
-Go to [https://tuwien-chor-dashboard.vercel.app/]() and log in with `test.admin@example.com` and password `asdfasdf`.
+Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
 
 ## Installing the project locally
 
