@@ -7,14 +7,7 @@ export const calendarUpstashUpdateRequestHandler: NextApiHandler = async (
   res: NextApiResponse
 ) => {
   try {
-    const { method } = req;
-    if (method === 'GET') {
-      await syncCalendar();
-      res.end();
-    } else {
-      throw Error('HTTP method ' + method + ' not supported by this endpoint!');
-    }
-
+    await syncCalendar();
     res.end();
   } catch (error) {
     console.error(error);
