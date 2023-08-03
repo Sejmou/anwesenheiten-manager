@@ -1,12 +1,12 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
-import { NextPageWithLayout } from '../_app';
-import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
+import { NextPageWithLayout } from 'pages/_app';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import { GetStaticProps } from 'next';
-import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
+import ResponsiveContainer from 'components/layout/ResponsiveContainer';
 import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
-import prisma from '../../lib/prisma';
+import prisma from 'lib/prisma';
 import { Event as EventDB } from '@prisma/client';
 import PageHead from 'components/PageHead';
 

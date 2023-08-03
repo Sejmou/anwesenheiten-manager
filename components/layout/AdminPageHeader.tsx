@@ -36,13 +36,14 @@ const Header = ({ sx }: Props) => {
   const links: { href: string; text: string }[] = [
     {
       href: '/anwesenheiten',
-      text: 'Anwesenheitsliste',
+      text: 'Anwesenheiten',
     },
-    { href: '/statistiken', text: 'Statistiken' },
-    { href: '/mitglieder', text: 'Mitglieder' },
     { href: '/termine', text: 'Termine' },
-    { href: '/admins', text: 'Admins' },
     { href: '/programm', text: 'Programm' },
+    { href: '/lieder', text: 'Lieder' },
+    { href: '/mitglieder', text: 'Mitglieder' },
+    { href: '/statistiken', text: 'Statistiken' },
+    { href: '/admins', text: 'Admins' },
   ];
 
   const handleDrawerKeyEvent = (event: KeyboardEvent<HTMLDivElement>) => {

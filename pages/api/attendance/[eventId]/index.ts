@@ -1,7 +1,7 @@
 import { Singer } from '@prisma/client';
 import { getToken } from 'next-auth/jwt';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next/types';
-import prisma from '../../../../lib/prisma';
+import prisma from 'lib/prisma';
 
 export type SingerAttendance = Singer & {
   attending: boolean;

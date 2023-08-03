@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Container,
@@ -16,7 +15,7 @@ import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
 import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
 import prisma from '../lib/prisma';
-import { RegistrationData } from './api/register';
+import { RegistrationData } from 'pages/api/register';
 import { NextPageWithLayout } from './_app';
 
 type Props = { inviteToken: string | null };

@@ -8,5 +8,6 @@ export const config = {
     '/statistiken',
     '/termine',
     '/programm',
+    '/lieder',
   ],
 };

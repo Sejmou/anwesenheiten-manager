@@ -3,7 +3,7 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
 // import GitHubProvider from 'next-auth/providers/github';
-import prisma from '../../../lib/prisma';
+import prisma from 'lib/prisma';
 import bcrypt from 'bcrypt';
 
 const authHandler: NextApiHandler = (req, res) =>

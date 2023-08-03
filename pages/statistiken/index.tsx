@@ -10,10 +10,10 @@ import PageHead from 'components/PageHead';
 import { voiceGroupGridValueFormatter } from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';
-import { eventFromDBEvent } from 'pages/anwesenheiten';
-import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
-import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
-import { NextPageWithLayout } from '../_app';
+import { eventFromDBEvent } from '../anwesenheiten';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
+import ResponsiveContainer from 'components/layout/ResponsiveContainer';
+import { NextPageWithLayout } from 'pages/_app';
 
 type Singer = Omit<SingerDB, 'createdAt'>;
 type Event = Omit<EventDB, 'lastSyncAt' | 'start' | 'end'> & {

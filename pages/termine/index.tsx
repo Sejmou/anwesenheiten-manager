@@ -15,9 +15,9 @@ import {
 } from '@tanstack/react-query';
 import PageHead from 'components/PageHead';
 import { useState } from 'react';
-import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
-import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
-import { NextPageWithLayout } from '../_app';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
+import ResponsiveContainer from 'components/layout/ResponsiveContainer';
+import { NextPageWithLayout } from 'pages/_app';
 
 const syncWithGoogleCalendar = () => fetch('/api/calendar/sync');
 const getEvents: QueryFunction<Event[]> = () =>

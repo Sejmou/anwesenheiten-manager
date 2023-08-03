@@ -6,20 +6,19 @@ import {
   useQueryClient,
   QueryFunction,
 } from '@tanstack/react-query';
-import { InviteToken } from '../api/invite-tokens';
+import { InviteToken } from 'pages/api/invite-tokens';
 import { Button, Stack, Typography } from '@mui/material';
-import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
+import ResponsiveContainer from 'components/layout/ResponsiveContainer';
 import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
-import { Admin } from '../api/admins';
-import { NextPageWithLayout } from '../_app';
-import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
-import CopyableLink from '../../components/CopyableLink';
-import Head from 'next/head';
+import { Admin } from 'pages/api/admins';
+import { NextPageWithLayout } from 'pages/_app';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
+import CopyableLink from 'components/CopyableLink';
 import PageHead from 'components/PageHead';
 
 type Props = { inviteLinkBaseUrl: string };

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { NextPageWithLayout } from '../_app';
-import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
+import { NextPageWithLayout } from 'pages/_app';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import PageHead from 'components/PageHead';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import prisma from 'lib/prisma';

@@ -1,6 +1,6 @@
 import { Container } from '@mui/material';
 import { ReactElement } from 'react';
-import Header from './Header';
+import Header from './AdminPageHeader';
 import NonAuthHeader from './NonAuthHeader';
 import StreetSingingMainPageHeader from './StreetSingingMainPageHeader';
 

@@ -1,6 +1,6 @@
 import { getToken } from 'next-auth/jwt';
 import { NextApiHandler, NextApiRequest } from 'next/types';
-import prisma from '../../../../lib/prisma';
+import prisma from 'lib/prisma';
 
 const attendancesRequestHandler: NextApiHandler = async (req, res) => {
   const token = await getToken({ req });

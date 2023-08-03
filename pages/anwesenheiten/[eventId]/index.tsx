@@ -1,7 +1,7 @@
-import { NextPageWithLayout } from '../../_app';
-import { getAdminPageLayout } from '../../../components/layout/get-page-layouts';
+import { NextPageWithLayout } from 'pages/_app';
+import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import { GetServerSideProps } from 'next';
-import prisma from '../../../lib/prisma';
+import prisma from 'lib/prisma';
 import { eventFromDBEvent } from '../';
 import Link from 'next/link';
 import {
@@ -17,14 +17,14 @@ import {
   Typography,
 } from '@mui/material';
 import { Event } from '../';
-import { SingerAttendance } from '../../api/attendance/[eventId]';
+import { SingerAttendance } from 'pages/api/attendance/[eventId]';
 import {
   DataGrid,
   GridColDef,
   GridFilterModel,
   GridRenderCellParams,
 } from '@mui/x-data-grid';
-import { VoiceGroupToDescriptionString } from '../../../frontend-utils';
+import { VoiceGroupToDescriptionString } from 'frontend-utils';
 import { VoiceGroup } from '@prisma/client';
 import {
   QueryFunction,
@@ -32,7 +32,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import ResponsiveContainer from '../../../components/layout/ResponsiveContainer';
+import ResponsiveContainer from 'components/layout/ResponsiveContainer';
 import { useState } from 'react';
 
 type AttendanceTableColDef = GridColDef & { field: keyof SingerAttendance };

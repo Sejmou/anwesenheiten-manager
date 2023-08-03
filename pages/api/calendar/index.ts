@@ -1,6 +1,6 @@
 import { NextApiHandler, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
-import prisma from '../../../lib/prisma';
+import prisma from 'lib/prisma';
 import { Event } from '@prisma/client';
 
 export const calendarRequestHandler: NextApiHandler = async (
