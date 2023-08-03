@@ -1,5 +1,5 @@
 # TU Wien Chor Dashboard
-This is a prototype for an application for administrative tasks concerning the university choir of TU Wien.
+This is a prototype for an application for everyday tasks concerning life in the university choir of TU Wien.
 
 ## Live demo with dummy data
 Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
