@@ -11,7 +11,7 @@ import { voiceGroupGridValueFormatter } from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';
 import { eventFromDBEvent } from 'pages/anwesenheiten';
-import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { NextPageWithLayout } from '../_app';
 
@@ -165,7 +165,7 @@ const Stats: NextPageWithLayout<Props> = ({
   );
 };
 
-Stats.getLayout = getAuthenticatedPageLayout;
+Stats.getLayout = getAdminPageLayout;
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const attendanceData = await prisma.eventAttendance.findMany();

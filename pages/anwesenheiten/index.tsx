@@ -1,7 +1,7 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from '../_app';
-import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
 import { GetStaticProps } from 'next';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
@@ -90,6 +90,6 @@ const AttendanceEventOverview: NextPageWithLayout<Props> = ({
   );
 };
 
-AttendanceEventOverview.getLayout = getAuthenticatedPageLayout;
+AttendanceEventOverview.getLayout = getAdminPageLayout;
 
 export default AttendanceEventOverview;

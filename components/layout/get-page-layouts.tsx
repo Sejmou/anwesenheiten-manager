@@ -2,11 +2,31 @@ import { Container } from '@mui/material';
 import { ReactElement } from 'react';
 import Header from './Header';
 import NonAuthHeader from './NonAuthHeader';
+import StreetSingingMainPageHeader from './StreetSingingMainPageHeader';
 
-export const getAuthenticatedPageLayout = (page: ReactElement) => {
+export const getAdminPageLayout = (page: ReactElement) => {
   return (
     <>
       <Header sx={{ flex: '0 1 auto' }} />
+      <Container
+        sx={{
+          minHeight: '100%',
+          flex: '1',
+          py: 2,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {page}
+      </Container>
+    </>
+  );
+};
+
+export const getStreetSingingPageLayout = (page: ReactElement) => {
+  return (
+    <>
+      <StreetSingingMainPageHeader sx={{ flex: '0 1 auto' }} />
       <Container
         sx={{
           minHeight: '100%',

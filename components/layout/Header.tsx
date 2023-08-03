@@ -42,6 +42,7 @@ const Header = ({ sx }: Props) => {
     { href: '/mitglieder', text: 'Mitglieder' },
     { href: '/termine', text: 'Termine' },
     { href: '/admins', text: 'Admins' },
+    { href: '/strassensingen_admin', text: 'Straßensingen' },
   ];
 
   const handleDrawerKeyEvent = (event: KeyboardEvent<HTMLDivElement>) => {

@@ -1,5 +1,5 @@
 import { NextPageWithLayout } from '../../_app';
-import { getAuthenticatedPageLayout } from '../../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../../components/layout/get-page-layouts';
 import { GetServerSideProps } from 'next';
 import prisma from '../../../lib/prisma';
 import { eventFromDBEvent } from '../';
@@ -219,6 +219,6 @@ const EventAttendance: NextPageWithLayout<Props> = ({ event }: Props) => {
   );
 };
 
-EventAttendance.getLayout = getAuthenticatedPageLayout;
+EventAttendance.getLayout = getAdminPageLayout;
 
 export default EventAttendance;

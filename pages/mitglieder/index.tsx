@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from '../_app';
-import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
 import CustomDropzone from '../../components/CustomDropzone';
 import Papa from 'papaparse';
 import { Button, Stack } from '@mui/material';
@@ -239,6 +239,6 @@ const Members: NextPageWithLayout = () => {
   );
 };
 
-Members.getLayout = getAuthenticatedPageLayout;
+Members.getLayout = getAdminPageLayout;
 
 export default Members;

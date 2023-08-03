@@ -17,7 +17,7 @@ import {
 } from '@mui/x-data-grid';
 import { Admin } from '../api/admins';
 import { NextPageWithLayout } from '../_app';
-import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
 import CopyableLink from '../../components/CopyableLink';
 import Head from 'next/head';
 import PageHead from 'components/PageHead';
@@ -186,7 +186,7 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
   );
 };
 
-Admins.getLayout = getAuthenticatedPageLayout;
+Admins.getLayout = getAdminPageLayout;
 
 export default Admins;
 

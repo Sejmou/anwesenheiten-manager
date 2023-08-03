@@ -22,7 +22,7 @@ const Footer = ({ sx }: Props) => {
         ...sx,
       }}
     >
-      <Typography variant="body2">Erstellt von Samo Kolter (2022)</Typography>
+      <Typography variant="body2">Erstellt von Samo Kolter (2023)</Typography>
       <Box>
         <Link href="https://www.linkedin.com/in/samo-k/" target="_blank">
           <IconButton>

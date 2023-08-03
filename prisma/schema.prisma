@@ -1,12 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 model Account {
@@ -24,8 +22,7 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -48,8 +45,8 @@ model User {
   createdAt     DateTime     @default(now())
   image         String?
   accounts      Account[]
-  sessions      Session[]
   InviteToken   InviteToken?
+  sessions      Session[]
 }
 
 model VerificationToken {
@@ -82,6 +79,65 @@ model Singer {
   attendances EventAttendance[]
 }
 
+model Event {
+  id          String            @id
+  summary     String
+  description String?
+  location    String?
+  lastSyncAt  DateTime
+  start       DateTime
+  end         DateTime
+  attendances EventAttendance[]
+}
+
+model EventAttendance {
+  singerId String
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id])
+  singer   Singer @relation(fields: [singerId], references: [id])
+
+  @@id([singerId, eventId])
+}
+
+model Song {
+  id             BigInt            @id @default(autoincrement())
+  created_at     DateTime?         @default(now()) @db.Timestamptz(6)
+  title          String?
+  key            musicalkey?
+  description    String?
+  files          SongFile[]
+  setlistEntries SetlistSongInfo[]
+}
+
+model Setlist {
+  id          BigInt            @id @default(autoincrement())
+  created_at  DateTime?         @default(now()) @db.Timestamptz(6)
+  title       String?
+  description String?
+  songs       SetlistSongInfo[]
+}
+
+model SetlistSongInfo {
+  id         BigInt    @id @default(autoincrement())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  setlist_id BigInt
+  song_id    BigInt
+  order      Int
+  notes      String?
+  Song       Song      @relation(fields: [song_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Setlist    Setlist   @relation(fields: [setlist_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model SongFile {
+  id         BigInt    @id @default(autoincrement())
+  song_id    BigInt?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  type       linktype?
+  name       String?
+  url        String?
+  Song       Song?     @relation(fields: [song_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
 enum VoiceGroup {
   S1
   S2
@@ -96,22 +152,29 @@ enum VoiceGroup {
   D
 }
 
-model Event {
-  id          String            @id
-  summary     String
-  description String?
-  location    String?
-  lastSyncAt  DateTime
-  start       DateTime
-  end         DateTime
-  attendances EventAttendance[]
+enum linktype {
+  audio
+  video
+  pdf
+  musescore
 }
 
-model EventAttendance {
-  singer   Singer @relation(fields: [singerId], references: [id])
-  event    Event  @relation(fields: [eventId], references: [id])
-  singerId String
-  eventId  String
-
-  @@id([singerId, eventId])
+enum musicalkey {
+  C
+  C_ @map("C#")
+  Db
+  D
+  D_ @map("D#")
+  Eb
+  E
+  F
+  F_ @map("F#")
+  Gb
+  G
+  G_ @map("G#")
+  Ab
+  A
+  A_ @map("A#")
+  Bb
+  B
 }

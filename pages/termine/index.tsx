@@ -15,7 +15,7 @@ import {
 } from '@tanstack/react-query';
 import PageHead from 'components/PageHead';
 import { useState } from 'react';
-import { getAuthenticatedPageLayout } from '../../components/layout/get-page-layouts';
+import { getAdminPageLayout } from '../../components/layout/get-page-layouts';
 import ResponsiveContainer from '../../components/layout/ResponsiveContainer';
 import { NextPageWithLayout } from '../_app';
 
@@ -138,6 +138,6 @@ const Calendar: NextPageWithLayout<Props> = () => {
   );
 };
 
-Calendar.getLayout = getAuthenticatedPageLayout;
+Calendar.getLayout = getAdminPageLayout;
 
 export default Calendar;
