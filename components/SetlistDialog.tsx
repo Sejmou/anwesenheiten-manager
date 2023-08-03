@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -10,24 +10,42 @@ import {
   TextField,
   DialogContent,
   IconButton,
+  Typography,
 } from '@mui/material';
 import Delete from '@mui/icons-material/Delete';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
 
+export type SetlistDialogFormValues = {
+  songIds: string[];
+  title: string;
+};
+
 export interface SetlistDialogProps {
   open: boolean;
   songsToSelectFrom: { label: string | null; id: string }[];
-  onSave: (songIds: string[]) => void;
+  onSave: (values: SetlistDialogFormValues) => void;
   onClose: () => void;
+  initialValues: SetlistDialogFormValues | null;
 }
 
 function SetlistDialog(props: SetlistDialogProps) {
   const { onSave, onClose, songsToSelectFrom, open } = props;
+  const [setlistTitle, setSetlistTitle] = useState<string>('');
   const [setlistSongIds, setSetlistSongIds] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (props.initialValues) {
+      setSetlistSongIds(props.initialValues.songIds);
+      setSetlistTitle(props.initialValues.title);
+    } else {
+      setSetlistSongIds([]);
+      setSetlistTitle('');
+    }
+  }, [props.initialValues]);
+
   const handleSave = () => {
-    onSave(setlistSongIds);
+    onSave({ songIds: setlistSongIds, title: setlistTitle });
   };
 
   const handleClose = () => {
@@ -62,15 +80,28 @@ function SetlistDialog(props: SetlistDialogProps) {
 
   return (
     <Dialog onClose={handleClose} open={open} fullWidth>
-      <DialogTitle>Neue Setlist</DialogTitle>
+      <DialogTitle>
+        {props.initialValues ? 'Setlist bearbeiten' : 'Neue Setlist'}
+      </DialogTitle>
       <DialogContent>
+        <TextField
+          sx={{ mt: 1 }}
+          label="Name"
+          variant="outlined"
+          fullWidth
+          value={setlistTitle}
+          onChange={event => {
+            setSetlistTitle(event.target.value);
+          }}
+        />
+        <Typography sx={{ pt: 2 }}>Lieder</Typography>
         <Autocomplete
           sx={{ paddingTop: 1 }}
           options={songsToSelectFrom}
           renderInput={params => (
             <TextField
               {...params}
-              label="Song"
+              label="Neuer Song"
               placeholder="Wähle einen Song"
               variant="outlined"
             />

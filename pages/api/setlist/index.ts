@@ -1,4 +1,4 @@
-import { Setlist } from '@prisma/client';
+import { Setlist, SetlistSongInfo } from '@prisma/client';
 import { getToken } from 'next-auth/jwt';
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next/types';
 import prisma from '../../../lib/prisma';
@@ -6,12 +6,12 @@ import { z } from 'zod';
 
 const validatePostRequestContent = z.object({
   songIds: z.array(z.string()),
-  title: z.string(),
+  title: z.string().min(1),
 });
 
 const setlistRequestHandler: NextApiHandler = async (
   req,
-  res: NextApiResponse<Setlist>
+  res: NextApiResponse<Setlist & { entries: SetlistSongInfo[] }>
 ) => {
   const token = await getToken({ req });
   if (!token) {
@@ -53,6 +53,9 @@ const setlistRequestHandler: NextApiHandler = async (
     const updatedSetlist = await prisma.setlist.findUnique({
       where: {
         id: newSetlist.id,
+      },
+      include: {
+        entries: true,
       },
     });
 
