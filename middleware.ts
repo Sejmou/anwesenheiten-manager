@@ -7,6 +7,6 @@ export const config = {
     '/mitglieder',
     '/statistiken',
     '/termine',
-    '/strassensingen_admin',
+    '/programm',
   ],
 };

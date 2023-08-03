@@ -40,6 +40,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     // get songs from most recently created setlist
     // TODO: figure out way for admin to choose what setlist to display
     const setlist = await prisma.setlist.findFirst({
+      where: {
+        title: {
+          startsWith: 'Straßensingen',
+        },
+      },
       orderBy: {
         created_at: 'desc',
       },

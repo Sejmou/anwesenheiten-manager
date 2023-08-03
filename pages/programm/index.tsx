@@ -24,7 +24,7 @@ type Props = {
   setlists: Array<Setlist & { entries: SetlistSongInfo[] }>;
 };
 
-const StreetSingingAdmin: NextPageWithLayout<
+const ProgramAdmin: NextPageWithLayout<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ songs, setlists: initialSetlists }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,28 +62,23 @@ const StreetSingingAdmin: NextPageWithLayout<
   };
 
   const handleSetlistRemove = async (id: string) => {
-    const response = await fetch(`/api/setlist/${id}`, {
+    const response = await fetch(`/api/setlists/${id}`, {
       method: 'DELETE',
     });
     if (response.ok) {
-      const deletedSetlist = await response.json();
-      const setlistIndex = setlists.findIndex(
-        setlist => setlist.id === deletedSetlist.id
-      );
+      const setlistIndex = setlists.findIndex(setlist => setlist.id === id);
       if (setlistIndex === -1) {
-        console.warn(
-          `Could not find setlist with id ${deletedSetlist.id} in setlists array.`
-        );
+        console.warn(`Could not find setlist with id ${id} in setlists array.`);
         return;
       }
-      setSetlists(setlists.filter(setlist => setlist.id !== deletedSetlist.id));
+      setSetlists(setlists.filter(setlist => setlist.id !== id));
     }
   };
 
   const handleDialogSave = async (payload: SetlistDialogFormValues) => {
     if (!editedSetlistId) {
       // create new setlist
-      const response = await fetch('/api/setlist', {
+      const response = await fetch('/api/setlists', {
         method: 'POST',
         body: JSON.stringify(payload),
       });
@@ -94,7 +89,7 @@ const StreetSingingAdmin: NextPageWithLayout<
       }
     } else {
       // update existing setlist
-      const response = await fetch(`/api/setlist/${editedSetlistId}`, {
+      const response = await fetch(`/api/setlists/${editedSetlistId}`, {
         method: 'PUT',
         body: JSON.stringify(payload),
       });
@@ -109,7 +104,9 @@ const StreetSingingAdmin: NextPageWithLayout<
           );
           return;
         }
-        setSetlists(updatedSetlist);
+        const updatedSetlists = [...setlists];
+        updatedSetlists[setlistIndex] = updatedSetlist;
+        setSetlists(updatedSetlists);
         setDialogOpen(false);
       }
     }
@@ -117,8 +114,8 @@ const StreetSingingAdmin: NextPageWithLayout<
 
   return (
     <>
-      <PageHead title="Straßensingen" />
-      <Typography variant="h5">Setlists</Typography>
+      <PageHead title="Programm-Admin" />
+      <Typography variant="h5">Programm/"Setlists"</Typography>
       {setlists.length > 0 ? (
         <List>
           {setlists.map(setlist => (
@@ -126,10 +123,9 @@ const StreetSingingAdmin: NextPageWithLayout<
               <ListItemButton onClick={() => handleSetlistClick(setlist.id)}>
                 <ListItemText
                   primary={setlist.title}
-                  secondary={
-                    `${setlist.entries.length} Lieder, erstellt: ` +
-                    setlist.created_at?.toLocaleString()
-                  }
+                  secondary={`${setlist.entries.length} Lied${
+                    setlist.entries.length == 1 ? '' : 'er'
+                  }`}
                 />
                 <IconButton
                   onClick={ev => {
@@ -199,6 +195,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   }
 };
 
-StreetSingingAdmin.getLayout = getAdminPageLayout;
+ProgramAdmin.getLayout = getAdminPageLayout;
 
-export default StreetSingingAdmin;
+export default ProgramAdmin;
