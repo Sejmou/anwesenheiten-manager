@@ -7,24 +7,16 @@ import prisma from 'lib/prisma';
 import { Setlist, Song, SetlistSongInfo } from '@prisma/client';
 import {
   Button,
-  Dialog,
-  DialogTitle,
   List,
   ListItem,
-  Autocomplete,
   ListItemText,
   Typography,
-  TextField,
-  DialogContent,
-  IconButton,
 } from '@mui/material';
-import Delete from '@mui/icons-material/Delete';
-import ArrowUpward from '@mui/icons-material/ArrowUpward';
-import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import SetlistDialog from 'components/SetlistDialog';
 
 type Props = {
   songs: Song[];
-  setlists: Setlist[];
+  setlists: Array<Setlist & { entries: SetlistSongInfo[] }>;
 };
 
 const StreetSingingAdmin: NextPageWithLayout<
@@ -39,9 +31,17 @@ const StreetSingingAdmin: NextPageWithLayout<
       {setlists.length > 0 ? (
         <List>
           {setlists.map(setlist => (
-            <Typography key={setlist.id} variant="body1">
-              {setlist.title}
-            </Typography>
+            <ListItem key={setlist.id}>
+              <ListItemText
+                primary={setlist.title}
+                secondary={
+                  `${setlist.entries.length} Lieder, erstellt: ` +
+                  setlist.created_at?.toLocaleString()
+                }
+              />
+            </ListItem>
+
+            // TODO: make setlists editable/deletable
           ))}
         </List>
       ) : (
@@ -54,13 +54,21 @@ const StreetSingingAdmin: NextPageWithLayout<
       >
         Neue Setlist erstellen
       </Button>
-      <SetlistEditDialog
+      <SetlistDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onSave={async songIds => {
-          console.log(songIds);
-          // wait for 1 second
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          const response = await fetch('/api/setlist', {
+            method: 'POST',
+            body: JSON.stringify({
+              title: 'Neue Setlist', // TODO: make this editable in UI
+              songIds,
+            }),
+          });
+          if (response.ok) {
+            const newSetlist = await response.json();
+            setlists.push(newSetlist);
+          }
           setDialogOpen(false);
         }}
         songsToSelectFrom={songs.map(song => ({
@@ -81,7 +89,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     });
     const setlists = await prisma.setlist.findMany({
       include: {
-        songs: true,
+        entries: true,
       },
     });
     return {
@@ -107,97 +115,3 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
 StreetSingingAdmin.getLayout = getAdminPageLayout;
 
 export default StreetSingingAdmin;
-
-export interface SetlistEditDialogProps {
-  open: boolean;
-  songsToSelectFrom: { label: string | null; id: string }[];
-  onSave: (songIds: string[]) => void;
-  onClose: () => void;
-}
-
-function SetlistEditDialog(props: SetlistEditDialogProps) {
-  const { onSave, onClose, songsToSelectFrom, open } = props;
-  const [setlistSongIds, setSetlistSongIds] = React.useState<string[]>([]);
-
-  const handleSave = () => {
-    onSave(setlistSongIds);
-  };
-
-  const handleClose = () => {
-    onClose();
-  };
-
-  const handleRemoveClick = (songId: string) => {
-    setSetlistSongIds(setlistSongIds.filter(id => id !== songId));
-  };
-
-  const handleMoveUpClick = (songId: string) => {
-    const songIndex = setlistSongIds.findIndex(id => id === songId);
-    if (songIndex > 0) {
-      const newSetlistData = [...setlistSongIds];
-      const temp = newSetlistData[songIndex - 1];
-      newSetlistData[songIndex - 1] = newSetlistData[songIndex];
-      newSetlistData[songIndex] = temp;
-      setSetlistSongIds(newSetlistData);
-    }
-  };
-
-  console.log(setlistSongIds);
-
-  const handleMoveDownClick = (songId: string) => {
-    const songIndex = setlistSongIds.findIndex(id => id === songId);
-    if (songIndex < setlistSongIds.length - 1) {
-      const newSetlistData = [...setlistSongIds];
-      const temp = newSetlistData[songIndex + 1];
-      newSetlistData[songIndex + 1] = newSetlistData[songIndex];
-      newSetlistData[songIndex] = temp;
-      setSetlistSongIds(newSetlistData);
-    }
-  };
-
-  return (
-    <Dialog onClose={handleClose} open={open} fullWidth>
-      <DialogTitle>Neue Setlist</DialogTitle>
-      <DialogContent>
-        <Autocomplete
-          sx={{ paddingTop: 1 }}
-          options={songsToSelectFrom}
-          renderInput={params => (
-            <TextField
-              {...params}
-              label="Song"
-              placeholder="Wähle einen Song"
-              variant="outlined"
-            />
-          )}
-          onChange={(event, value) => {
-            if (value) {
-              setSetlistSongIds([...setlistSongIds, value.id]);
-            }
-          }}
-        />
-        <List sx={{ pt: 0 }}>
-          {setlistSongIds.map(item => (
-            <ListItem disableGutters>
-              <ListItemText
-                primary={songsToSelectFrom.find(s => s.id == item)?.label}
-              />
-              <IconButton onClick={() => handleMoveUpClick(item)}>
-                <ArrowUpward />
-              </IconButton>
-              <IconButton onClick={() => handleMoveDownClick(item)}>
-                <ArrowDownward />
-              </IconButton>
-              <IconButton onClick={() => handleRemoveClick(item)}>
-                <Delete />
-              </IconButton>
-            </ListItem>
-          ))}
-        </List>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Speichern
-        </Button>
-      </DialogContent>
-    </Dialog>
-  );
-}
