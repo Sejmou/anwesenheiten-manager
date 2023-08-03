@@ -100,7 +100,7 @@ model EventAttendance {
 }
 
 model Song {
-  id             BigInt            @id @default(autoincrement())
+  id             String            @id @default(cuid())
   created_at     DateTime?         @default(now()) @db.Timestamptz(6)
   title          String?
   key            musicalkey?
@@ -110,7 +110,7 @@ model Song {
 }
 
 model Setlist {
-  id          BigInt            @id @default(autoincrement())
+  id          String            @id @default(cuid())
   created_at  DateTime?         @default(now()) @db.Timestamptz(6)
   title       String?
   description String?
@@ -118,10 +118,10 @@ model Setlist {
 }
 
 model SetlistSongInfo {
-  id         BigInt    @id @default(autoincrement())
+  id         String    @id @default(cuid())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
-  setlist_id BigInt
-  song_id    BigInt
+  setlist_id String
+  song_id    String
   order      Int
   notes      String?
   Song       Song      @relation(fields: [song_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -129,8 +129,8 @@ model SetlistSongInfo {
 }
 
 model SongFile {
-  id         BigInt    @id @default(autoincrement())
-  song_id    BigInt?
+  id         String    @id @default(cuid())
+  song_id    String
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   type       linktype?
   name       String?
