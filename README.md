@@ -69,6 +69,11 @@ GOOGLE_API_KEY=<your-api-key>
 
 The `GOOGLE_API_KEY` is needed to allow the applcation to use the Google Calendar API for syncing the choir practice events in the database with the choir practice events of the TU Wien Chor [public calendar](https://calendar.google.com/calendar/embed?src=qshfu0pshf6u7emr0f7pn80a3c%40group.calendar.google.com&ctz=Europe%2FVienna). You need to generate it in the Google Developer console. Once you have it, replace `<your-api-key>` with the key you obtained. For details on how to obtain your key, see [here](https://cloud.google.com/docs/authentication/api-keys).
 
+### Configure drizzle
+Create a file called `drizzle.config.ts` in the root folder of this project. For reference, check out the `drizzle.config.example.ts` file.
+
+To sync the drizzle DB schema with the current state of the DB, run `yarn introspect`. This will create a new schema file in `drizzle` (which is also used by the newer parts of the application's data fetching logic, including the tRPC router). The rest currently still uses Prisma, but I wish to migrate away from it someday.
+
 ### Launching the application
 
 Now that we've installed the dependencies and the database is set up, the application is ready. Type `yarn dev` to start it.

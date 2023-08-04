@@ -1,28 +1,42 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter } from '../trpc';
+import { song, songFile } from 'drizzle/schema';
+import { eq } from 'drizzle-orm';
+import { InferModel } from 'drizzle-orm';
+
+type NewFile = InferModel<typeof songFile, 'insert'>;
+
+const songFileInput = z.object({
+  name: z.string(),
+  url: z.string(),
+  type: z.enum(songFile.type.enumValues),
+  songId: z.string(),
+});
 
 // TODO: add procedures for editing and removing songs and editing related data
 export const songRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const songs = await ctx.prisma.song.findMany();
+    const songsQueryResult = await ctx.db
+      .select()
+      .from(song)
+      .leftJoin(songFile, eq(song.id, songFile.songId));
+
     return {
-      songs,
+      songsQueryResult,
     };
   }),
-  getOne: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const song = await ctx.prisma.song.findUnique({
-        where: {
-          id: input.id,
-        },
+  addFile: publicProcedure
+    .input(songFileInput)
+    .mutation(async ({ ctx, input }) => {
+      const file = await ctx.db.insert(songFile).values({
+        type: input.type,
+        name: input.name,
+        url: input.url,
+        songId: input.songId,
+        id: 'asdf',
       });
       return {
-        song,
+        songFile: file,
       };
     }),
 });

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "introspect": "drizzle-kit introspect:pg"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "@types/papaparse": "^5.3.5",
     "@upstash/qstash": "^0.3.6",
     "bcrypt": "^5.0.1",
+    "drizzle-orm": "^0.27.2",
     "easy-peasy": "^5.0.4",
     "eslint-config-next": "^13.4.12",
     "googleapis": "^107.0.0",
@@ -36,6 +38,7 @@
     "next-auth": "^4.10.3",
     "next-superjson-plugin": "^0.5.9",
     "papaparse": "^5.3.2",
+    "postgres": "^3.3.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.2",
@@ -46,6 +49,7 @@
   "devDependencies": {
     "@types/node": "18.14.0",
     "@types/react": "18.0.28",
+    "drizzle-kit": "^0.19.12",
     "prisma": "^4.2.1",
     "typescript": "4.5.5"
   }

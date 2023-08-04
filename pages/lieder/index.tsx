@@ -4,13 +4,33 @@ import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import PageHead from 'components/PageHead';
 import { api } from 'utils/trpc-api';
+import { Button } from '@mui/material';
 
 const Songs: NextPageWithLayout = () => {
-  const hello = api.song.getAll.useQuery();
+  const songQ = api.song.getAll.useQuery();
+  const addSongFile = api.song.addFile.useMutation();
 
-  const songs = hello?.data?.songs ?? null;
+  const songs = songQ?.data?.songs ?? null;
 
-  const songList = songs?.map(song => <li key={song.id}>{song.title}</li>);
+  const handleAddClick = (songId: string) => {
+    console.log(songId);
+    addSongFile.mutateAsync({
+      songId,
+      file: {
+        name: 'Alle Stimmen',
+        link: 'https://drive.google.com/uc?id=1yHpQK5tifFzxA-KeLnBa3fjQcdqoZGUb&export=download',
+        type: 'audio',
+      },
+    });
+  };
+
+  const songList = songs?.map(song => (
+    <li key={song.id}>
+      {song.title} ({song.files.length} File
+      {song.files.length !== 1 ? 's' : ''})
+      <Button onClick={() => handleAddClick(song.id)}>File hinzufügen</Button>
+    </li>
+  ));
 
   return (
     <>
@@ -18,7 +38,7 @@ const Songs: NextPageWithLayout = () => {
       <Typography variant="body1">
         Folgende Lieder sind in der Datenbank:
       </Typography>
-      {songList || <Typography variant="body1">'Lade Lieder...</Typography>}
+      {songList || <Typography variant="body1">Lade Lieder...</Typography>}
     </>
   );
 };
