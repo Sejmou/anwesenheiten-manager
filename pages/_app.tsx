@@ -1,5 +1,5 @@
 import { SessionProvider } from 'next-auth/react';
-import { trpc } from '../utils/trpc';
+import { api } from '../utils/trpc-api';
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
@@ -65,4 +65,4 @@ const App = ({ Component, pageProps }: any) => {
   );
 };
 
-export default trpc.withTRPC(App);
+export default api.withTRPC(App);

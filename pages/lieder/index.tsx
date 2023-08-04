@@ -3,20 +3,22 @@ import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import PageHead from 'components/PageHead';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/trpc-api';
 
 const Songs: NextPageWithLayout = () => {
-  const hello = trpc.hello.useQuery({ name: 'client' });
+  const hello = api.song.getAll.useQuery();
+
+  const songs = hello?.data?.songs ?? null;
+
+  const songList = songs?.map(song => <li key={song.id}>{song.title}</li>);
 
   return (
     <>
       <PageHead title="Lieder" />
-      <Typography variant="h1" component="h1" gutterBottom>
-        Coming soon
-      </Typography>
       <Typography variant="body1">
-        {hello?.data?.greeting ?? 'Loading...'}
+        Folgende Lieder sind in der Datenbank:
       </Typography>
+      {songList || <Typography variant="body1">'Lade Lieder...</Typography>}
     </>
   );
 };

@@ -1,1 +1,19 @@
-// TODO: add code for setting up context for router procedures (DB access, auth status etc.) here
+import type { inferAsyncReturnType } from '@trpc/server';
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { getSession } from 'next-auth/react';
+import prisma from 'lib/prisma';
+
+/**
+ * Creates context for an incoming request
+ * @link https://trpc.io/docs/context
+ */
+export async function createTRPCContext(opts: CreateNextContextOptions) {
+  const session = await getSession({ req: opts.req });
+
+  return {
+    session,
+    prisma,
+  };
+}
+
+export type Context = inferAsyncReturnType<typeof createTRPCContext>;
