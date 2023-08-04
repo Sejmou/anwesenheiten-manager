@@ -4,6 +4,22 @@ This is a prototype for an application for everyday tasks concerning life in the
 ## Live demo with dummy data
 Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
 
+## TODOs and nice-to-haves I will probably never find the time for
+This project is very much a playground for me to learn how to make things happen. I was still very much in the process of figuring things out as I added features. As a consequence of this, much of this code is a bit of a sh*tshow. Here I list some things that I would like to do if I had the time, just to keep track and prioritize stuff and fix it if I were to find the time to work on this again.
+
+- [ ] code smells and changes required to reduce them
+  - [ ] move all routes in `pages/api` to tRPC routers
+  - [ ] unify data fetching (some routes use getStaticProps, some getServerSideProps, some fetch on client side - even that is done with different approaches lol)
+  - [ ] refactor ugly backend stats collection code to just use SQL lol
+  - [ ] find a simpler and more bullet-proof way to handle authentication (or rather, actually understand what nextauth does lol)
+- [ ] cool new tech
+  - [ ] move from NextJS to SvelteKit
+  - [ ] move from Prisma to drizzle
+- [ ] UI
+  - [ ] redesign (really looks ugly lol)
+  - [ ] replace Material UI with more lightweight custom components
+- [ ] More control about admin accounts (changing passwords, emails, names, deleting accounts, etc.)
+
 ## Installing the project locally
 
 This guide only explains how to do this on Ubuntu. Things might be different for Windows or MacOS.
@@ -17,12 +33,12 @@ This guide only explains how to do this on Ubuntu. Things might be different for
 2. Run `psql` (or `sudo -u postgres psql` if that doesn't work) to login into the "postgres console" (not sure what proper term for it is)
 3. In the postgres console, run the following SQL commands (replacing `yourpass` with a password of your choice):
    ```
-   CREATE DATABASE anwesenheitslisten_manager;
-   CREATE USER anwesenheitslisten_admin WITH PASSWORD 'yourpass';
-   GRANT ALL PRIVILEGES ON DATABASE anwesenheitslisten_manager TO anwesenheitslisten_admin;
+   CREATE DATABASE choir_manager;
+   CREATE USER choir_admin WITH PASSWORD 'yourpass';
+   GRANT ALL PRIVILEGES ON DATABASE choir_manager TO choir_admin;
    ```
-   This will create a `anwesenheitslisten_manager` database and a database user `anwesenheitslisten_admin` that essentially has "super-user" access to the database. **NOTE: I am not entirely sure about the security implications of not having an encrypted password. I guess it should be fine as the user is only "reachable" locally anyway?**
-4. Now, the database should be accessible via the connection URI `postgresql://anwesenheitslisten_admin:yourpass@localhost/anwesenheitslisten_manager`, replacing `yourpass` with the password you chose earlier. More details on how connection URIs work can be found [here](https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris).
+   This will create a `choir_manager` database and a database user `choir_admin` that essentially has "super-user" access to the database. **NOTE: I am not entirely sure about the security implications of not having an encrypted password. I guess it should be fine as the user is only "reachable" locally anyway?**
+4. Now, the database should be accessible via the connection URI `postgresql://choir_admin:yourpass@localhost/choir_manager`, replacing `yourpass` with the password you chose earlier. More details on how connection URIs work can be found [here](https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris).
 5. Create a `.env` file in the root folder of this project, containing a single line:
    ```
    DATABASE_URL=<connection-uri>
@@ -72,4 +88,4 @@ A requirement for this project is to use a fully self-hosted solution, running e
 Probably we would need to do Database migrations with [`Prisma migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) instead of using `db push`. This way, Prisma will create a history of SQL migration files to allow us to keep track of database changes more easily, and also revert if something goes wrong. To make this work, one has to
 
 1. Log into the "postgres console" as the DB super user (like mentioned above)
-2. Execute `ALTER USER anwesenheitslisten_admin CREATEDB;` to give the database user for this project the ability to create new databases. This is required for `Prisma migrate` to work properly as it needs to create a "shadow database" in the background, details see [here](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database).
+2. Execute `ALTER USER choir_admin CREATEDB;` to give the database user for this project the ability to create new databases. This is required for `Prisma migrate` to work properly as it needs to create a "shadow database" in the background, details see [here](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database).
