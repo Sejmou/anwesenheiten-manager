@@ -82,7 +82,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
       return dict;
     }, {} as { [id: string]: Song });
 
-    const songsInSetlist = songIds.map(id => songsDict[id]);
+    const songsInSetlist = songIds.map(id => songsDict[id]!);
 
     return {
       props: {

@@ -75,7 +75,9 @@ const Members: NextPageWithLayout = () => {
   >([]);
 
   const handleFiles = async (files: File[]) => {
-    const { data } = (await parsePromise(files[0], true)) as {
+    const file = files[0];
+    if (!file) return;
+    const { data } = (await parsePromise(file, true)) as {
       data: { [key: string]: string }[];
     };
     const importedSingers: Singer[] = data
@@ -86,9 +88,9 @@ const Members: NextPageWithLayout = () => {
       }))
       .filter(row => !!row.Stimmgruppe && !!row.Vorname && !!row.Nachname)
       .map((row, i) => ({
-        firstName: row.Vorname,
-        lastName: row.Nachname,
-        voiceGroup: csvVoiceGroupToDBVoiceGroup[row.Stimmgruppe],
+        firstName: row.Vorname!,
+        lastName: row.Nachname!,
+        voiceGroup: csvVoiceGroupToDBVoiceGroup[row.Stimmgruppe!]!,
         id: i.toString(),
       }))
       .filter(row => !!row.voiceGroup);

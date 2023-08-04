@@ -169,6 +169,8 @@ Stats.getLayout = getAdminPageLayout;
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const attendanceData = await prisma.eventAttendance.findMany();
+  // TODO: refactor this mess to just use some SQL lol
+  // why was I doing this, it truly is ridiculous
   const events = (
     await prisma.eventAttendance.findMany({
       select: { event: true },
@@ -196,7 +198,8 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 
   const singersByVoiceGroup: { [group: string]: number } = {};
   singersByVoiceGroupObjs.forEach(obj => {
-    const [group, count] = Array.from(Object.entries(obj))[0];
+    const group = Object.keys(obj)[0]!;
+    const count = obj[group]!;
     singersByVoiceGroup[group] = count;
   });
 

@@ -60,8 +60,8 @@ function SetlistDialog(props: SetlistDialogProps) {
     const songIndex = setlistSongIds.findIndex(id => id === songId);
     if (songIndex > 0) {
       const newSetlistData = [...setlistSongIds];
-      const temp = newSetlistData[songIndex - 1];
-      newSetlistData[songIndex - 1] = newSetlistData[songIndex];
+      const temp = newSetlistData[songIndex - 1]!;
+      newSetlistData[songIndex - 1] = newSetlistData[songIndex]!;
       newSetlistData[songIndex] = temp;
       setSetlistSongIds(newSetlistData);
     }
@@ -71,8 +71,8 @@ function SetlistDialog(props: SetlistDialogProps) {
     const songIndex = setlistSongIds.findIndex(id => id === songId);
     if (songIndex < setlistSongIds.length - 1) {
       const newSetlistData = [...setlistSongIds];
-      const temp = newSetlistData[songIndex + 1];
-      newSetlistData[songIndex + 1] = newSetlistData[songIndex];
+      const temp = newSetlistData[songIndex + 1]!;
+      newSetlistData[songIndex + 1] = newSetlistData[songIndex]!;
       newSetlistData[songIndex] = temp;
       setSetlistSongIds(newSetlistData);
     }
