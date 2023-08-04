@@ -1,15 +1,16 @@
 import { SessionProvider } from 'next-auth/react';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
-import Footer from '../components/layout/Footer';
-
-import './globals.css';
-import { ReactElement, ReactNode } from 'react';
+import { trpc } from '../utils/trpc';
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
-import globalMessageStore from '../lib/message-store';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { ReactElement, ReactNode } from 'react';
+import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+
+import globalMessageStore from 'lib/message-store';
 import { StoreProvider } from 'easy-peasy';
-import GlobalMessageSnackbar from '../components/GlobalMessageSnackbar';
+import './globals.css';
+import GlobalMessageSnackbar from 'components/GlobalMessageSnackbar';
+import Footer from 'components/layout/Footer';
 
 const queryClient = new QueryClient();
 
@@ -64,4 +65,4 @@ const App = ({ Component, pageProps }: any) => {
   );
 };
 
-export default App;
+export default trpc.withTRPC(App);
