@@ -16,28 +16,21 @@ const songFileInput = z.object({
 // TODO: add procedures for editing and removing songs and editing related data
 export const songRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const songsQueryResult = await ctx.db
-      .select()
-      .from(song)
-      .leftJoin(songFile, eq(song.id, songFile.songId));
+    const songs = await ctx.db.query.song.findMany({
+      with: {
+        files: true,
+      },
+    });
 
     return {
-      songsQueryResult,
+      songs,
     };
   }),
   addFile: publicProcedure
     .input(songFileInput)
     .mutation(async ({ ctx, input }) => {
-      const file = await ctx.db.insert(songFile).values({
-        type: input.type,
-        name: input.name,
-        url: input.url,
-        songId: input.songId,
-        id: 'asdf',
-      });
-      return {
-        songFile: file,
-      };
+      const newFile = await ctx.db.insert(songFile).values(input).returning();
+      return newFile;
     }),
 });
 
