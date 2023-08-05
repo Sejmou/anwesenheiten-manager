@@ -4,30 +4,14 @@ This is a prototype for an application for everyday tasks concerning life in the
 ## Live demo with dummy data
 Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
 
-## TODOs and nice-to-haves I will probably never find the time for
-This project is very much a playground for me to learn how to make things happen. I was still very much in the process of figuring things out as I added features. As a consequence of this, much of this code is a bit of a sh*tshow. Here I list some things that I would like to do if I had the time, just to keep track and prioritize stuff and fix it if I were to find the time to work on this again.
+## Installing the project
 
-- [ ] code smells and changes required to reduce them
-  - [ ] move all routes in `pages/api` to tRPC routers
-  - [ ] unify data fetching (some routes use getStaticProps, some getServerSideProps, some fetch on client side - even that is done with different approaches lol)
-  - [ ] refactor ugly backend stats collection code to just use SQL lol
-  - [ ] find a simpler and more bullet-proof way to handle authentication (or rather, actually understand what nextauth does lol)
-- [ ] cool new tech
-  - [ ] move from NextJS to SvelteKit
-  - [ ] move from Prisma to drizzle
-- [ ] UI
-  - [ ] redesign (really looks ugly lol)
-  - [ ] replace Material UI with more lightweight custom components
-- [ ] More control about admin accounts (changing passwords, emails, names, deleting accounts, etc.)
-
-## Installing the project locally
-
-This guide only explains how to do this on Ubuntu. Things might be different for Windows or MacOS.
-
-1. Make sure Node and yarn are installed on the machine. This should be as simple as running `sudo apt update && sudo apt install nodejs && sudo apt install yarn`. IMPORTANT: Prisma currently crashes on Debian systems when using Node 18 and PostgreSQL (https://github.com/prisma/prisma/issues/10649). As this project also uses PostgreSQL, a downgrade to Node version 16 is the easiest fix. You can use the [Node Version Manager](https://github.com/nvm-sh/nvm) to install multiple versions of Node on the same machine and switch between them as needed.
+1. Make sure Node and yarn are installed on the machine. On Ubuntu, this should be as simple as running `sudo apt update && sudo apt install nodejs && sudo apt install yarn`. Check online what the equivalent commands for Mac/Windows are. Note: Prisma apparently crashes on Debian systems when using Node 18 and PostgreSQL (https://github.com/prisma/prisma/issues/10649). You can use the [Node Version Manager](https://github.com/nvm-sh/nvm) to install another version of Node and switch to it for this project.
 2. Run `yarn`. This will install all the Node modules used by this NextJS project.
 
-### Local Test Database Config (Ubuntu)
+### Set up DB (postgres)
+
+#### Local
 
 1. Make sure postgres is installed and running (`psql` command works - [this](https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database#debian-and-ubuntu) guide might help)
 2. Run `psql` (or `sudo -u postgres psql` if that doesn't work) to login into the "postgres console" (not sure what proper term for it is)
@@ -38,20 +22,34 @@ This guide only explains how to do this on Ubuntu. Things might be different for
    GRANT ALL PRIVILEGES ON DATABASE choir_manager TO choir_admin;
    ```
    This will create a `choir_manager` database and a database user `choir_admin` that essentially has "super-user" access to the database. **NOTE: I am not entirely sure about the security implications of not having an encrypted password. I guess it should be fine as the user is only "reachable" locally anyway?**
-4. Now, the database should be accessible via the connection URI `postgresql://choir_admin:yourpass@localhost/choir_manager`, replacing `yourpass` with the password you chose earlier. More details on how connection URIs work can be found [here](https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris).
-5. Create a `.env` file in the root folder of this project, containing a single line:
+4. Now, the database should be accessible via the connection string `postgresql://choir_admin:yourpass@localhost/choir_manager`, replacing `yourpass` with the password you chose earlier. More details on how connection URIs work can be found [here](https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris).
+
+#### Remote
+I currently I use Supabase's postgres cloud DB. Check out the [Supabase docs](https://supabase.io/docs) or other sources on the web for details on how to set things up.
+
+### Create DB Schema with Prisma, generate Prisma client
+1. Create a `.env` file in the root folder of this project, containing a single line:
    ```
-   DATABASE_URL=<connection-uri>
+   DATABASE_URL=<connection-string>
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=<some-secret-string>
    ```
-   where`<connection-uri>` is the connection URI from the previous step. `NEXTAUTH_URL` and `NEXTAUTH_SECRET` are needed by `nextauth` (for details click [here](https://next-auth.js.org/configuration/options#environment-variables)). Replace `<some-secret-string>` with a random string generated by running `openssl rand -base64 32` on the command line.
-6. Run `npx prisma db push`. This will use [Prisma](https://www.prisma.io/), an ORM for Node.js and Typescript, to sync the created database with the database schema defined in `prisma/schema.prisma`. As the database will be empty before we run this command, it essentially just creates all the tables mentioned in the schema.
-7. (Optional) Run `npx prisma studio`. This will launch Prisma Studio (Prisma's "database explorer") on your machine and make the GUI available via your browser (per default on `localhost:5555`). You can use it to check out the models used in the database - no records will exist at this point.
+   where`<connection-string>` is the connection DB connection string from the previous step. `NEXTAUTH_URL` and `NEXTAUTH_SECRET` are needed by `nextauth` (for details click [here](https://next-auth.js.org/configuration/options#environment-variables)). Replace `<some-secret-string>` with a random string generated by running `openssl rand -base64 32` on the command line.
+2. Run `npx prisma db push`. This will use [Prisma](https://www.prisma.io/), an ORM for Node.js and Typescript, to sync the created database with the database schema defined in `prisma/schema.prisma`. As the database will be empty before we run this command, it essentially just creates all the tables mentioned in the schema. Then, run `npx prisma generate` to create the Prisma client, which is used to interact with the database from the application code. The client will then have access to all the entities of the schema (mapped from DB tables and columns).
+3. (Optional) Run `npx prisma studio`. This will launch Prisma Studio (Prisma's "database explorer") on your machine and make the GUI available via your browser (per default on `localhost:5555`). You can use it to check out the models used in the database - no records will exist at this point.
 
-Now the database should be ready :)
+Now the database stuff should be ready :)
 
-However, the app is still not yet ready...
+However, the app is still not yet ready to run...
+
+### Setup drizzle, create drizzle schema from DB
+I don't like the Prisma client interface. I find the syntax quite hard to learn (especially when querying/updating/deleting relations) and too different from regular SQL. Also, Prisma [does NOT use SQL joins when combining data from different tables](https://github.com/prisma/prisma/discussions/12715). Tbh, this isn't that much of a problem for this project. However, I still wanted to try something different. Hence, I went with [drizzle](https://github.com/drizzle-team/drizzle-orm), a lightweight ORM that uses SQL-like syntax and allows for joins. It's still rapidly evolving but I like the API a lot. It is used by the newer parts of this app. Some stuff, like the authentication logic builds on Prisma though, so migrating away from Prisma completely is not an option atm.
+
+Similar to Prisma, drizzle also features a typesafe schema. However, instead of generating a client from the CLI, we generate a schema. Tables, relations etc. from this schema can then be imported in any file that interacts with the DB. The schema is generated from the DB schema using `drizzle-kit`'s `introspect` command. 
+
+To configure  drizzle, create a file called `drizzle.config.ts` in the root folder of this project (check out the `drizzle.config.example.ts` file for reference).
+
+Afterwards, generate the drizzle schema file (`drizzle/schema.ts`) from the current DB schema by running `yarn introspect`. 
 
 ### Add other required secrets and API keys
 
@@ -69,28 +67,33 @@ GOOGLE_API_KEY=<your-api-key>
 
 The `GOOGLE_API_KEY` is needed to allow the applcation to use the Google Calendar API for syncing the choir practice events in the database with the choir practice events of the TU Wien Chor [public calendar](https://calendar.google.com/calendar/embed?src=qshfu0pshf6u7emr0f7pn80a3c%40group.calendar.google.com&ctz=Europe%2FVienna). You need to generate it in the Google Developer console. Once you have it, replace `<your-api-key>` with the key you obtained. For details on how to obtain your key, see [here](https://cloud.google.com/docs/authentication/api-keys).
 
-### Configure drizzle
-Create a file called `drizzle.config.ts` in the root folder of this project. For reference, check out the `drizzle.config.example.ts` file.
+### Launch the application
 
-To sync the drizzle DB schema with the current state of the DB, run `yarn introspect`. This will create a new schema file in `drizzle` (which is also used by the newer parts of the application's data fetching logic, including the tRPC router). The rest currently still uses Prisma, but I wish to migrate away from it someday.
-
-### Launching the application
-
-Now that we've installed the dependencies and the database is set up, the application is ready. Type `yarn dev` to start it.
+Now that we've installed the dependencies and the database stuff, environmnent variables etc. are set up, the application is ready. Type `yarn dev` to start it.
 
 Then, navigate to `localhost:3000/register` to create a user with a name, email and password of your choice. The credentials will be stored in the database (passwords are encrypted/hashed using `bcrypt`, so they should be quite safe, even if the database were compromised).
 
-After registering, you should be logged in and see the main page. All other users that try to register will need an invitation link. To generate those, you can click on 'Invites'. There, you will see an overview page for all invite links that have been generated (there will be none, initially). To generate a new one, just click the button on that page. You can send the generated link to someone you would like to add as a user.
+After registering, you should be logged in and see an admin page. All other admin users that try to register will need an invitation link. To generate those, you can click on 'Invites'. There, you will see an overview page for all invite links that have been generated (there will be none, initially). To generate a new one, just click the button on that page. You can send the generated link to someone you would like to add as a user.
 
-## How actual deployment on a self-hosted server could work
+## Other developer notes
 
-Here I keep track of what I found out about how to do an actual production deployment.
+### Database ER Diagram (as of 2023-08-05)
+This is an ER Diagram I created from the `public` DB schema of the database (which is the schema used by the core application; Prisma, Supabase etc. create other schemas in the DB). It was created with [DBeaver](https://dbeaver.io/download/). Check [this](https://dba.stackexchange.com/questions/244590/what-do-the-entity-relationship-diagram-erd-symbols-used-in-dbeaver-mean) StackExchange discussion for details on the notation/symbols used in the diagram.
 
-A requirement for this project is to use a fully self-hosted solution, running everything on a server hosted at the university, which makes things tricky.
+![ER Diagram](./docs/er-diagram.png)
 
-### Database setup
+### TODOs and nice-to-haves I will probably never find the time for
+This project is very much a playground for me to learn how to make things happen. I was still figuring things out as I added features. As a consequence of this, much of this code is a bit of a sh*tshow. Here I keep track of and prioritize stuff, so that I could fix it if I were to find the time to work on this.
 
-Probably we would need to do Database migrations with [`Prisma migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) instead of using `db push`. This way, Prisma will create a history of SQL migration files to allow us to keep track of database changes more easily, and also revert if something goes wrong. To make this work, one has to
-
-1. Log into the "postgres console" as the DB super user (like mentioned above)
-2. Execute `ALTER USER choir_admin CREATEDB;` to give the database user for this project the ability to create new databases. This is required for `Prisma migrate` to work properly as it needs to create a "shadow database" in the background, details see [here](https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database).
+- [ ] code smells and changes required to reduce them
+  - [ ] move all routes in `pages/api` to tRPC routers
+  - [ ] unify data fetching (some routes use getStaticProps, some getServerSideProps, some fetch on client side - even that is done with different approaches lol)
+  - [ ] refactor ugly backend stats collection code to just use SQL lol
+  - [ ] find a simpler and more bullet-proof way to handle authentication (or rather, actually understand what nextauth does lol)
+- [ ] cool new tech
+  - [ ] move from NextJS to SvelteKit
+  - [ ] move from Prisma to drizzle
+- [ ] UI
+  - [ ] redesign (really looks ugly lol)
+  - [ ] replace Material UI with more lightweight custom components
+- [ ] More control about admin accounts (changing passwords, emails, names, deleting accounts, etc.)

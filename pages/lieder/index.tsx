@@ -16,11 +16,9 @@ const Songs: NextPageWithLayout = () => {
     console.log(songId);
     addSongFile.mutateAsync({
       songId,
-      file: {
-        name: 'Alle Stimmen',
-        link: 'https://drive.google.com/uc?id=1yHpQK5tifFzxA-KeLnBa3fjQcdqoZGUb&export=download',
-        type: 'audio',
-      },
+      name: 'Alle Stimmen',
+      url: 'https://drive.google.com/uc?id=1yHpQK5tifFzxA-KeLnBa3fjQcdqoZGUb&export=download',
+      type: 'audio',
     });
   };
 

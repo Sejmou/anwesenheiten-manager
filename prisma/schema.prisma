@@ -42,7 +42,7 @@ model User {
   email         String?      @unique
   passwordHash  String?
   emailVerified DateTime?
-  createdAt     DateTime     @default(now())
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
   image         String?
   accounts      Account[]
   InviteToken   InviteToken?
@@ -62,9 +62,9 @@ model InviteToken {
   id        Int       @id @default(autoincrement())
   token     String    @unique
   used      Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  expires   DateTime?
-  usedAt    DateTime?
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  expires   DateTime? @db.Timestamptz(6)
+  usedAt    DateTime? @db.Timestamptz(6)
   userId    String?   @unique @map("user_id")
   usedBy    User?     @relation(fields: [userId], references: [id])
 }
@@ -74,7 +74,7 @@ model Singer {
   firstName   String
   lastName    String
   email       String?           @unique
-  createdAt   DateTime          @default(now())
+  createdAt   DateTime          @default(now()) @db.Timestamptz(6)
   voiceGroup  VoiceGroup
   attendances EventAttendance[]
 }
@@ -84,25 +84,26 @@ model Event {
   summary     String
   description String?
   location    String?
-  lastSyncAt  DateTime
-  start       DateTime
-  end         DateTime
+  lastSyncAt  DateTime          @db.Timestamptz(6)
+  start       DateTime          @db.Timestamptz(6)
+  end         DateTime          @db.Timestamptz(6)
   attendances EventAttendance[]
 }
 
 model EventAttendance {
-  singerId String
-  eventId  String
-  event    Event  @relation(fields: [eventId], references: [id])
-  singer   Singer @relation(fields: [singerId], references: [id])
+  singerId  String
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id])
+  singer    Singer   @relation(fields: [singerId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@id([singerId, eventId])
 }
 
 model Song {
   id             String            @id @default(cuid())
-  created_at     DateTime?         @default(now()) @db.Timestamptz(6)
-  title          String            @unique
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+  name           String            @unique
   key            MusicalKey?
   description    String?
   files          SongFile[]
@@ -111,33 +112,34 @@ model Song {
 
 model Setlist {
   id          String            @id @default(cuid())
-  created_at  DateTime?         @default(now()) @db.Timestamptz(6)
-  title       String?
+  createdAt   DateTime          @default(now()) @db.Timestamptz(6)
+  name        String
   description String?
   entries     SetlistSongInfo[]
 }
 
 model SetlistSongInfo {
-  id         String    @id @default(cuid())
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  setlist_id String
-  song_id    String
-  order      Int
-  notes      String?
-  song       Song      @relation(fields: [song_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  setlist    Setlist   @relation(fields: [setlist_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  setlistId String
+  songId    String
+  order     Int
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  notes     String?
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  setlist   Setlist  @relation(fields: [setlistId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([setlist_id, song_id, order], name: "setlistEntryId")
+  @@id([setlistId, songId])
+  @@unique([setlistId, songId, order], name: "setlistEntryOrderUnique")
 }
 
 model SongFile {
-  id         String    @id @default(cuid())
-  song_id    String
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  type       LinkType
-  name       String?
-  url        String?
-  song       Song      @relation(fields: [song_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  songId    String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  type      LinkType
+  name      String
+  url       String
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([songId, name], name: "songFileId")
 }
 
 enum VoiceGroup {
