@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
@@ -12,17 +12,40 @@ import {
   ListItemText,
 } from '@mui/material';
 import { SongFile } from 'drizzle/models';
+import { AttachFile } from '@mui/icons-material';
+import SongFilesDialog from 'components/SongFilesDialog';
 
 const Songs: NextPageWithLayout = () => {
   const songQ = api.song.getAll.useQuery();
-  const addSongFile = api.song.addOrUpdateFile.useMutation();
+  const updateSongFiles = api.song.updateFiles.useMutation();
 
-  const songs = songQ?.data?.songs ?? null;
+  const songs = songQ?.data?.songs ?? [];
 
-  const handleAddClick = async (file: SongFile) => {
-    console.log(file);
-    const fileFromDB = await addSongFile.mutateAsync(file);
-    console.log(fileFromDB);
+  const [fileEditDialogOpen, setDialogOpen] = useState(false);
+  const [song, setSong] = useState<(typeof songs)[0] | null>(null);
+
+  const handleFilesSave = async (files: SongFile[], songId: string) => {
+    console.log(files);
+    const update = await updateSongFiles.mutateAsync({
+      files,
+      songId,
+    });
+    const song = songs?.find(s => s.id === update.songId);
+    if (song) {
+      song.files = update.files;
+    } else {
+      console.warn('Song not found, cannot update files received from server');
+    }
+    setDialogOpen(false);
+  };
+
+  const handleFileEditClick = (song: (typeof songs)[0]) => {
+    setSong(song);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
   };
 
   const songListItems = songs?.map(song => (
@@ -35,16 +58,11 @@ const Songs: NextPageWithLayout = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() =>
-            handleAddClick({
-              songId: song.id,
-              name: song.name,
-              type: 'video',
-              url: 'https://www.youtube.com/watch?v=5qap5aO4i9A',
-            })
-          }
+          startIcon={<AttachFile />}
+          onClick={() => handleFileEditClick(song)}
         >
-          Hinzufügen
+          {song.files.length} Verlinkte{song.files.length == 1 ? 's' : ''} File
+          {song.files.length !== 1 ? 's' : ''}
         </Button>
       </ListItemSecondaryAction>
     </ListItem>
@@ -60,6 +78,17 @@ const Songs: NextPageWithLayout = () => {
         <List>{songListItems}</List>
       ) : (
         <Typography variant="body1">Lade Lieder...</Typography>
+      )}
+      {song && (
+        <SongFilesDialog
+          open={fileEditDialogOpen}
+          key={song.id} // force re=render if song changes
+          files={song.files}
+          songId={song.id}
+          songName={song.name}
+          onSave={files => handleFilesSave(files, song.id)}
+          onClose={handleDialogClose}
+        />
       )}
     </>
   );

@@ -2,12 +2,12 @@ import { pgTable, pgEnum, pgSchema, AnyPgColumn, uniqueIndex, serial, text, time
 
 export const keyStatus = pgEnum("key_status", ['default', 'valid', 'invalid', 'expired'])
 export const keyType = pgEnum("key_type", ['aead-ietf', 'aead-det', 'hmacsha512', 'hmacsha256', 'auth', 'shorthash', 'generichash', 'kdf', 'secretbox', 'secretstream', 'stream_xchacha20'])
+export const linkType = pgEnum("LinkType", ['other', 'audio', 'video', 'pdf', 'musescore'])
 export const factorType = pgEnum("factor_type", ['totp', 'webauthn'])
 export const factorStatus = pgEnum("factor_status", ['unverified', 'verified'])
 export const aalLevel = pgEnum("aal_level", ['aal1', 'aal2', 'aal3'])
 export const codeChallengeMethod = pgEnum("code_challenge_method", ['s256', 'plain'])
 export const voiceGroup = pgEnum("VoiceGroup", ['S1', 'S2', 'S2_M', 'A1_M', 'A1', 'A2', 'T1', 'T2', 'B1', 'B2', 'D'])
-export const linkType = pgEnum("LinkType", ['audio', 'video', 'pdf', 'musescore'])
 export const musicalKey = pgEnum("MusicalKey", ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'])
 
 import { sql } from "drizzle-orm"
