@@ -2,7 +2,7 @@ import { Box, Container } from '@mui/material';
 import Image from 'next/image';
 
 type Props = {};
-const NonAuthHeader = (props: Props) => {
+const BigAdminLogo = (props: Props) => {
   return (
     <Box mb={3}>
       <Box display="flex" alignItems="center" justifyContent="center">
@@ -19,4 +19,4 @@ const NonAuthHeader = (props: Props) => {
     </Box>
   );
 };
-export default NonAuthHeader;
+export default BigAdminLogo;

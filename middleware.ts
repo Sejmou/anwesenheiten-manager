@@ -7,7 +7,7 @@ export const config = {
     '/mitglieder',
     '/statistiken',
     '/termine',
-    '/programm',
+    '/programm_admin',
     '/lieder',
   ],
 };

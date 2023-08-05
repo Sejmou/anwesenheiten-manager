@@ -20,7 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { useStoreActions } from 'lib/message-store';
 
 const parsePromise = function (file: File, header: boolean) {
@@ -129,7 +129,7 @@ const Members: NextPageWithLayout = () => {
 
   return (
     <>
-      <PageHead title="Mitglieder" />
+      <AdminPageHead title="Mitglieder" />
       <Stack spacing={1}>
         <Stack mt={2} spacing={{ xs: 0, md: 2 }}>
           {singersLoading ? (

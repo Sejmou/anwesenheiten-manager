@@ -9,9 +9,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
+import { getAdminAuthPageLayout } from '../components/layout/get-page-layouts';
 import type { NextPageWithLayout } from './_app';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { GetServerSideProps } from 'next';
 import prisma from 'lib/prisma';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ const Login: NextPageWithLayout<Props> = ({ noUsersInDB }: Props) => {
 
   return (
     <>
-      <PageHead
+      <AdminPageHead
         title="Login"
         description="Login für TU Wien Chor AdministratorInnen"
       />
@@ -106,7 +106,7 @@ const Login: NextPageWithLayout<Props> = ({ noUsersInDB }: Props) => {
   );
 };
 
-Login.getLayout = getNonAuthenticatedPageLayout;
+Login.getLayout = getAdminAuthPageLayout;
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
   try {

@@ -13,7 +13,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 type Props = {
-  title: string;
+  title?: string;
   description?: string;
   children: React.ReactNode;
   sx?: SxProps;
@@ -79,9 +79,11 @@ const ResponsiveContainer = ({
     </Accordion>
   ) : (
     <Box sx={sx}>
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        {title}
-      </Typography>
+      {title && (
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          {title}
+        </Typography>
+      )}
       {description && <Typography variant="body1">{description}</Typography>}
       <Paper sx={contentWrapperSxWide}>{children}</Paper>
     </Box>

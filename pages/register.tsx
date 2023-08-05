@@ -6,14 +6,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { GetServerSideProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { FormEventHandler, useState } from 'react';
-import { getNonAuthenticatedPageLayout } from '../components/layout/get-page-layouts';
+import { getAdminAuthPageLayout } from '../components/layout/get-page-layouts';
 import prisma from '../lib/prisma';
 import { RegistrationData } from 'pages/api/register';
 import { NextPageWithLayout } from './_app';
@@ -76,7 +76,7 @@ const Register: NextPageWithLayout<Props> = ({ inviteToken }: Props) => {
 
   return (
     <>
-      <PageHead title="Registrierung" />
+      <AdminPageHead title="Registrierung" />
       <Container
         maxWidth="sm"
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
@@ -130,7 +130,7 @@ const Register: NextPageWithLayout<Props> = ({ inviteToken }: Props) => {
   );
 };
 
-Register.getLayout = getNonAuthenticatedPageLayout;
+Register.getLayout = getAdminAuthPageLayout;
 
 export default Register;
 

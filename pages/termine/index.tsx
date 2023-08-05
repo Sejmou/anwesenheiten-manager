@@ -13,7 +13,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { useState } from 'react';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import ResponsiveContainer from 'components/layout/ResponsiveContainer';
@@ -82,7 +82,7 @@ const Calendar: NextPageWithLayout<Props> = () => {
 
   return (
     <>
-      <PageHead title="Terminkalender" />
+      <AdminPageHead title="Terminkalender" />
       {eventsLoading ? (
         'Lade Termine'
       ) : events.length > 0 ? (

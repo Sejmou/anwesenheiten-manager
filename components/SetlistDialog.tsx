@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -33,6 +33,9 @@ function SetlistDialog(props: SetlistDialogProps) {
   const { onSave, onClose, songsToSelectFrom, open } = props;
   const [setlistTitle, setSetlistTitle] = useState<string>('');
   const [setlistSongIds, setSetlistSongIds] = useState<string[]>([]);
+
+  // hack to clear autocomplete field whenever a new song was added
+  const [clearAutocompleteKey, setClearAutocompleteKey] = useState<number>(0);
 
   useEffect(() => {
     if (props.initialValues) {
@@ -81,7 +84,9 @@ function SetlistDialog(props: SetlistDialogProps) {
   return (
     <Dialog onClose={handleClose} open={open} fullWidth>
       <DialogTitle>
-        {props.initialValues ? 'Setlist bearbeiten' : 'Neue Setlist'}
+        {props.initialValues
+          ? 'Programm bearbeiten'
+          : 'Neues Auftrittsprogramm'}
       </DialogTitle>
       <DialogContent>
         <TextField
@@ -98,17 +103,19 @@ function SetlistDialog(props: SetlistDialogProps) {
         <Autocomplete
           sx={{ paddingTop: 1 }}
           options={songsToSelectFrom}
+          key={clearAutocompleteKey}
           renderInput={params => (
             <TextField
               {...params}
-              label="Neuer Song"
-              placeholder="Wähle einen Song"
+              label="Lied hinzufügen"
+              placeholder="Wähle ein Lied aus dem Repertoire"
               variant="outlined"
             />
           )}
           onChange={(event, value) => {
             if (value) {
               setSetlistSongIds([...setlistSongIds, value.id]);
+              setClearAutocompleteKey(clearAutocompleteKey + 1);
             }
           }}
         />

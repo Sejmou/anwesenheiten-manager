@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import prisma from 'lib/prisma';
 import { Setlist, Song, SetlistSongInfo } from '@prisma/client';
@@ -114,7 +114,7 @@ const ProgramAdmin: NextPageWithLayout<
 
   return (
     <>
-      <PageHead title="Programm-Admin" />
+      <AdminPageHead title="Programm-Admin" />
       <Typography variant="h5">Programm/"Setlists"</Typography>
       {setlists.length > 0 ? (
         <List>
@@ -140,14 +140,16 @@ const ProgramAdmin: NextPageWithLayout<
           ))}
         </List>
       ) : (
-        <Typography variant="body1">Keine Setlists vorhanden.</Typography>
+        <Typography variant="body1">
+          Keine Auftrittsprogramme vorhanden.
+        </Typography>
       )}
       <Button
         variant="contained"
         color="primary"
         onClick={handleNewSetlistClick}
       >
-        Neue Setlist erstellen
+        Neues Programm erstellen
       </Button>
       <SetlistDialog
         open={dialogOpen}

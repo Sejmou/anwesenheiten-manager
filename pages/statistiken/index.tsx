@@ -6,7 +6,7 @@ import {
   Singer as SingerDB,
   VoiceGroup,
 } from '@prisma/client';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { voiceGroupGridValueFormatter } from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';
@@ -92,7 +92,7 @@ const Stats: NextPageWithLayout<Props> = ({
 
   return (
     <>
-      <PageHead title="Statistiken" />
+      <AdminPageHead title="Statistiken" />
       <Stack>
         <Typography>
           Hier werden verschiedene Statistiken über den Chor und die

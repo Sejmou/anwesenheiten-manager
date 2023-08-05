@@ -3,14 +3,19 @@ This is a prototype for an application for everyday tasks concerning life in the
 
 ## Features
 The main feature is a choir admin dashboard. It includes the following:
-- View all upcoming and past events (choir practice, concerts, etc.)
+- Event overview (choir practice, concerts, etc.)
   - The calendar is automatically synced daily with the TU Wien Google calendar
   - If needed, users can also trigger sync from the UI
 - Attendance management for events (e.g. to keep track of how often each choir member attends choir practice)
+- Choir member management
+  - Import members (name and voice group) from CSV
+- 🚧 WIP: Choir repertoire management (list of songs, linked files, etc.)
 - Stats page (choir members, attendances, members by voice group, etc.)
 - Admin account managment
   - Admin accounts with email and password
   - Invite system for new admins: existing admin users can create invite links for new admins (custom account creation links with invite token, tied to specific email)
+
+I plan to add public-facing sites for choir members as well. Currently, only a page for the current program is available. It includes a list of songs and links to the corresponding files (sheet music, lyrics, etc.).
 
 ## Live demo with dummy data
 Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.

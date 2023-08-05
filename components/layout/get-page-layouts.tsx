@@ -1,8 +1,8 @@
 import { Container } from '@mui/material';
 import { ReactElement } from 'react';
 import Header from './AdminPageHeader';
-import NonAuthHeader from './NonAuthHeader';
-import StreetSingingMainPageHeader from './StreetSingingMainPageHeader';
+import BigAdminLogo from './BigAdminLogo';
+import BigLogo from './BigLogo';
 
 export const getAdminPageLayout = (page: ReactElement) => {
   return (
@@ -23,10 +23,9 @@ export const getAdminPageLayout = (page: ReactElement) => {
   );
 };
 
-export const getStreetSingingPageLayout = (page: ReactElement) => {
+export const getPublicPageLayout = (page: ReactElement) => {
   return (
     <>
-      <StreetSingingMainPageHeader sx={{ flex: '0 1 auto' }} />
       <Container
         sx={{
           minHeight: '100%',
@@ -36,13 +35,14 @@ export const getStreetSingingPageLayout = (page: ReactElement) => {
           flexDirection: 'column',
         }}
       >
+        <BigLogo />
         {page}
       </Container>
     </>
   );
 };
 
-export const getNonAuthenticatedPageLayout = (page: ReactElement) => {
+export const getAdminAuthPageLayout = (page: ReactElement) => {
   return (
     <Container
       sx={{
@@ -54,7 +54,7 @@ export const getNonAuthenticatedPageLayout = (page: ReactElement) => {
         justifyContent: 'center',
       }}
     >
-      <NonAuthHeader />
+      <BigAdminLogo />
       {page}
     </Container>
   );

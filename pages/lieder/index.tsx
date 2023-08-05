@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
-import PageHead from 'components/PageHead';
+import AdminPageHead from 'components/AdminPageHead';
 import { api } from 'utils/api';
 import { Button } from '@mui/material';
 
@@ -32,7 +32,7 @@ const Songs: NextPageWithLayout = () => {
 
   return (
     <>
-      <PageHead title="Lieder" />
+      <AdminPageHead title="Lieder" />
       <Typography variant="body1">
         Folgende Lieder sind in der Datenbank:
       </Typography>

@@ -39,7 +39,7 @@ const Header = ({ sx }: Props) => {
       text: 'Anwesenheiten',
     },
     { href: '/termine', text: 'Termine' },
-    { href: '/programm', text: 'Programm' },
+    { href: '/programm_admin', text: 'Programm' },
     { href: '/lieder', text: 'Lieder' },
     { href: '/mitglieder', text: 'Mitglieder' },
     { href: '/statistiken', text: 'Statistiken' },
