@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const validatePostRequestContent = z.object({
   songIds: z.array(z.string()),
-  title: z.string().min(1),
+  name: z.string().min(1),
 });
 
 const setlistRequestHandler: NextApiHandler = async (
@@ -28,7 +28,7 @@ const setlistRequestHandler: NextApiHandler = async (
   }
 
   try {
-    const { songIds, title } = validatePostRequestContent.parse(
+    const { songIds, name } = validatePostRequestContent.parse(
       JSON.parse(req.body)
     );
 
@@ -36,13 +36,13 @@ const setlistRequestHandler: NextApiHandler = async (
     // consider switching to drizzle if this project were to continue
     const newSetlist = await prisma.setlist.create({
       data: {
-        title,
+        name,
       },
     });
 
     const setlistSongs = songIds.map((songId, i) => ({
-      song_id: songId,
-      setlist_id: newSetlist.id,
+      songId: songId,
+      setlistId: newSetlist.id,
       order: i,
     }));
 

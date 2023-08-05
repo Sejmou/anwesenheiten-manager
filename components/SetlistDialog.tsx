@@ -18,7 +18,7 @@ import ArrowDownward from '@mui/icons-material/ArrowDownward';
 
 export type SetlistDialogFormValues = {
   songIds: string[];
-  title: string;
+  name: string;
 };
 
 export interface SetlistDialogProps {
@@ -37,7 +37,7 @@ function SetlistDialog(props: SetlistDialogProps) {
   useEffect(() => {
     if (props.initialValues) {
       setSetlistSongIds(props.initialValues.songIds);
-      setSetlistTitle(props.initialValues.title);
+      setSetlistTitle(props.initialValues.name);
     } else {
       setSetlistSongIds([]);
       setSetlistTitle('');
@@ -45,7 +45,7 @@ function SetlistDialog(props: SetlistDialogProps) {
   }, [props.initialValues]);
 
   const handleSave = () => {
-    onSave({ songIds: setlistSongIds, title: setlistTitle });
+    onSave({ songIds: setlistSongIds, name: setlistTitle });
   };
 
   const handleClose = () => {

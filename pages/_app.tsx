@@ -1,5 +1,5 @@
 import { SessionProvider } from 'next-auth/react';
-import { api } from '../utils/trpc-api';
+import { api } from 'utils/api';
 import { NextPage } from 'next';
 import { AppProps } from 'next/app';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';

@@ -125,13 +125,10 @@ const Stats: NextPageWithLayout<Props> = ({
                 hideFooter
               />
             </ResponsiveContainer>
-            <ResponsiveContainer
-              title='Proben-"Besucherzahlen"'
-              heightEqualsMaxHeight
-            >
+            <ResponsiveContainer title="Anwesenheiten" heightEqualsMaxHeight>
               <DataGrid
                 columns={[
-                  { field: 'summary', headerName: 'Name/Anlass', flex: 1 },
+                  { field: 'summary', headerName: 'Termin', flex: 1 },
                   { field: 'start', headerName: 'Datum', flex: 1 },
                   { field: 'count', headerName: 'Anwesend', flex: 0.5 },
                 ]}

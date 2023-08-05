@@ -1,6 +1,17 @@
 # TU Wien Chor Dashboard
 This is a prototype for an application for everyday tasks concerning life in the university choir of TU Wien.
 
+## Features
+The main feature is a choir admin dashboard. It includes the following:
+- View all upcoming and past events (choir practice, concerts, etc.)
+  - The calendar is automatically synced daily with the TU Wien Google calendar
+  - If needed, users can also trigger sync from the UI
+- Attendance management for events (e.g. to keep track of how often each choir member attends choir practice)
+- Stats page (choir members, attendances, members by voice group, etc.)
+- Admin account managment
+  - Admin accounts with email and password
+  - Invite system for new admins: existing admin users can create invite links for new admins (custom account creation links with invite token, tied to specific email)
+
 ## Live demo with dummy data
 Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
 
@@ -27,7 +38,11 @@ Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.
 #### Remote
 I currently I use Supabase's postgres cloud DB. Check out the [Supabase docs](https://supabase.io/docs) or other sources on the web for details on how to set things up.
 
-### Create DB Schema with Prisma, generate Prisma client
+### Setup Prisma
+[Prisma](https://www.prisma.io/) is an ORM for Node.js and Typescript. It is used to interact with the database from the application code. It also features a typesafe schema, which is used to generate a client that maps entities to DB tables and relations and can be used to interact with the database.
+
+To set up Prisma, follow these steps:
+
 1. Create a `.env` file in the root folder of this project, containing a single line:
    ```
    DATABASE_URL=<connection-string>
@@ -38,18 +53,12 @@ I currently I use Supabase's postgres cloud DB. Check out the [Supabase docs](ht
 2. Run `npx prisma db push`. This will use [Prisma](https://www.prisma.io/), an ORM for Node.js and Typescript, to sync the created database with the database schema defined in `prisma/schema.prisma`. As the database will be empty before we run this command, it essentially just creates all the tables mentioned in the schema. Then, run `npx prisma generate` to create the Prisma client, which is used to interact with the database from the application code. The client will then have access to all the entities of the schema (mapped from DB tables and columns).
 3. (Optional) Run `npx prisma studio`. This will launch Prisma Studio (Prisma's "database explorer") on your machine and make the GUI available via your browser (per default on `localhost:5555`). You can use it to check out the models used in the database - no records will exist at this point.
 
-Now the database stuff should be ready :)
-
-However, the app is still not yet ready to run...
-
-### Setup drizzle, create drizzle schema from DB
+### Setup drizzle
 I don't like the Prisma client interface. I find the syntax quite hard to learn (especially when querying/updating/deleting relations) and too different from regular SQL. Also, Prisma [does NOT use SQL joins when combining data from different tables](https://github.com/prisma/prisma/discussions/12715). Tbh, this isn't that much of a problem for this project. However, I still wanted to try something different. Hence, I went with [drizzle](https://github.com/drizzle-team/drizzle-orm), a lightweight ORM that uses SQL-like syntax and allows for joins. It's still rapidly evolving but I like the API a lot. It is used by the newer parts of this app. Some stuff, like the authentication logic builds on Prisma though, so migrating away from Prisma completely is not an option atm.
 
 Similar to Prisma, drizzle also features a typesafe schema. However, instead of generating a client from the CLI, we generate a schema. Tables, relations etc. from this schema can then be imported in any file that interacts with the DB. The schema is generated from the DB schema using `drizzle-kit`'s `introspect` command. 
 
-To configure  drizzle, create a file called `drizzle.config.ts` in the root folder of this project (check out the `drizzle.config.example.ts` file for reference).
-
-Afterwards, generate the drizzle schema file (`drizzle/schema.ts`) from the current DB schema by running `yarn introspect`. 
+To configure drizzle, create a file called `drizzle.config.ts` in the root folder of this project (check out the `drizzle.config.example.ts` file for reference). Then you should be able to run `npx drizzle-kit introspect:pg` to generate the drizzle client schema file.
 
 ### Add other required secrets and API keys
 
@@ -75,7 +84,22 @@ Then, navigate to `localhost:3000/register` to create a user with a name, email 
 
 After registering, you should be logged in and see an admin page. All other admin users that try to register will need an invitation link. To generate those, you can click on 'Invites'. There, you will see an overview page for all invite links that have been generated (there will be none, initially). To generate a new one, just click the button on that page. You can send the generated link to someone you would like to add as a user.
 
+### Add data
+The application will look weird in its initial state, as neither events nor choir members will exist yet. 
+
+You can add choir members from the 'Mitglieder' page in the admin dashboard. To get started with some fake choir members quickly, upload the file located in `mock-data/fake_choir_members.csv` by dragging it into the designated area and clicking the 'Bestätigen' button. This will add all the choir members from the file to the database. 
+
+Events are synced from the choirs' public Google calendar. Go to the 'Termine' page and click the button that says 'Mit Google Kalender synchronisieren'. This will fetch all events from the calendar and add them to the database. Note that this will only work if you have set up the `GOOGLE_API_KEY` environment variable as described above.
+
+
 ## Other developer notes
+### Schema/Model changes
+The Prisma schema file `prisma/schema.prisma` is the source of truth for the database schema (and hence the whole 'data model' of this application). It is used to generate the Prisma client and sync the database with the schema. The drizzle DB client also relies on it indirectly: its schema is generated from the DB schema using `drizzle-kit`'s `introspect` command. So, whenever you change the Prisma schema, you need to 
+- run `npx prisma db push` to sync the "push" the changes in the Prisma schema to the DB (updating its schema),
+- run `npx prisma generate` to update the Prisma client, and
+- run `npx drizzle-kit introspect:pg` to update the drizzle client schema from the updated DB schema.
+
+Conveniently, there's a script in `package.json` that does all of that: `update-schema-and-clients`. So, whenever you change the Prisma schema, just run `yarn update-schema-and-clients` and you should be good to go.
 
 ### Database ER Diagram (as of 2023-08-05)
 This is an ER Diagram I created from the `public` DB schema of the database (which is the schema used by the core application; Prisma, Supabase etc. create other schemas in the DB). It was created with [DBeaver](https://dbeaver.io/download/). Check [this](https://dba.stackexchange.com/questions/244590/what-do-the-entity-relationship-diagram-erd-symbols-used-in-dbeaver-mean) StackExchange discussion for details on the notation/symbols used in the diagram.

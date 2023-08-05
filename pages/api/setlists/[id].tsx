@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const validatePutRequestContent = z.object({
   songIds: z.array(z.string()),
-  title: z.string().min(1),
+  name: z.string().min(1),
 });
 
 const setlistRequestHandler: NextApiHandler = async (
@@ -24,7 +24,7 @@ const setlistRequestHandler: NextApiHandler = async (
 
   if (method === 'PUT') {
     try {
-      const { songIds, title } = validatePutRequestContent.parse(
+      const { songIds, name } = validatePutRequestContent.parse(
         JSON.parse(req.body)
       );
 
@@ -42,27 +42,27 @@ const setlistRequestHandler: NextApiHandler = async (
 
       // TODO: figure out how to do stuff with transactions (probably huge brainf*ck with prisma)
       // consider switching to drizzle if this project were to continue
-      const updatedSetlist = await prisma.setlist.update({
+      await prisma.setlist.update({
         where: {
-          id: id as string,
+          id,
         },
         data: {
-          title,
+          name,
         },
       });
 
       // delete old selist entries
       await prisma.setlistSongInfo.deleteMany({
         where: {
-          setlist_id: id as string,
+          setlistId: id,
         },
       });
 
       // create new ones
       await prisma.setlistSongInfo.createMany({
         data: songIds.map((songId, i) => ({
-          setlist_id: id as string,
-          song_id: songId,
+          setlistId: id as string,
+          songId: songId,
           order: i,
         })),
       });

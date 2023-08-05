@@ -6,7 +6,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "introspect": "drizzle-kit introspect:pg"
+    "update-schema-and-clients": "prisma db push && prisma generate && drizzle-kit introspect:pg"
   },
   "keywords": [],
   "author": "",
@@ -51,6 +51,6 @@
     "@types/react": "18.0.28",
     "drizzle-kit": "^0.19.12",
     "prisma": "^4.2.1",
-    "typescript": "4.5.5"
+    "typescript": "^5.1.6"
   }
 }

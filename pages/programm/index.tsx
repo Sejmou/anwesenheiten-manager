@@ -42,8 +42,8 @@ const ProgramAdmin: NextPageWithLayout<
         return null;
       }
       const formValues: SetlistDialogFormValues = {
-        title: setlist.title!, // TODO: update model to make title non-nullable
-        songIds: setlist.entries.map(entry => entry.song_id),
+        name: setlist.name!, // TODO: update model to make title non-nullable
+        songIds: setlist.entries.map(entry => entry.songId),
       };
       return formValues;
     } else {
@@ -122,7 +122,7 @@ const ProgramAdmin: NextPageWithLayout<
             <ListItem key={setlist.id}>
               <ListItemButton onClick={() => handleSetlistClick(setlist.id)}>
                 <ListItemText
-                  primary={setlist.title}
+                  primary={setlist.name}
                   secondary={`${setlist.entries.length} Lied${
                     setlist.entries.length == 1 ? '' : 'er'
                   }`}
@@ -154,7 +154,7 @@ const ProgramAdmin: NextPageWithLayout<
         onClose={() => setDialogOpen(false)}
         onSave={handleDialogSave}
         songsToSelectFrom={songs.map(song => ({
-          label: song.title,
+          label: song.name,
           id: song.id,
         }))}
         initialValues={initialDialogValues}
