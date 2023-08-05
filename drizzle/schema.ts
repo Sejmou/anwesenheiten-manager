@@ -16,7 +16,7 @@ export const verificationToken = pgTable("VerificationToken", {
 	id: serial("id").primaryKey().notNull(),
 	identifier: text("identifier").notNull(),
 	token: text("token").notNull(),
-	expires: timestamp("expires", { precision: 3, mode: 'string' }).notNull(),
+	expires: timestamp("expires", { precision: 3,  }).notNull(),
 },
 (table) => {
 	return {
@@ -31,8 +31,8 @@ export const user = pgTable("User", {
 	lastName: text("lastName").notNull(),
 	email: text("email"),
 	passwordHash: text("passwordHash"),
-	emailVerified: timestamp("emailVerified", { precision: 3, mode: 'string' }),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	emailVerified: timestamp("emailVerified", { precision: 3,  }),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	image: text("image"),
 },
 (table) => {
@@ -67,7 +67,7 @@ export const session = pgTable("Session", {
 	id: text("id").primaryKey().notNull(),
 	sessionToken: text("session_token").notNull(),
 	userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade", onUpdate: "cascade" } ),
-	expires: timestamp("expires", { precision: 3, mode: 'string' }).notNull(),
+	expires: timestamp("expires", { precision: 3,  }).notNull(),
 },
 (table) => {
 	return {
@@ -79,9 +79,9 @@ export const inviteToken = pgTable("InviteToken", {
 	id: serial("id").primaryKey().notNull(),
 	token: text("token").notNull(),
 	used: boolean("used").default(false).notNull(),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
-	expires: timestamp("expires", { precision: 6, withTimezone: true, mode: 'string' }),
-	usedAt: timestamp("usedAt", { precision: 6, withTimezone: true, mode: 'string' }),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
+	expires: timestamp("expires", { precision: 6, withTimezone: true,  }),
+	usedAt: timestamp("usedAt", { precision: 6, withTimezone: true,  }),
 	userId: text("user_id").references(() => user.id, { onDelete: "set null", onUpdate: "cascade" } ),
 },
 (table) => {
@@ -96,9 +96,9 @@ export const event = pgTable("Event", {
 	summary: text("summary").notNull(),
 	description: text("description"),
 	location: text("location"),
-	lastSyncAt: timestamp("lastSyncAt", { precision: 6, withTimezone: true, mode: 'string' }).notNull(),
-	start: timestamp("start", { precision: 6, withTimezone: true, mode: 'string' }).notNull(),
-	end: timestamp("end", { precision: 6, withTimezone: true, mode: 'string' }).notNull(),
+	lastSyncAt: timestamp("lastSyncAt", { precision: 6, withTimezone: true,  }).notNull(),
+	start: timestamp("start", { precision: 6, withTimezone: true,  }).notNull(),
+	end: timestamp("end", { precision: 6, withTimezone: true,  }).notNull(),
 });
 
 export const singer = pgTable("Singer", {
@@ -106,7 +106,7 @@ export const singer = pgTable("Singer", {
 	firstName: text("firstName").notNull(),
 	lastName: text("lastName").notNull(),
 	email: text("email"),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	voiceGroup: voiceGroup("voiceGroup").notNull(),
 },
 (table) => {
@@ -117,7 +117,7 @@ export const singer = pgTable("Singer", {
 
 export const song = pgTable("Song", {
 	id: text("id").primaryKey().notNull(),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	name: text("name").notNull(),
 	key: musicalKey("key"),
 	description: text("description"),
@@ -130,7 +130,7 @@ export const song = pgTable("Song", {
 
 export const setlist = pgTable("Setlist", {
 	id: text("id").primaryKey().notNull(),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	name: text("name").notNull(),
 	description: text("description"),
 });
@@ -138,7 +138,7 @@ export const setlist = pgTable("Setlist", {
 export const eventAttendance = pgTable("EventAttendance", {
 	singerId: text("singerId").notNull().references(() => singer.id, { onDelete: "restrict", onUpdate: "cascade" } ),
 	eventId: text("eventId").notNull().references(() => event.id, { onDelete: "restrict", onUpdate: "cascade" } ),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 },
 (table) => {
 	return {
@@ -148,7 +148,7 @@ export const eventAttendance = pgTable("EventAttendance", {
 
 export const songFile = pgTable("SongFile", {
 	songId: text("songId").notNull().references(() => song.id, { onDelete: "cascade" } ),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	type: linkType("type").notNull(),
 	name: text("name").notNull(),
 	url: text("url").notNull(),
@@ -163,7 +163,7 @@ export const setlistSongInfo = pgTable("SetlistSongInfo", {
 	setlistId: text("setlistId").notNull().references(() => setlist.id, { onDelete: "cascade" } ),
 	songId: text("songId").notNull().references(() => song.id, { onDelete: "cascade" } ),
 	order: integer("order").notNull(),
-	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	notes: text("notes"),
 },
 (table) => {

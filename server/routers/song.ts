@@ -1,19 +1,11 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter } from '../trpc';
 import { song, songFile } from 'drizzle/schema';
-import { eq } from 'drizzle-orm';
-import { InferModel } from 'drizzle-orm';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-type NewFile = InferModel<typeof songFile, 'insert'>;
+// create input schema
+const songFileInput = createInsertSchema(songFile);
 
-const songFileInput = z.object({
-  name: z.string(),
-  url: z.string(),
-  type: z.enum(songFile.type.enumValues),
-  songId: z.string(),
-});
-
-// TODO: add procedures for editing and removing songs and editing related data
 export const songRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const songs = await ctx.db.query.song.findMany({
@@ -26,11 +18,21 @@ export const songRouter = createTRPCRouter({
       songs,
     };
   }),
-  addFile: publicProcedure
+  addOrUpdateFile: publicProcedure
     .input(songFileInput)
     .mutation(async ({ ctx, input }) => {
-      const newFile = await ctx.db.insert(songFile).values(input).returning();
-      return newFile;
+      const file = await ctx.db
+        .insert(songFile)
+        .values(input)
+        .onConflictDoUpdate({
+          target: [songFile.songId, songFile.name],
+          set: {
+            url: input.url,
+            type: input.type,
+          },
+        })
+        .returning();
+      return file[0]!;
     }),
 });
 

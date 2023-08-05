@@ -6,7 +6,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "update-schema-and-clients": "prisma db push && prisma generate && drizzle-kit introspect:pg"
+    "update-schema-and-clients": "prisma db push && prisma generate && drizzle-kit introspect:pg && sed -i '' \"s/mode: 'string'//g\" drizzle/schema.ts"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,7 @@
     "@upstash/qstash": "^0.3.6",
     "bcrypt": "^5.0.1",
     "drizzle-orm": "^0.27.2",
+    "drizzle-zod": "^0.4.4",
     "easy-peasy": "^5.0.4",
     "eslint-config-next": "^13.4.12",
     "googleapis": "^107.0.0",

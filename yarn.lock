@@ -1397,6 +1397,11 @@ drizzle-orm@^0.27.2:
   resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.27.2.tgz#bff4b9bb3dc53aa9f12ad2804bc8229f4c757cf8"
   integrity sha512-ZvBvceff+JlgP7FxHKe0zOU9CkZ4RcOtibumIrqfYzDGuOeF0YUY0F9iMqYpRM7pxnLRfC+oO7rWOUH3T5oFQA==
 
+drizzle-zod@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/drizzle-zod/-/drizzle-zod-0.4.4.tgz#a7683d23e433f7cb0cf69e7f77ec3dc865c7d0e6"
+  integrity sha512-XNn0mjQ306Hvg+CuyKV98wnsWBWeTqv+kgE/N79Zj0EdCvjD2kaoN5sFDGFkMVqPQuP7IB1IPs0lEcOij1RvBA==
+
 easy-peasy@^5.0.4:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/easy-peasy/-/easy-peasy-5.2.0.tgz#aee9a06d4bf72aa1e20442d5019306a552f350a0"

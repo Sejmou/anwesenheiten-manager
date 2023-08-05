@@ -106,6 +106,8 @@ The Prisma schema file `prisma/schema.prisma` is the source of truth for the dat
 
 Conveniently, there's a script in `package.json` that does all of that: `update-schema-and-clients`. So, whenever you change the Prisma schema, just run `yarn update-schema-and-clients` and you should be good to go.
 
+Note: because I had an issue with the infer mode for timestamp columns being set to `mode: 'string'` in the introspection script (see this [GitHub issue](https://github.com/drizzle-team/drizzle-kit-mirror/issues/144)), I had to manually remove all instances of that string from the output schema file with `sed -i '' \"s/mode: 'string'//g\" drizzle/schema.ts` (to make replacement work on Mac - this might not work on Linux, and surely doesn't on Windows - find an equivalent if needed).
+
 ### Database ER Diagram (as of 2023-08-05)
 This is an ER Diagram I created from the `public` DB schema of the database (which is the schema used by the core application; Prisma, Supabase etc. create other schemas in the DB). It was created with [DBeaver](https://dbeaver.io/download/). Check [this](https://dba.stackexchange.com/questions/244590/what-do-the-entity-relationship-diagram-erd-symbols-used-in-dbeaver-mean) StackExchange discussion for details on the notation/symbols used in the diagram.
 

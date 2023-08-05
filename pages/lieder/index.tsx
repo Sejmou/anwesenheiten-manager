@@ -4,31 +4,50 @@ import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import AdminPageHead from 'components/AdminPageHead';
 import { api } from 'utils/api';
-import { Button } from '@mui/material';
+import {
+  Button,
+  List,
+  ListItem,
+  ListItemSecondaryAction,
+  ListItemText,
+} from '@mui/material';
+import { SongFile } from 'drizzle/models';
 
 const Songs: NextPageWithLayout = () => {
   const songQ = api.song.getAll.useQuery();
-  const addSongFile = api.song.addFile.useMutation();
+  const addSongFile = api.song.addOrUpdateFile.useMutation();
 
   const songs = songQ?.data?.songs ?? null;
 
-  const handleAddClick = async (songId: string) => {
-    console.log(songId);
-    const success = await addSongFile.mutateAsync({
-      songId,
-      name: 'Alle Stimmen',
-      url: 'https://drive.google.com/uc?id=1yHpQK5tifFzxA-KeLnBa3fjQcdqoZGUb&export=download',
-      type: 'audio',
-    });
-    console.log(success);
+  const handleAddClick = async (file: SongFile) => {
+    console.log(file);
+    const fileFromDB = await addSongFile.mutateAsync(file);
+    console.log(fileFromDB);
   };
 
-  const songList = songs?.map(song => (
-    <li key={song.id}>
-      {song.name} ({song.files.length} File
-      {song.files.length !== 1 ? 's' : ''})
-      <Button onClick={() => handleAddClick(song.id)}>File hinzufügen</Button>
-    </li>
+  const songListItems = songs?.map(song => (
+    <ListItem key={song.id}>
+      <ListItemText
+        primary={song.name}
+        secondary={song.createdAt.toLocaleDateString()}
+      />
+      <ListItemSecondaryAction>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            handleAddClick({
+              songId: song.id,
+              name: song.name,
+              type: 'video',
+              url: 'https://www.youtube.com/watch?v=5qap5aO4i9A',
+            })
+          }
+        >
+          Hinzufügen
+        </Button>
+      </ListItemSecondaryAction>
+    </ListItem>
   ));
 
   return (
@@ -37,7 +56,11 @@ const Songs: NextPageWithLayout = () => {
       <Typography variant="body1">
         Folgende Lieder sind in der Datenbank:
       </Typography>
-      {songList || <Typography variant="body1">Lade Lieder...</Typography>}
+      {songListItems ? (
+        <List>{songListItems}</List>
+      ) : (
+        <Typography variant="body1">Lade Lieder...</Typography>
+      )}
     </>
   );
 };
