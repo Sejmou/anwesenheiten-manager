@@ -13,7 +13,7 @@ import {
 import PublicPageHead from 'components/layout/PublicPageHead';
 import BasicAccordion, { BasicAccordionItem } from 'components/BasicAccordion';
 import { singularPluralAutoFormat } from 'frontend-utils';
-import { SongWithFiles } from 'drizzle/models';
+import { SongWithFileLinks } from 'drizzle/models';
 import SongDetailsDialog from 'components/SongDetailsDialog';
 
 type PageProps = {
@@ -21,9 +21,11 @@ type PageProps = {
 };
 
 const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
-  const [selectedSong, setSelectedSong] = useState<SongWithFiles | null>(null);
+  const [selectedSong, setSelectedSong] = useState<SongWithFileLinks | null>(
+    null
+  );
 
-  const handleSongClick = (song: SongWithFiles) => {
+  const handleSongClick = (song: SongWithFileLinks) => {
     setSelectedSong(song);
   };
 
@@ -40,7 +42,11 @@ const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
       {setlists.length > 0 ? (
         <BasicAccordion>
           {setlists.map(setlist => (
-            <SetlistItem setlist={setlist} onSongClick={handleSongClick} />
+            <SetlistItem
+              setlist={setlist}
+              key={setlist.id}
+              onSongClick={handleSongClick}
+            />
           ))}
         </BasicAccordion>
       ) : (
@@ -59,7 +65,7 @@ const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
 
 type SetlistItemProps = {
   setlist: PageProps['setlists'][0];
-  onSongClick: (song: SongWithFiles) => void;
+  onSongClick: (song: SongWithFileLinks) => void;
 };
 
 const SetlistItem = ({ setlist, onSongClick }: SetlistItemProps) => {
@@ -71,8 +77,8 @@ const SetlistItem = ({ setlist, onSongClick }: SetlistItemProps) => {
       secondaryText={singularPluralAutoFormat(setlist.setlistSongInfo, 'Lied')}
     >
       <List>
-        {songs.map(song => (
-          <ListItem>
+        {songs.map((song, i) => (
+          <ListItem key={i}>
             <ListItemButton onClick={() => onSongClick(song)}>
               <ListItemText
                 primary={song.name}
@@ -86,8 +92,8 @@ const SetlistItem = ({ setlist, onSongClick }: SetlistItemProps) => {
   );
 };
 
-function getSecondaryText(song: SongWithFiles) {
-  const filesStr = singularPluralAutoFormat(song.files, 'File');
+function getSecondaryText(song: SongWithFileLinks) {
+  const filesStr = singularPluralAutoFormat(song.fileLinks, 'File');
   const keyStr = song.key ? `Tonart: ${song.key}` : '';
   return [keyStr, filesStr].filter(str => str !== '').join(', ');
 }
@@ -125,7 +131,7 @@ async function getSetlistsWithSongs() {
         with: {
           song: {
             with: {
-              files: true,
+              fileLinks: true,
             },
           },
         },

@@ -9,5 +9,6 @@ export const config = {
     '/termine',
     '/programm_admin',
     '/lieder',
+    '/files',
   ],
 };

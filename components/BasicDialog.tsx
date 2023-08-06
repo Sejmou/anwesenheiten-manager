@@ -48,7 +48,9 @@ const BasicDialog = ({
 
       <DialogActions>
         <Button onClick={onClose}>{closeButtonText || 'Schließen'}</Button>
-        {saveButtonText && <Button onClick={onSave}>{saveButtonText}</Button>}
+        {onSave && (
+          <Button onClick={onSave}>{saveButtonText || 'Speichern'}</Button>
+        )}
       </DialogActions>
     </Dialog>
   );

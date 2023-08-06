@@ -5,11 +5,11 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { Song, SongFile } from 'drizzle/models';
+import { Song, SongFileLink } from 'drizzle/models';
 import BasicDialog from './BasicDialog';
 import TextAttributeDisplay from './TextAttributeDisplay';
 
-type SongWithFiles = Song & { files: SongFile[] };
+type SongWithFiles = Song & { fileLinks: SongFileLink[] };
 
 type Props = {
   song: SongWithFiles;
@@ -35,18 +35,18 @@ const SongDetailsDialog = ({ song, open, onClose }: Props) => {
         ]}
       />
       <Typography variant="h6">Files</Typography>
-      {song.files.length > 0 && (
+      {song.fileLinks.length > 0 && (
         <List>
-          {song.files.map((file, i) => (
-            <ListItem key={file.songId + file.name}>
+          {song.fileLinks.map((file, i) => (
+            <ListItem key={file.songId + file.label}>
               <ListItemButton>
-                <ListItemText primary={file.name} />
+                <ListItemText primary={file.label} />
               </ListItemButton>
             </ListItem>
           ))}
         </List>
       )}
-      {song.files.length === 0 && (
+      {song.fileLinks.length === 0 && (
         <Typography>Es sind keine Files verlinkt.</Typography>
       )}
     </BasicDialog>

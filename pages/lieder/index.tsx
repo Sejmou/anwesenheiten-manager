@@ -11,30 +11,31 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from '@mui/material';
-import { Song, SongFile } from 'drizzle/models';
+import { Song, SongFileLink } from 'drizzle/models';
 import { AttachFile } from '@mui/icons-material';
-import SongFilesDialog from 'components/admin/SongFilesDialog';
+import SongFileLinksDialog from 'components/admin/SongFileLinksDialog';
 import CustomDropzone from 'components/CustomDropzone';
 import BasicDialog from 'components/BasicDialog';
+import { singularPluralAutoFormat } from 'frontend-utils';
 
 const Songs: NextPageWithLayout = () => {
   const songQ = api.song.getAll.useQuery();
-  const updateSongFiles = api.song.updateFiles.useMutation();
+  const updateSongFileLinks = api.song.updateFileLinks.useMutation();
 
   const songs = songQ?.data?.songs ?? [];
 
   const [fileEditDialogOpen, setDialogOpen] = useState(false);
   const [song, setSong] = useState<(typeof songs)[0] | null>(null);
 
-  const handleFilesSave = async (files: SongFile[], songId: string) => {
-    console.log(files);
-    const update = await updateSongFiles.mutateAsync({
-      files,
+  const handleFileLinksSave = async (links: SongFileLink[], songId: string) => {
+    console.log(links);
+    const update = await updateSongFileLinks.mutateAsync({
+      links,
       songId,
     });
     const song = songs?.find(s => s.id === update.songId);
     if (song) {
-      song.files = update.files;
+      song.fileLinks = update.fileLinks;
     } else {
       console.warn('Song not found, cannot update files received from server');
     }
@@ -63,8 +64,7 @@ const Songs: NextPageWithLayout = () => {
           startIcon={<AttachFile />}
           onClick={() => handleFileEditClick(song)}
         >
-          {song.files.length} Verlinkte{song.files.length == 1 ? 's' : ''} File
-          {song.files.length !== 1 ? 's' : ''}
+          {singularPluralAutoFormat(song.fileLinks, 'File')} verlinkt
         </Button>
       </ListItemSecondaryAction>
     </ListItem>
@@ -92,13 +92,13 @@ const Songs: NextPageWithLayout = () => {
         }}
       />
       {song && (
-        <SongFilesDialog
+        <SongFileLinksDialog
           open={fileEditDialogOpen}
           key={song.id} // force re=render if song changes
-          files={song.files}
+          links={song.fileLinks}
           songId={song.id}
           songName={song.name}
-          onSave={files => handleFilesSave(files, song.id)}
+          onSave={files => handleFileLinksSave(files, song.id)}
           onClose={handleDialogClose}
         />
       )}

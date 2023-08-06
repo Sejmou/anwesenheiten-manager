@@ -23,6 +23,15 @@ export const prismaMigrations = pgTable("_prisma_migrations", {
 	appliedStepsCount: integer("applied_steps_count").default(0).notNull(),
 });
 
+export const googleDriveFile = pgTable("GoogleDriveFile", {
+	id: text("id").primaryKey().notNull(),
+	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
+	name: text("name").notNull(),
+	mimeType: text("mimeType").notNull(),
+	downloadUrl: text("downloadUrl").notNull(),
+	lastSyncAt: timestamp("lastSyncAt", { precision: 6, withTimezone: true,  }).notNull(),
+});
+
 export const verificationToken = pgTable("VerificationToken", {
 	id: serial("id").primaryKey().notNull(),
 	identifier: text("identifier").notNull(),
@@ -171,15 +180,17 @@ export const setlistSongInfo = pgTable("SetlistSongInfo", {
 	}
 });
 
-export const songFile = pgTable("SongFile", {
+export const songFileLink = pgTable("SongFileLink", {
 	songId: uuid("songId").notNull().references(() => song.id, { onDelete: "cascade" } ),
 	createdAt: timestamp("createdAt", { precision: 6, withTimezone: true,  }).defaultNow().notNull(),
 	type: linkType("type").notNull(),
-	name: text("name").notNull(),
+	label: text("label").notNull(),
 	url: text("url").notNull(),
+	googleDriveId: text("googleDriveId").references(() => googleDriveFile.id, { onDelete: "set null", onUpdate: "cascade" } ),
 },
 (table) => {
 	return {
-		songFilePkey: primaryKey(table.songId, table.name)
+		googleDriveIdKey: uniqueIndex("SongFileLink_googleDriveId_key").on(table.googleDriveId),
+		songFileLinkPkey: primaryKey(table.songId, table.label)
 	}
 });

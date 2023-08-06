@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS "Setlist" (
 	"description" text
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "SongFile" (
+CREATE TABLE IF NOT EXISTS "SongFileLink" (
 	"id" text PRIMARY KEY NOT NULL,
 	"song_id" text NOT NULL,
 	"created_at" timestamp(6) with time zone DEFAULT CURRENT_TIMESTAMP,
@@ -206,7 +206,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "SongFile" ADD CONSTRAINT "SongFile_song_id_fkey" FOREIGN KEY ("song_id") REFERENCES "Song"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "SongFileLink" ADD CONSTRAINT "SongFileLink_song_id_fkey" FOREIGN KEY ("song_id") REFERENCES "Song"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

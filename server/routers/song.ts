@@ -1,17 +1,17 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { songFile, song } from 'drizzle/schema';
+import { songFileLink, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // create input schema
-const songFileInput = createInsertSchema(songFile);
+const songFileLinkInput = createInsertSchema(songFileLink);
 
 export const songRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const songs = await ctx.db.query.song.findMany({
       with: {
-        files: true,
+        fileLinks: true,
       },
     });
 
@@ -36,35 +36,37 @@ export const songRouter = createTRPCRouter({
         failures,
       };
     }),
-  updateFiles: protectedProcedure
+  updateFileLinks: protectedProcedure
     .input(
       z.object({
-        files: songFileInput.array(),
+        links: songFileLinkInput.array(),
         songId: z.string().nonempty(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const { songId } = input;
-      const files = await ctx.db.transaction(async tx => {
-        await tx.delete(songFile).where(eq(songFile.songId, input.songId));
-        if (input.files.length === 0) {
+      const fileLinks = await ctx.db.transaction(async tx => {
+        await tx
+          .delete(songFileLink)
+          .where(eq(songFileLink.songId, input.songId));
+        if (input.links.length === 0) {
           return [];
         }
-        return await tx.insert(songFile).values(input.files).returning();
+        return await tx.insert(songFileLink).values(input.links).returning();
       });
       return {
-        files,
+        fileLinks,
         songId,
       };
     }),
-  addOrUpdateFile: protectedProcedure
-    .input(songFileInput)
+  addOrUpdateFileLink: protectedProcedure
+    .input(songFileLinkInput)
     .mutation(async ({ ctx, input }) => {
       const file = await ctx.db
-        .insert(songFile)
+        .insert(songFileLink)
         .values(input)
         .onConflictDoUpdate({
-          target: [songFile.songId, songFile.name],
+          target: [songFileLink.songId, songFileLink.label],
           set: {
             url: input.url,
             type: input.type,
@@ -72,6 +74,25 @@ export const songRouter = createTRPCRouter({
         })
         .returning();
       return file[0]!;
+    }),
+  removeFileLink: protectedProcedure
+    .input(
+      z.object({
+        songId: z.string().nonempty(),
+        label: z.string().nonempty(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { songId, label } = input;
+      await ctx.db
+        .delete(songFileLink)
+        .where(
+          and(eq(songFileLink.songId, songId), eq(songFileLink.label, label))
+        );
+      return {
+        songId,
+        label,
+      };
     }),
 });
 

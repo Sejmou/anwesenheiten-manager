@@ -3,29 +3,30 @@ import { List, ListItem, IconButton, TextField, Stack } from '@mui/material';
 
 import Delete from '@mui/icons-material/Delete';
 import Add from '@mui/icons-material/Add';
-import { SongFile, LinkType, linkTypeValues } from 'drizzle/models';
+import { SongFileLink, LinkType, linkTypeValues } from 'drizzle/models';
 import BasicSelect from '../BasicSelect';
 import BasicDialog from 'components/BasicDialog';
+import { songLinkTypeOptions } from 'frontend-utils';
 
-export interface SongFileEditDialogProps {
+export interface SongFileLinkEditDialogProps {
   open: boolean;
-  files: SongFile[];
+  links: SongFileLink[];
   songId: string;
   songName: string;
-  onSave: (files: SongFile[]) => void;
+  onSave: (files: SongFileLink[]) => void;
   onClose: () => void;
 }
 
-function SongFilesDialog(props: SongFileEditDialogProps) {
+function SongFileLinksDialog(props: SongFileLinkEditDialogProps) {
   const {
     open,
-    files: existingFiles,
+    links: existingFiles,
     songId,
     songName,
     onSave,
     onClose,
   } = props;
-  const [files, setFiles] = useState<SongFile[]>(existingFiles);
+  const [files, setFiles] = useState<SongFileLink[]>(existingFiles);
 
   const handleSave = () => {
     onSave(files);
@@ -35,17 +36,17 @@ function SongFilesDialog(props: SongFileEditDialogProps) {
     onClose();
   };
 
-  const handleAdd = (file: SongFile) => {
+  const handleAdd = (file: SongFileLink) => {
     setFiles([...files, file]);
   };
 
-  const handleEdit = (file: SongFile, i: number) => {
+  const handleEdit = (file: SongFileLink, i: number) => {
     const newFiles = [...files];
     newFiles[i] = file;
     setFiles(newFiles);
   };
 
-  const handleRemove = (file: SongFile) => {
+  const handleRemove = (file: SongFileLink) => {
     setFiles(files.filter(f => f !== file));
   };
 
@@ -62,7 +63,7 @@ function SongFilesDialog(props: SongFileEditDialogProps) {
         {files.map((file, i) => (
           <FileLink
             variant="existing"
-            key={file.songId + file.name}
+            key={file.songId + file.label}
             file={file}
             onEdit={file => handleEdit(file, i)}
             onRemove={() => handleRemove(file)}
@@ -78,64 +79,31 @@ function SongFilesDialog(props: SongFileEditDialogProps) {
   );
 }
 
-function getLabelForLinkType(type: SongFile['type']) {
-  switch (type) {
-    case 'Audio':
-      return 'Audio (allgemein)';
-    case 'AudioInitialNotes':
-      return 'Anfangstöne';
-    case 'AudioPracticeTrack':
-      return 'Übungstrack';
-    case 'AudioRecording':
-      return 'Aufnahme';
-    case 'PDF':
-      return 'PDF';
-    case 'Video':
-      return 'Video';
-    case 'MuseScore':
-      return 'MuseScore';
-    case 'Other':
-      return 'Diverses';
-    default:
-      console.warn(
-        `Cannot find label for DB link type '${type}' - using as label in UI`
-      );
-      return type;
-  }
-}
-
-const options = linkTypeValues
-  .map(type => ({
-    label: getLabelForLinkType(type),
-    value: type,
-  }))
-  .sort((a, b) => a.value.toLowerCase().localeCompare(b.value.toLowerCase()));
-
 type FileLinkProps =
   | {
       variant: 'existing';
-      file: SongFile;
-      onEdit: (file: SongFile) => void;
+      file: SongFileLink;
+      onEdit: (file: SongFileLink) => void;
       onRemove: () => void;
     }
   | {
       variant: 'new';
       songId: string;
-      onAdd: (file: SongFile) => void;
+      onAdd: (file: SongFileLink) => void;
     };
 
 const FileLink = (props: FileLinkProps) => {
-  const file: SongFile =
+  const file: SongFileLink =
     props.variant === 'existing'
       ? props.file
       : {
-          name: '',
+          label: '',
           type: 'AudioInitialNotes',
           url: '',
           songId: props.songId,
         };
 
-  const [name, setName] = useState(file.name);
+  const [label, setLabel] = useState(file.label);
   const [type, setType] = useState(file.type);
   const [url, setUrl] = useState(file.url);
 
@@ -149,19 +117,19 @@ const FileLink = (props: FileLinkProps) => {
         }}
         alignItems="center"
       >
-        <TextField
-          label="Name"
-          value={name}
-          sx={{
-            flex: 1,
-          }}
-          onChange={e => setName(e.target.value)}
-        />
         <BasicSelect<LinkType>
           optionsTypeLabel="Link-Typ"
           value={type}
           onChange={newType => setType(newType)}
-          options={options}
+          options={songLinkTypeOptions}
+        />
+        <TextField
+          label="Link-Label"
+          value={label}
+          sx={{
+            flex: 1,
+          }}
+          onChange={e => setLabel(e.target.value)}
         />
         <TextField
           label="URL"
@@ -176,7 +144,7 @@ const FileLink = (props: FileLinkProps) => {
           onClick={
             props.variant === 'existing'
               ? props.onRemove
-              : () => props.onAdd({ name, type, url, songId: props.songId })
+              : () => props.onAdd({ label, type, url, songId: props.songId })
           }
         >
           {props.variant === 'existing' ? <Delete /> : <Add color="primary" />}
@@ -186,4 +154,4 @@ const FileLink = (props: FileLinkProps) => {
   );
 };
 
-export default SongFilesDialog;
+export default SongFileLinksDialog;

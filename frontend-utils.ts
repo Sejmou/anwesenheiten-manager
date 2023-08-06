@@ -1,5 +1,6 @@
 import { GridValueFormatterParams } from '@mui/x-data-grid';
 import { VoiceGroup } from '@prisma/client';
+import { SongFileLink, linkTypeValues } from 'drizzle/models';
 
 export const VoiceGroupToDescriptionString: { [voiceGroup: string]: string } = {
   S1: 'Sopran 1',
@@ -45,3 +46,36 @@ export function singularPluralAutoFormat<T>(
   }
   return `${array.length} ${mappings[wordInSingular]}`;
 }
+
+function getLabelForSongFileLinkType(type: SongFileLink['type']) {
+  switch (type) {
+    case 'Audio':
+      return 'Audio (allgemein)';
+    case 'AudioInitialNotes':
+      return 'Anfangstöne';
+    case 'AudioPracticeTrack':
+      return 'Übungstrack';
+    case 'AudioRecording':
+      return 'Aufnahme';
+    case 'PDF':
+      return 'PDF';
+    case 'Video':
+      return 'Video';
+    case 'MuseScore':
+      return 'MuseScore';
+    case 'Other':
+      return 'Diverses';
+    default:
+      console.warn(
+        `Cannot find label for SongFileLink link type '${type}' - using as label in UI`
+      );
+      return type;
+  }
+}
+
+export const songLinkTypeOptions = linkTypeValues
+  .map(type => ({
+    label: getLabelForSongFileLinkType(type),
+    value: type,
+  }))
+  .sort((a, b) => a.value.toLowerCase().localeCompare(b.value.toLowerCase()));
