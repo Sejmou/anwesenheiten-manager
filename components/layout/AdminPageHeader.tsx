@@ -19,7 +19,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState, KeyboardEvent } from 'react';
 import { useRouter } from 'next/router';
 import { signOut, useSession } from 'next-auth/react';
-import TUIcon from './TUIcon';
+import TuIcon from './TUIcon';
 
 type Props = { sx: SxProps };
 const Header = ({ sx }: Props) => {
@@ -69,14 +69,14 @@ const Header = ({ sx }: Props) => {
       <Container maxWidth="xl">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
-            startIcon={<TUIcon />}
+            startIcon={<TuIcon />}
             color="inherit"
             size="large"
             onClick={() => {
               router.push('/');
             }}
           >
-            Chor-Dashboard
+            Chor-Admin
           </Button>
           {matches ? (
             <Box>
