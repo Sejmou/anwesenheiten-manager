@@ -1,4 +1,5 @@
 import {
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -8,6 +9,7 @@ import {
 import { Song, SongFileLink } from 'drizzle/models';
 import BasicDialog from './BasicDialog';
 import TextAttributeDisplay from './TextAttributeDisplay';
+import { Download } from '@mui/icons-material';
 
 type SongWithFiles = Song & { fileLinks: SongFileLink[] };
 
@@ -26,7 +28,6 @@ const SongDetailsDialog = ({ song, open, onClose }: Props) => {
       closeButtonText={'Schließen'}
       fullWidth={true}
       maxWidth="md"
-      titleHeadingVariant="h3"
     >
       <TextAttributeDisplay
         attributesAndHeadings={[
@@ -34,14 +35,15 @@ const SongDetailsDialog = ({ song, open, onClose }: Props) => {
           [song.notes, 'Notizen'],
         ]}
       />
-      <Typography variant="h6">Files</Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>Files</Typography>
       {song.fileLinks.length > 0 && (
         <List>
-          {song.fileLinks.map((file, i) => (
-            <ListItem key={file.songId + file.label}>
-              <ListItemButton>
-                <ListItemText primary={file.label} />
-              </ListItemButton>
+          {song.fileLinks.map((link, i) => (
+            <ListItem key={link.songId + link.label}>
+              <ListItemText primary={link.label} />
+              <IconButton href={link.url}>
+                <Download />
+              </IconButton>
             </ListItem>
           ))}
         </List>
