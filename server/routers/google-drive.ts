@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
 import { googleDriveFile } from 'drizzle/schema';
+import { publicFolderId } from 'utils/google-drive';
 
 const getGoogleAPIKey = () => {
   if (!process.env.GOOGLE_API_KEY) {
@@ -10,7 +11,6 @@ const getGoogleAPIKey = () => {
 };
 
 const GOOGLE_API_KEY = getGoogleAPIKey();
-const googleDriveFolderId = '1-6hG9wl-E7ymovC6uub9roJgGyVz1tOM'; // public folder for choir-related files
 
 const sourceDataInput = z.object({
   downloadUrl: z.string().url(),
@@ -29,7 +29,7 @@ export const googleDriveRouter = createTRPCRouter({
   }),
   sync: protectedProcedure.mutation(async ({ ctx }) => {
     const folderFilesApiRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q="${googleDriveFolderId}"+in+parents&key=${GOOGLE_API_KEY}` // try fetching data about Google Drive folder
+      `https://www.googleapis.com/drive/v3/files?q="${publicFolderId}"+in+parents&key=${GOOGLE_API_KEY}` // try fetching data about Google Drive folder
     );
     const response = await folderFilesApiRes.json();
     const files = (response.files as { name: string; id: string }[]).map(f => ({

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
@@ -8,6 +8,7 @@ import {
   Autocomplete,
   Button,
   IconButton,
+  Link,
   List,
   Stack,
   TextField,
@@ -19,6 +20,9 @@ import BasicSelect from 'components/BasicSelect';
 import { songLinkTypeOptions } from 'frontend-utils';
 import { AddLink, LinkOff } from '@mui/icons-material';
 import type { SongFileLink } from 'drizzle/models';
+import { publicFolderId } from 'utils/google-drive';
+
+const folderUrl = `https://drive.google.com/drive/folders/${publicFolderId}`;
 
 const Files: NextPageWithLayout = () => {
   const addMessage = useStoreActions(actions => actions.addMessage);
@@ -55,6 +59,13 @@ const Files: NextPageWithLayout = () => {
   return (
     <>
       <AdminPageHead title="Files" />
+      <Typography>
+        Hier können Files von{' '}
+        <Link href={folderUrl} target="_blank">
+          Google Drive
+        </Link>{' '}
+        mit Liedern im Choir-Repertoire verlinkt werden.
+      </Typography>
       {files.length == 0 && (
         <Typography>
           Keine Files gefunden. Entweder ist der Google Drive Ordner leer oder

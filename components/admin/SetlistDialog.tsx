@@ -1,14 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Button,
-  Dialog,
-  DialogTitle,
   List,
   ListItem,
   Autocomplete,
   ListItemText,
   TextField,
-  DialogContent,
   IconButton,
   Typography,
 } from '@mui/material';
@@ -34,9 +30,6 @@ function SetlistDialog(props: SetlistDialogProps) {
   const { onSave, onClose, songsToSelectFrom, open } = props;
   const [setlistTitle, setSetlistTitle] = useState<string>('');
   const [setlistSongIds, setSetlistSongIds] = useState<string[]>([]);
-
-  // hack to clear autocomplete field whenever a new song was added
-  const [clearAutocompleteKey, setClearAutocompleteKey] = useState<number>(0);
 
   useEffect(() => {
     if (props.initialValues) {
@@ -82,8 +75,6 @@ function SetlistDialog(props: SetlistDialogProps) {
     }
   };
 
-  const elementRef = useRef<HTMLInputElement>(null);
-
   return (
     <BasicDialog
       saveButtonText="Speichern"
@@ -109,8 +100,6 @@ function SetlistDialog(props: SetlistDialogProps) {
       <Autocomplete
         sx={{ paddingTop: 1 }}
         options={songsToSelectFrom}
-        key={clearAutocompleteKey}
-        ref={elementRef}
         renderInput={params => (
           <TextField
             {...params}
@@ -122,12 +111,10 @@ function SetlistDialog(props: SetlistDialogProps) {
         onChange={(event, value) => {
           if (value) {
             setSetlistSongIds([...setlistSongIds, value.id]);
-            setClearAutocompleteKey(clearAutocompleteKey + 1);
-            elementRef.current?.focus();
           }
         }}
       />
-      <List sx={{ pt: 0 }}>
+      <List>
         {setlistSongIds.map((id, i) => (
           <ListItem disableGutters key={i}>
             <ListItemText
