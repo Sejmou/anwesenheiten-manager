@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -81,6 +81,8 @@ function SetlistDialog(props: SetlistDialogProps) {
     }
   };
 
+  const elementRef = useRef<HTMLInputElement>(null);
+
   return (
     <Dialog onClose={handleClose} open={open} fullWidth>
       <DialogTitle>
@@ -104,6 +106,7 @@ function SetlistDialog(props: SetlistDialogProps) {
           sx={{ paddingTop: 1 }}
           options={songsToSelectFrom}
           key={clearAutocompleteKey}
+          ref={elementRef}
           renderInput={params => (
             <TextField
               {...params}
@@ -116,6 +119,7 @@ function SetlistDialog(props: SetlistDialogProps) {
             if (value) {
               setSetlistSongIds([...setlistSongIds, value.id]);
               setClearAutocompleteKey(clearAutocompleteKey + 1);
+              elementRef.current?.focus();
             }
           }}
         />

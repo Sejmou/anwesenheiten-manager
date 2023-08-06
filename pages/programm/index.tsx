@@ -1,73 +1,104 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NextPageWithLayout } from '../_app';
 import { getPublicPageLayout } from '../../components/layout/get-page-layouts';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import { db } from 'server/db';
 import {
-  Card,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   Typography,
 } from '@mui/material';
-import PublicPageHead from 'components/PublicPageHead';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
+import PublicPageHead from 'components/layout/PublicPageHead';
+import BasicAccordion, { BasicAccordionItem } from 'components/BasicAccordion';
+import { singularPluralAutoFormat } from 'frontend-utils';
+import { SongWithFiles } from 'drizzle/models';
+import SongDetailsDialog from 'components/SongDetailsDialog';
 
-const SetlistsPage: NextPageWithLayout<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ setlists }) => {
+type PageProps = {
+  setlists: Awaited<ReturnType<typeof getSetlistsWithSongs>>;
+};
+
+const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
+  const [selectedSong, setSelectedSong] = useState<SongWithFiles | null>(null);
+
+  const handleSongClick = (song: SongWithFiles) => {
+    setSelectedSong(song);
+  };
+
+  const handleSongDetailsDialogClose = () => {
+    setSelectedSong(null);
+  };
+
   return (
     <>
       <PublicPageHead title="Programm" />
-      <Typography variant="h2" gutterBottom>
+      <Typography variant="h3" gutterBottom>
         Programm
       </Typography>
       {setlists.length > 0 ? (
-        <Setlists setlists={setlists} />
+        <BasicAccordion>
+          {setlists.map(setlist => (
+            <SetlistItem setlist={setlist} onSongClick={handleSongClick} />
+          ))}
+        </BasicAccordion>
       ) : (
         <Typography variant="body1">Es gibt noch kein Programm.</Typography>
+      )}
+      {selectedSong && (
+        <SongDetailsDialog
+          open={true} // doesn't really matter what we set this to, because we're rendering it conditionally
+          onClose={handleSongDetailsDialogClose}
+          song={selectedSong}
+        />
       )}
     </>
   );
 };
 
-const Setlists = ({ setlists }: SetlistsWithSongs) => {
-  const router = useRouter();
+type SetlistItemProps = {
+  setlist: PageProps['setlists'][0];
+  onSongClick: (song: SongWithFiles) => void;
+};
+
+const SetlistItem = ({ setlist, onSongClick }: SetlistItemProps) => {
+  const songs = setlist.setlistSongInfo.map(info => info.song);
+
   return (
-    <Card>
+    <BasicAccordionItem
+      primaryText={setlist.name}
+      secondaryText={singularPluralAutoFormat(setlist.setlistSongInfo, 'Lied')}
+    >
       <List>
-        {setlists.map(setlist => (
-          <ListItem key={setlist.id}>
-            <Link href={router.pathname + '/' + setlist.id}>
-              <ListItemButton>
-                <ListItemText
-                  primary={setlist.name}
-                  secondary={setlist.description}
-                />
-              </ListItemButton>
-            </Link>
+        {songs.map(song => (
+          <ListItem>
+            <ListItemButton onClick={() => onSongClick(song)}>
+              <ListItemText
+                primary={song.name}
+                secondary={getSecondaryText(song)}
+              />
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
-    </Card>
+    </BasicAccordionItem>
   );
 };
 
-type SetlistsWithSongs = {
-  setlists: Awaited<ReturnType<typeof getSetlists>>;
-};
+function getSecondaryText(song: SongWithFiles) {
+  const filesStr = singularPluralAutoFormat(song.files, 'File');
+  const keyStr = song.key ? `Tonart: ${song.key}` : '';
+  return [keyStr, filesStr].filter(str => str !== '').join(', ');
+}
 
-export const getServerSideProps: GetServerSideProps<
-  SetlistsWithSongs
-> = async context => {
+export const getServerSideProps: GetServerSideProps<PageProps> = async () => {
   try {
-    const setlists = await getSetlists();
+    const setlistsWithSongs = await getSetlistsWithSongs();
 
     return {
       props: {
-        setlists,
+        setlists: setlistsWithSongs,
       },
     };
   } catch (error) {
@@ -87,9 +118,23 @@ SetlistsPage.getLayout = getPublicPageLayout;
 
 export default SetlistsPage;
 
-async function getSetlists() {
+async function getSetlistsWithSongs() {
   const setlists = await db.query.setlist.findMany({
-    orderBy: (setlist, { desc }) => desc(setlist.createdAt),
+    with: {
+      setlistSongInfo: {
+        with: {
+          song: {
+            with: {
+              files: true,
+            },
+          },
+        },
+        columns: {
+          order: false,
+        },
+        orderBy: s => s.order,
+      },
+    },
   });
 
   return setlists;

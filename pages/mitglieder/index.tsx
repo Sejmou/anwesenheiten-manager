@@ -20,7 +20,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { useStoreActions } from 'lib/message-store';
 
 const parsePromise = function (file: File, header: boolean) {

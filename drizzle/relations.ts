@@ -3,36 +3,32 @@
 import { relations } from 'drizzle-orm';
 import { song, songFile, setlist, setlistSongInfo } from 'drizzle/schema';
 
-export const songsRelations = relations(song, ({ many }) => ({
+export const songRelations = relations(song, ({ many }) => ({
   files: many(songFile),
+  setlistSongInfo: many(setlistSongInfo),
 }));
 
-export const songFilesRelations = relations(songFile, ({ one }) => ({
+export const songFileRelations = relations(songFile, ({ one }) => ({
   song: one(song, {
     fields: [songFile.songId],
     references: [song.id],
   }),
 }));
 
-// couldn't get this many-to-many relation to work
-// export const setlistSongsRelations = relations(setlist, ({ many }) => ({
-//   songs: many(song),
-// }));
+export const setlistRelations = relations(setlist, ({ many }) => ({
+  setlistSongInfo: many(setlistSongInfo),
+}));
 
-// export const songSetlistsRelations = relations(song, ({ many }) => ({
-//   setlists: many(setlist),
-// }));
-
-// export const setlistsToSongsRelations = relations(
-//   setlistSongInfo,
-//   ({ one }) => ({
-//     setlist: one(setlist, {
-//       fields: [setlistSongInfo.setlistId],
-//       references: [setlist.id],
-//     }),
-//     song: one(song, {
-//       fields: [setlistSongInfo.songId],
-//       references: [song.id],
-//     }),
-//   })
-// );
+export const setlistsToSongsRelations = relations(
+  setlistSongInfo,
+  ({ one }) => ({
+    setlist: one(setlist, {
+      fields: [setlistSongInfo.setlistId],
+      references: [setlist.id],
+    }),
+    song: one(song, {
+      fields: [setlistSongInfo.songId],
+      references: [song.id],
+    }),
+  })
+);

@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { GetServerSideProps } from 'next';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';

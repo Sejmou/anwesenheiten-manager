@@ -21,3 +21,25 @@ export function voiceGroupGridValueFormatter(
   if (!params.value) return '-';
   return VoiceGroupToDescriptionString[params.value] ?? '-';
 }
+
+type GermanSingularToPluralMappings = {
+  ['Lied']: string;
+  ['File']: string;
+};
+
+const mappings: GermanSingularToPluralMappings = {
+  ['Lied']: 'Lieder',
+  ['File']: 'Files',
+};
+
+type WordInSingular = keyof GermanSingularToPluralMappings;
+
+export function singularPluralAutoFormat<T>(
+  array: Array<T>,
+  wordInSingular: WordInSingular
+) {
+  if (array.length === 1) {
+    return `${array.length} ${wordInSingular}`;
+  }
+  return `${array.length} ${mappings[wordInSingular]}`;
+}

@@ -105,17 +105,18 @@ model Song {
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
   name           String            @unique
   key            MusicalKey?
-  description    String?
+  lyrics         String?
+  notes          String?
   files          SongFile[]
   setlistEntries SetlistSongInfo[]
 }
 
 model Setlist {
-  id          String            @id @default(cuid())
-  createdAt   DateTime          @default(now()) @db.Timestamptz(6)
-  name        String
-  description String?
-  entries     SetlistSongInfo[]
+  id        String            @id @default(cuid())
+  createdAt DateTime          @default(now()) @db.Timestamptz(6)
+  name      String
+  notes     String?
+  entries   SetlistSongInfo[]
 }
 
 model SetlistSongInfo {

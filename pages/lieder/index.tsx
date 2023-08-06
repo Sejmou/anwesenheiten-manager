@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { api } from 'utils/api';
 import {
   Button,

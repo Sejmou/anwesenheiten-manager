@@ -13,7 +13,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { useState } from 'react';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import ResponsiveContainer from 'components/layout/ResponsiveContainer';

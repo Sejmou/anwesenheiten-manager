@@ -8,3 +8,7 @@ export const linkTypeValues = linkType.enumValues;
 export type Song = InferModel<typeof song>;
 
 export type Setlist = InferModel<typeof setlist>;
+
+export type SongWithFiles = Song & {
+  files: Array<SongFile>;
+};

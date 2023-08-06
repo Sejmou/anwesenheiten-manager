@@ -8,6 +8,10 @@ import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 
 import globalMessageStore from 'lib/message-store';
 import { StoreProvider } from 'easy-peasy';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 import './globals.css';
 import GlobalMessageSnackbar from 'components/GlobalMessageSnackbar';
 import Footer from 'components/layout/Footer';

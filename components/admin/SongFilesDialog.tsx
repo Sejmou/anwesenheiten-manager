@@ -17,7 +17,7 @@ import {
 import Delete from '@mui/icons-material/Delete';
 import Add from '@mui/icons-material/Add';
 import { SongFile, LinkType, linkTypeValues } from 'drizzle/models';
-import BasicSelect from './BasicSelect';
+import BasicSelect from '../BasicSelect';
 
 export interface SongFileEditDialogProps {
   open: boolean;

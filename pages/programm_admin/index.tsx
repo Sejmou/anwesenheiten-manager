@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import prisma from 'lib/prisma';
 import { Setlist, Song, SetlistSongInfo } from '@prisma/client';
@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import SetlistDialog, {
   SetlistDialogFormValues,
-} from 'components/SetlistDialog';
+} from 'components/admin/SetlistDialog';
 import Delete from '@mui/icons-material/Delete';
 
 type Props = {

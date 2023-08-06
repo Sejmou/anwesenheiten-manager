@@ -8,7 +8,7 @@ import { List, ListItemButton, ListItemText, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import prisma from 'lib/prisma';
 import { Event as EventDB } from '@prisma/client';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 
 export type Event = Omit<EventDB, 'start' | 'end' | 'lastSyncAt'> & {
   start: string;

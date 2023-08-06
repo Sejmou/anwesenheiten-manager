@@ -6,7 +6,7 @@ import {
   Singer as SingerDB,
   VoiceGroup,
 } from '@prisma/client';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { voiceGroupGridValueFormatter } from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';

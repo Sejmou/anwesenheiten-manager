@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { getAdminAuthPageLayout } from '../components/layout/get-page-layouts';
 import type { NextPageWithLayout } from './_app';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 import { GetServerSideProps } from 'next';
 import prisma from 'lib/prisma';
 import Link from 'next/link';

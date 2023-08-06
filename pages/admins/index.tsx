@@ -19,7 +19,7 @@ import { Admin } from 'pages/api/admins';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
 import CopyableLink from 'components/CopyableLink';
-import AdminPageHead from 'components/AdminPageHead';
+import AdminPageHead from 'components/layout/AdminPageHead';
 
 type Props = { inviteLinkBaseUrl: string };
 
