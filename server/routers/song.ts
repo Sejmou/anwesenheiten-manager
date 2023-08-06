@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { song, songFile } from 'drizzle/schema';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { songFile, song } from 'drizzle/schema';
+import { createInsertSchema } from 'drizzle-zod';
 import { eq } from 'drizzle-orm';
+import type { Song } from 'drizzle/models';
 
 // create input schema
 const songFileInput = createInsertSchema(songFile);
@@ -19,6 +20,23 @@ export const songRouter = createTRPCRouter({
       songs,
     };
   }),
+  add: protectedProcedure
+    .input(z.string().array())
+    .mutation(async ({ ctx, input }) => {
+      const songNames = input;
+      const createdSongs = await ctx.db
+        .insert(song)
+        .values(songNames.map(name => ({ name })))
+        .onConflictDoNothing()
+        .returning();
+      const failures = songNames.filter(
+        name => !createdSongs.some(song => song.name === name)
+      );
+      return {
+        createdSongs,
+        failures,
+      };
+    }),
   updateFiles: protectedProcedure
     .input(
       z.object({

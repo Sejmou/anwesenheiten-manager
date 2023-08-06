@@ -12,10 +12,10 @@ type BasicDialogProps = {
   open: boolean;
   children: ReactNode;
   onClose: () => void;
-  closeButtonText: string;
+  closeButtonText?: string;
   onSave?: () => void;
   confirmActionButtonText?: string;
-  fullWidth: boolean;
+  fullWidth?: boolean;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   titleHeadingVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 };
@@ -45,16 +45,13 @@ const BasicDialog = ({
         <DialogTitle>{title}</DialogTitle>
       )}
       <DialogContent>{children}</DialogContent>
-      {(confirmActionButtonText || closeButtonText) && (
-        <DialogActions>
-          {closeButtonText && (
-            <Button onClick={onClose}>{closeButtonText}</Button>
-          )}
-          {confirmActionButtonText && (
-            <Button onClick={onSave}>{confirmActionButtonText}</Button>
-          )}
-        </DialogActions>
-      )}
+
+      <DialogActions>
+        <Button onClick={onClose}>{closeButtonText || 'Schließen'}</Button>
+        {confirmActionButtonText && (
+          <Button onClick={onSave}>{confirmActionButtonText}</Button>
+        )}
+      </DialogActions>
     </Dialog>
   );
 };

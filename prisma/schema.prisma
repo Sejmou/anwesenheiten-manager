@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String  @map("user_id")
+  id                 String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String  @map("user_id") @db.Uuid
   type               String
   provider           String
   providerAccountId  String  @map("provider_account_id")
@@ -28,15 +28,15 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   sessionToken String   @unique @map("session_token")
-  userId       String   @map("user_id")
+  userId       String   @map("user_id") @db.Uuid
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String       @id @default(cuid())
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   firstName     String
   lastName      String
   email         String?      @unique
@@ -65,12 +65,12 @@ model InviteToken {
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   expires   DateTime? @db.Timestamptz(6)
   usedAt    DateTime? @db.Timestamptz(6)
-  userId    String?   @unique @map("user_id")
+  userId    String?   @unique @map("user_id") @db.Uuid
   usedBy    User?     @relation(fields: [userId], references: [id])
 }
 
 model Singer {
-  id          String            @id @default(cuid())
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   firstName   String
   lastName    String
   email       String?           @unique
@@ -91,7 +91,7 @@ model Event {
 }
 
 model EventAttendance {
-  singerId  String
+  singerId  String   @db.Uuid
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id])
   singer    Singer   @relation(fields: [singerId], references: [id])
@@ -101,7 +101,7 @@ model EventAttendance {
 }
 
 model Song {
-  id             String            @id @default(cuid())
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt      DateTime          @default(now()) @db.Timestamptz(6)
   name           String            @unique
   key            MusicalKey?
@@ -112,7 +112,7 @@ model Song {
 }
 
 model Setlist {
-  id        String            @id @default(cuid())
+  id        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime          @default(now()) @db.Timestamptz(6)
   name      String
   notes     String?
@@ -120,20 +120,19 @@ model Setlist {
 }
 
 model SetlistSongInfo {
-  setlistId String
-  songId    String
+  setlistId String   @db.Uuid
+  songId    String   @db.Uuid
   order     Int
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   notes     String?
   song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   setlist   Setlist  @relation(fields: [setlistId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([setlistId, songId])
-  @@unique([setlistId, songId, order], name: "setlistEntryOrderUnique")
+  @@id([setlistId, songId, order])
 }
 
 model SongFile {
-  songId    String
+  songId    String   @db.Uuid
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   type      LinkType
   name      String

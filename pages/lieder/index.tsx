@@ -11,9 +11,11 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from '@mui/material';
-import { SongFile } from 'drizzle/models';
+import { Song, SongFile } from 'drizzle/models';
 import { AttachFile } from '@mui/icons-material';
-import SongFilesDialog from 'components/SongFilesDialog';
+import SongFilesDialog from 'components/admin/SongFilesDialog';
+import CustomDropzone from 'components/CustomDropzone';
+import BasicDialog from 'components/BasicDialog';
 
 const Songs: NextPageWithLayout = () => {
   const songQ = api.song.getAll.useQuery();
@@ -71,14 +73,29 @@ const Songs: NextPageWithLayout = () => {
   return (
     <>
       <AdminPageHead title="Lieder" />
-      <Typography variant="body1">
-        Folgende Lieder sind in der Datenbank:
-      </Typography>
       {songListItems ? (
-        <List>{songListItems}</List>
+        <>
+          {songListItems.length > 0 && (
+            <Typography variant="body1">
+              Folgende Lieder sind in der Datenbank:
+            </Typography>
+          )}
+          {songListItems.length === 0 && (
+            <Typography variant="body1">
+              Es sind noch keine Lieder in der Datenbank.
+            </Typography>
+          )}
+          <List>{songListItems}</List>
+        </>
       ) : (
         <Typography variant="body1">Lade Lieder...</Typography>
       )}
+      <SongsImport
+        onImport={songs => {
+          // just refetch data instead of trying to merge
+          songQ.refetch();
+        }}
+      />
       {song && (
         <SongFilesDialog
           open={fileEditDialogOpen}
@@ -93,6 +110,93 @@ const Songs: NextPageWithLayout = () => {
     </>
   );
 };
+
+type SongImportProps = {
+  onImport: (songs: Song[]) => void;
+};
+
+const SongsImport = ({ onImport }: SongImportProps) => {
+  const addSongs = api.song.add.useMutation();
+  const [importedNames, setImportedNames] = useState<string[]>([]);
+  const [failures, setFailures] = useState<string[]>([]);
+
+  const handleFilesAdded = async (files: File[]) => {
+    const firstFile = files[0];
+    if (!firstFile) return;
+    const text = await readFileTextContent(firstFile);
+    console.log(text);
+    const songNames = text.split('\n').map(s => s.trim());
+    const uniqueSongNames = [...new Set(songNames)];
+    setImportedNames(uniqueSongNames);
+  };
+
+  return (
+    <>
+      <CustomDropzone
+        text={'Neue Lieder importieren (Textdatei 1 Namen pro Zeile)'}
+        onFilesAdded={handleFilesAdded}
+        fileTypesAndExtensions={{
+          'text/plain': ['txt', 'log'],
+          'text/csv': ['csv'],
+        }}
+      />
+      {importedNames.length > 0 && (
+        <Button
+          sx={{ mt: 2 }}
+          variant="contained"
+          color="primary"
+          onClick={async () => {
+            const { createdSongs, failures } = await addSongs.mutateAsync(
+              importedNames
+            );
+            setFailures(failures);
+            onImport(createdSongs);
+            setImportedNames([]);
+          }}
+        >
+          {importedNames.length} Lieder importieren
+        </Button>
+      )}
+      <BasicDialog
+        open={failures.length > 0}
+        onClose={() => setFailures([])}
+        title="Fehler beim Importieren"
+      >
+        <Typography variant="body1">
+          Folgende Lieder konnten nicht importiert werden:
+        </Typography>
+        <List>
+          {failures.map(failure => (
+            <ListItem key={failure}>
+              <ListItemText primary={failure} />
+            </ListItem>
+          ))}
+        </List>
+        <Typography>
+          Wahrscheinlich existieren die Lieder schon. Wenn nicht, bitte an den
+          Admin wenden.
+        </Typography>
+      </BasicDialog>
+    </>
+  );
+};
+
+async function readFileTextContent(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const text = reader.result;
+      resolve(text as string);
+    };
+
+    reader.onerror = error => {
+      reject(error);
+    };
+
+    reader.readAsText(file);
+  });
+}
 
 Songs.getLayout = getAdminPageLayout;
 

@@ -90,9 +90,11 @@ Then, navigate to `localhost:3000/register` to create a user with a name, email 
 After registering, you should be logged in and see an admin page. All other admin users that try to register will need an invitation link. To generate those, you can click on 'Invites'. There, you will see an overview page for all invite links that have been generated (there will be none, initially). To generate a new one, just click the button on that page. You can send the generated link to someone you would like to add as a user.
 
 ### Add data
-The application will look weird in its initial state, as neither events nor choir members will exist yet. 
+The application will look weird in its initial state, as neither events nor songs or choir members will exist yet. 
 
-You can add choir members from the 'Mitglieder' page in the admin dashboard. To get started with some fake choir members quickly, upload the file located in `mock-data/fake_choir_members.csv` by dragging it into the designated area and clicking the 'Bestätigen' button. This will add all the choir members from the file to the database. 
+You can add choir members from the 'Mitglieder' page in the admin dashboard. To get started with some fake choir members quickly, upload the file located in `mock-data/fake_choir_members.csv` by dragging it into the designated area and clicking the 'Bestätigen' button. This will add all the choir members from the file to the database.
+
+Similarly, songs can be imported from a text file on the 'Lieder' page. However, this time a simple file with one song title per line is expected. You can find an example file in `mock-data/songs.txt`.
 
 Events are synced from the choirs' public Google calendar. Go to the 'Termine' page and click the button that says 'Mit Google Kalender synchronisieren'. This will fetch all events from the calendar and add them to the database. Note that this will only work if you have set up the `GOOGLE_API_KEY` environment variable as described above.
 
