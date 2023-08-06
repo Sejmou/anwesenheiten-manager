@@ -1,23 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  List,
-  ListItem,
-  DialogContent,
-  IconButton,
-  TextField,
-  ListItemSecondaryAction,
-  Stack,
-  Container,
-  Box,
-} from '@mui/material';
+import { useState } from 'react';
+import { List, ListItem, IconButton, TextField, Stack } from '@mui/material';
 
 import Delete from '@mui/icons-material/Delete';
 import Add from '@mui/icons-material/Add';
 import { SongFile, LinkType, linkTypeValues } from 'drizzle/models';
 import BasicSelect from '../BasicSelect';
+import BasicDialog from 'components/BasicDialog';
 
 export interface SongFileEditDialogProps {
   open: boolean;
@@ -62,30 +50,31 @@ function SongFilesDialog(props: SongFileEditDialogProps) {
   };
 
   return (
-    <Dialog onClose={handleClose} open={open} fullWidth maxWidth="xl">
-      <DialogTitle>{`Files für '${songName}'`}</DialogTitle>
-      <DialogContent>
-        <List>
-          {files.map((file, i) => (
-            <FileLink
-              variant="existing"
-              key={file.songId + file.name}
-              file={file}
-              onEdit={file => handleEdit(file, i)}
-              onRemove={() => handleRemove(file)}
-            />
-          ))}
+    <BasicDialog
+      onClose={handleClose}
+      open={open}
+      fullWidth
+      maxWidth="xl"
+      title={`Files für '${songName}'`}
+      onSave={handleSave}
+    >
+      <List>
+        {files.map((file, i) => (
           <FileLink
-            variant="new"
-            songId={songId}
-            onAdd={file => handleAdd(file)}
+            variant="existing"
+            key={file.songId + file.name}
+            file={file}
+            onEdit={file => handleEdit(file, i)}
+            onRemove={() => handleRemove(file)}
           />
-        </List>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Speichern
-        </Button>
-      </DialogContent>
-    </Dialog>
+        ))}
+        <FileLink
+          variant="new"
+          songId={songId}
+          onAdd={file => handleAdd(file)}
+        />
+      </List>
+    </BasicDialog>
   );
 }
 

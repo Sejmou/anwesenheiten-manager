@@ -14,7 +14,7 @@ type BasicDialogProps = {
   onClose: () => void;
   closeButtonText?: string;
   onSave?: () => void;
-  confirmActionButtonText?: string;
+  saveButtonText?: string;
   fullWidth?: boolean;
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   titleHeadingVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
@@ -26,7 +26,7 @@ const BasicDialog = ({
   onSave,
   onClose,
   children,
-  confirmActionButtonText,
+  saveButtonText,
   closeButtonText,
   fullWidth,
   maxWidth,
@@ -48,9 +48,7 @@ const BasicDialog = ({
 
       <DialogActions>
         <Button onClick={onClose}>{closeButtonText || 'Schließen'}</Button>
-        {confirmActionButtonText && (
-          <Button onClick={onSave}>{confirmActionButtonText}</Button>
-        )}
+        {saveButtonText && <Button onClick={onSave}>{saveButtonText}</Button>}
       </DialogActions>
     </Dialog>
   );

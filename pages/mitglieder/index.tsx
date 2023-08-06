@@ -142,11 +142,7 @@ const Members: NextPageWithLayout = () => {
               </Typography>
             </Stack>
           ) : (
-            <ResponsiveContainer
-              title="Chor-Mitglieder"
-              description="Folgende Personen sind derzeit als Chor-Mitglieder vermerkt:"
-              heightEqualsMaxHeight
-            >
+            <ResponsiveContainer title="Chor-Mitglieder" heightEqualsMaxHeight>
               <DataGrid columns={singerTableCols} rows={singers} />
             </ResponsiveContainer>
           )}

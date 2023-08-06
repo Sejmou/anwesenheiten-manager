@@ -15,6 +15,7 @@ import {
 import Delete from '@mui/icons-material/Delete';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
+import BasicDialog from 'components/BasicDialog';
 
 export type SetlistDialogFormValues = {
   songIds: string[];
@@ -84,68 +85,67 @@ function SetlistDialog(props: SetlistDialogProps) {
   const elementRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Dialog onClose={handleClose} open={open} fullWidth>
-      <DialogTitle>
-        {props.initialValues
-          ? 'Programm bearbeiten'
-          : 'Neues Auftrittsprogramm'}
-      </DialogTitle>
-      <DialogContent>
-        <TextField
-          sx={{ mt: 1 }}
-          label="Name"
-          variant="outlined"
-          fullWidth
-          value={setlistTitle}
-          onChange={event => {
-            setSetlistTitle(event.target.value);
-          }}
-        />
-        <Typography sx={{ pt: 2 }}>Lieder</Typography>
-        <Autocomplete
-          sx={{ paddingTop: 1 }}
-          options={songsToSelectFrom}
-          key={clearAutocompleteKey}
-          ref={elementRef}
-          renderInput={params => (
-            <TextField
-              {...params}
-              label="Lied hinzufügen"
-              placeholder="Wähle ein Lied aus dem Repertoire"
-              variant="outlined"
+    <BasicDialog
+      saveButtonText="Speichern"
+      onSave={handleSave}
+      onClose={handleClose}
+      open={open}
+      fullWidth
+      title={
+        props.initialValues ? 'Programm bearbeiten' : 'Neues Auftrittsprogramm'
+      }
+    >
+      <TextField
+        sx={{ mt: 1 }}
+        label="Name"
+        variant="outlined"
+        fullWidth
+        value={setlistTitle}
+        onChange={event => {
+          setSetlistTitle(event.target.value);
+        }}
+      />
+      <Typography sx={{ pt: 2 }}>Lieder</Typography>
+      <Autocomplete
+        sx={{ paddingTop: 1 }}
+        options={songsToSelectFrom}
+        key={clearAutocompleteKey}
+        ref={elementRef}
+        renderInput={params => (
+          <TextField
+            {...params}
+            label="Lied hinzufügen"
+            placeholder="Wähle ein Lied aus dem Repertoire"
+            variant="outlined"
+          />
+        )}
+        onChange={(event, value) => {
+          if (value) {
+            setSetlistSongIds([...setlistSongIds, value.id]);
+            setClearAutocompleteKey(clearAutocompleteKey + 1);
+            elementRef.current?.focus();
+          }
+        }}
+      />
+      <List sx={{ pt: 0 }}>
+        {setlistSongIds.map((id, i) => (
+          <ListItem disableGutters key={i}>
+            <ListItemText
+              primary={songsToSelectFrom.find(s => s.id == id)?.label}
             />
-          )}
-          onChange={(event, value) => {
-            if (value) {
-              setSetlistSongIds([...setlistSongIds, value.id]);
-              setClearAutocompleteKey(clearAutocompleteKey + 1);
-              elementRef.current?.focus();
-            }
-          }}
-        />
-        <List sx={{ pt: 0 }}>
-          {setlistSongIds.map((id, i) => (
-            <ListItem disableGutters key={i}>
-              <ListItemText
-                primary={songsToSelectFrom.find(s => s.id == id)?.label}
-              />
-              <IconButton onClick={() => handleMoveUpClick(id)}>
-                <ArrowUpward />
-              </IconButton>
-              <IconButton onClick={() => handleMoveDownClick(id)}>
-                <ArrowDownward />
-              </IconButton>
-              <IconButton onClick={() => handleRemoveClick(id)}>
-                <Delete />
-              </IconButton>
-            </ListItem>
-          ))}
-        </List>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Speichern
-        </Button>
-      </DialogContent>
-    </Dialog>
+            <IconButton onClick={() => handleMoveUpClick(id)}>
+              <ArrowUpward />
+            </IconButton>
+            <IconButton onClick={() => handleMoveDownClick(id)}>
+              <ArrowDownward />
+            </IconButton>
+            <IconButton onClick={() => handleRemoveClick(id)}>
+              <Delete />
+            </IconButton>
+          </ListItem>
+        ))}
+      </List>
+    </BasicDialog>
   );
 }
 

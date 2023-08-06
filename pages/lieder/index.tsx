@@ -75,11 +75,6 @@ const Songs: NextPageWithLayout = () => {
       <AdminPageHead title="Lieder" />
       {songListItems ? (
         <>
-          {songListItems.length > 0 && (
-            <Typography variant="body1">
-              Folgende Lieder sind in der Datenbank:
-            </Typography>
-          )}
           {songListItems.length === 0 && (
             <Typography variant="body1">
               Es sind noch keine Lieder in der Datenbank.
@@ -163,7 +158,7 @@ const SongsImport = ({ onImport }: SongImportProps) => {
         title="Fehler beim Importieren"
       >
         <Typography variant="body1">
-          Folgende Lieder konnten nicht importiert werden:
+          Einige Lieder konnten nicht importiert werden:
         </Typography>
         <List>
           {failures.map(failure => (

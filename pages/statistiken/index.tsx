@@ -7,7 +7,10 @@ import {
   VoiceGroup,
 } from '@prisma/client';
 import AdminPageHead from 'components/layout/AdminPageHead';
-import { voiceGroupGridValueFormatter } from 'frontend-utils';
+import {
+  singularPluralAutoFormat,
+  voiceGroupGridValueFormatter,
+} from 'frontend-utils';
 import prisma from 'lib/prisma';
 import { GetStaticProps } from 'next';
 import { eventFromDBEvent } from '../anwesenheiten';
@@ -101,8 +104,8 @@ const Stats: NextPageWithLayout<Props> = ({
         <Stack>
           <Typography variant="h3">Probenanwesenheiten</Typography>
           <Typography>
-            Insgesamt gab es bisher {events.length} Proben, für die
-            Anwesenheiten eingetragen wurden.
+            Insgesamt gab es bisher {singularPluralAutoFormat(events, 'Probe')}{' '}
+            für die Anwesenheiten eingetragen wurden.
           </Typography>
           <Stack spacing={{ md: 1 }}>
             <ResponsiveContainer

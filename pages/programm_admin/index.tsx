@@ -115,7 +115,6 @@ const ProgramAdmin: NextPageWithLayout<
   return (
     <>
       <AdminPageHead title="Programm-Admin" />
-      <Typography variant="h5">Programm/"Setlists"</Typography>
       {setlists.length > 0 ? (
         <List>
           {setlists.map(setlist => (

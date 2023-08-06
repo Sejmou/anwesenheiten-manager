@@ -140,7 +140,7 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
     />
   ) : (
     <Typography py={2} px={1}>
-      Es gibt keine noch nicht eingelösten Links.
+      Es gibt keine ungenutzten Links.
     </Typography>
   );
 
@@ -158,10 +158,7 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
           {adminsLoading ? (
             'Lade Admin-Daten...'
           ) : (
-            <ResponsiveContainer
-              title="Admins"
-              description="Folgende Personen sind derzeit als Admins registriert:"
-            >
+            <ResponsiveContainer title="Admins">
               <DataGrid
                 autoHeight
                 columns={adminTableCols}
@@ -178,7 +175,11 @@ const Admins: NextPageWithLayout<Props> = ({ inviteLinkBaseUrl }: Props) => {
           </ResponsiveContainer>
         </Stack>
       </Stack>
-      <Button onClick={() => newTokenMutation.mutate()}>
+      <Button
+        variant="contained"
+        sx={{ mt: 2 }}
+        onClick={() => newTokenMutation.mutate()}
+      >
         Neuen Link generieren
       </Button>
     </>

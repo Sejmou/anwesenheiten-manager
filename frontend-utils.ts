@@ -25,11 +25,13 @@ export function voiceGroupGridValueFormatter(
 type GermanSingularToPluralMappings = {
   ['Lied']: string;
   ['File']: string;
+  ['Probe']: string;
 };
 
 const mappings: GermanSingularToPluralMappings = {
   ['Lied']: 'Lieder',
   ['File']: 'Files',
+  ['Probe']: 'Proben',
 };
 
 type WordInSingular = keyof GermanSingularToPluralMappings;
