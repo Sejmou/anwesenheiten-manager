@@ -4,6 +4,7 @@ import { getPublicPageLayout } from '../../components/layout/get-page-layouts';
 import { GetServerSideProps } from 'next';
 import { db } from 'server/db';
 import {
+  Box,
   List,
   ListItem,
   ListItemButton,
@@ -87,7 +88,11 @@ const SetlistItem = ({
     >
       <List>
         {songs.map((song, i) => (
-          <SongItem song={song} key={song.id} onSongClick={onSongClick} />
+          <SongItem
+            song={song}
+            key={i} // cannot use song.id here, because the same song can appear multiple times in the same setlist
+            onSongClick={onSongClick}
+          />
         ))}
       </List>
     </BasicAccordionItem>
@@ -106,13 +111,13 @@ const SongItem = ({
   );
 
   return (
-    <ListItem>
+    <ListItem disablePadding>
       <ListItemButton disableRipple onClick={() => onSongClick(song)}>
         <ListItemText primary={song.name} secondary={getSecondaryText(song)} />
         {initialNotesLink && (
-          <ListItemSecondaryAction onClick={e => e.stopPropagation()}>
+          <Box onClick={e => e.stopPropagation()}>
             <InitialNotesPlayButton link={initialNotesLink} />
-          </ListItemSecondaryAction>
+          </Box>
         )}
       </ListItemButton>
     </ListItem>

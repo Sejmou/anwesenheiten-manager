@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import type { SongFileLink } from 'drizzle/models';
 import { PlayArrow as Play, Stop, MusicNote } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, SxProps } from '@mui/material';
 
 type NotesPlayButtonProps = {
   link: SongFileLink;
+  sx?: SxProps;
 };
 
-const InitialNotesPlayButton = ({ link }: NotesPlayButtonProps) => {
+const InitialNotesPlayButton = ({ link, sx }: NotesPlayButtonProps) => {
   const [playing, setPlaying] = useState(false);
-  console.log(link.url);
   const [audio] = useState<HTMLAudioElement>(
     (typeof Audio !== 'undefined'
       ? new Audio(link.url)
@@ -40,7 +40,7 @@ const InitialNotesPlayButton = ({ link }: NotesPlayButtonProps) => {
       variant="contained"
       onClick={handlePlayPause}
       startIcon={!playing ? <Play /> : <Stop />}
-      endIcon={<MusicNote />}
+      sx={sx}
     >
       Töne
     </Button>
