@@ -13,21 +13,23 @@ type AccordionItemProps = {
   primaryText: string;
   secondaryText?: string;
   children: ReactNode;
+  defaultExpanded?: boolean;
 };
 
 export const BasicAccordionItem = ({
   primaryText,
   secondaryText,
   children,
+  defaultExpanded,
 }: AccordionItemProps) => {
   return (
-    <Accordion>
+    <Accordion defaultExpanded={defaultExpanded}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography sx={{ width: '33%', flexShrink: 0 }}>
-          {primaryText}
-        </Typography>
+        <Typography>{primaryText}</Typography>
         {secondaryText && (
-          <Typography sx={{ color: 'text.secondary' }}>
+          <Typography
+            sx={{ color: 'text.secondary', marginLeft: 'auto', marginRight: 2 }}
+          >
             {secondaryText}
           </Typography>
         )}

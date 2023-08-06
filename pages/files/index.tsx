@@ -170,6 +170,7 @@ const FileLinkForm = ({
           width: '100%',
         }}
         alignItems="center"
+        flexWrap={{ xs: 'wrap', md: 'nowrap' }}
       >
         <Autocomplete
           options={songsToSelectFrom}

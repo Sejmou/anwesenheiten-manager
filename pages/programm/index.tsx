@@ -7,6 +7,7 @@ import {
   List,
   ListItem,
   ListItemButton,
+  ListItemSecondaryAction,
   ListItemText,
   Typography,
 } from '@mui/material';
@@ -15,6 +16,7 @@ import BasicAccordion, { BasicAccordionItem } from 'components/BasicAccordion';
 import { singularPluralAutoFormat } from 'frontend-utils';
 import { SongWithFileLinks } from 'drizzle/models';
 import SongDetailsDialog from 'components/SongDetailsDialog';
+import InitialNotesPlayButton from 'components/InitialNotesPlayButton';
 
 type PageProps = {
   setlists: Awaited<ReturnType<typeof getSetlistsWithSongs>>;
@@ -41,11 +43,12 @@ const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
       </Typography>
       {setlists.length > 0 ? (
         <BasicAccordion>
-          {setlists.map(setlist => (
+          {setlists.map((setlist, i) => (
             <SetlistItem
               setlist={setlist}
               key={setlist.id}
               onSongClick={handleSongClick}
+              defaultExpanded={i === 0}
             />
           ))}
         </BasicAccordion>
@@ -66,29 +69,53 @@ const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
 type SetlistItemProps = {
   setlist: PageProps['setlists'][0];
   onSongClick: (song: SongWithFileLinks) => void;
+  defaultExpanded?: boolean;
 };
 
-const SetlistItem = ({ setlist, onSongClick }: SetlistItemProps) => {
+const SetlistItem = ({
+  setlist,
+  onSongClick,
+  defaultExpanded,
+}: SetlistItemProps) => {
   const songs = setlist.setlistSongInfo.map(info => info.song);
 
   return (
     <BasicAccordionItem
       primaryText={setlist.name}
       secondaryText={singularPluralAutoFormat(setlist.setlistSongInfo, 'Lied')}
+      defaultExpanded={defaultExpanded}
     >
       <List>
         {songs.map((song, i) => (
-          <ListItem key={i}>
-            <ListItemButton onClick={() => onSongClick(song)}>
-              <ListItemText
-                primary={song.name}
-                secondary={getSecondaryText(song)}
-              />
-            </ListItemButton>
-          </ListItem>
+          <SongItem song={song} key={song.id} onSongClick={onSongClick} />
         ))}
       </List>
     </BasicAccordionItem>
+  );
+};
+
+const SongItem = ({
+  song,
+  onSongClick,
+}: {
+  song: SongWithFileLinks;
+  onSongClick: (song: SongWithFileLinks) => void;
+}) => {
+  const initialNotesLink = song.fileLinks.find(
+    link => link.type === 'AudioInitialNotes'
+  );
+
+  return (
+    <ListItem>
+      <ListItemButton disableRipple onClick={() => onSongClick(song)}>
+        <ListItemText primary={song.name} secondary={getSecondaryText(song)} />
+        {initialNotesLink && (
+          <ListItemSecondaryAction onClick={e => e.stopPropagation()}>
+            <InitialNotesPlayButton link={initialNotesLink} />
+          </ListItemSecondaryAction>
+        )}
+      </ListItemButton>
+    </ListItem>
   );
 };
 
