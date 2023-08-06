@@ -116,17 +116,19 @@ This is an ER Diagram I created from the `public` DB schema of the database (whi
 ![ER Diagram](./docs/er-diagram.png)
 
 ### TODOs and nice-to-haves I will probably never find the time for
-This project is very much a playground for me to learn how to make things happen. I was still figuring things out as I added features. As a consequence of this, much of this code is a bit of a sh*tshow. Here I keep track of and prioritize stuff, so that I could fix it if I were to find the time to work on this.
+This project is very much a playground for me to learn how to make things happen. I was still figuring things out as I added features. As a consequence of this, some of this code is a bit of a sh*tshow. Here I keep track of and prioritize stuff, so that I could fix it if I were to find the time to work on this.
 
+- [ ] More control about admin accounts (changing passwords, emails, names, deleting accounts, etc.)
+- [ ] cool new tech
+  - [x] use drizzle instead of Prisma for DB access in new parts of the app
+  - [x] use tRPC routers instead of Next.js API routes in new parts of the app
+  - [ ] use new Next.js 13 `app` directory instead of `pages` directory
+  - [ ] full transition from `pages/api` to tRPC routers
+  - [ ] transition from Prisma to drizzle
 - [ ] code smells and changes required to reduce them
-  - [ ] move all routes in `pages/api` to tRPC routers
   - [ ] unify data fetching (some routes use getStaticProps, some getServerSideProps, some fetch on client side - even that is done with different approaches lol)
   - [ ] refactor ugly backend stats collection code to just use SQL lol
   - [ ] find a simpler and more bullet-proof way to handle authentication (or rather, actually understand what nextauth does lol)
-- [ ] cool new tech
-  - [ ] move from NextJS to SvelteKit
-  - [ ] move from Prisma to drizzle
 - [ ] UI
-  - [ ] redesign (really looks ugly lol)
+  - [ ] redesign (really not that beautiful)
   - [ ] replace Material UI with more lightweight custom components
-- [ ] More control about admin accounts (changing passwords, emails, names, deleting accounts, etc.)

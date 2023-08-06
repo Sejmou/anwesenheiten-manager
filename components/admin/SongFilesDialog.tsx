@@ -80,15 +80,21 @@ function SongFilesDialog(props: SongFileEditDialogProps) {
 
 function getLabelForLinkType(type: SongFile['type']) {
   switch (type) {
-    case 'audio':
-      return 'Audio';
-    case 'pdf':
+    case 'Audio':
+      return 'Audio (allgemein)';
+    case 'AudioInitialNotes':
+      return 'Anfangstöne';
+    case 'AudioPracticeTrack':
+      return 'Übungstrack';
+    case 'AudioRecording':
+      return 'Aufnahme';
+    case 'PDF':
       return 'PDF';
-    case 'video':
+    case 'Video':
       return 'Video';
-    case 'musescore':
+    case 'MuseScore':
       return 'MuseScore';
-    case 'other':
+    case 'Other':
       return 'Diverses';
     default:
       console.warn(
@@ -98,10 +104,12 @@ function getLabelForLinkType(type: SongFile['type']) {
   }
 }
 
-const options = linkTypeValues.map(type => ({
-  label: getLabelForLinkType(type),
-  value: type,
-}));
+const options = linkTypeValues
+  .map(type => ({
+    label: getLabelForLinkType(type),
+    value: type,
+  }))
+  .sort((a, b) => a.value.toLowerCase().localeCompare(b.value.toLowerCase()));
 
 type FileLinkProps =
   | {
@@ -122,7 +130,7 @@ const FileLink = (props: FileLinkProps) => {
       ? props.file
       : {
           name: '',
-          type: 'audio',
+          type: 'AudioInitialNotes',
           url: '',
           songId: props.songId,
         };

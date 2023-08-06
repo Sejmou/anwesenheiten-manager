@@ -157,11 +157,14 @@ enum VoiceGroup {
 }
 
 enum LinkType {
-  audio
-  video
-  pdf
-  musescore
-  other
+  Audio
+  AudioRecording
+  AudioPracticeTrack
+  AudioInitialNotes
+  Video
+  PDF
+  MuseScore
+  Other
 }
 
 enum MusicalKey {

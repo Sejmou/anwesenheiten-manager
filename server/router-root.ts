@@ -1,6 +1,7 @@
 import { createTRPCRouter } from './trpc';
 import { songRouter } from './routers/song';
 import { setlistRouter } from './routers/setlist';
+import { googleDriveRouter } from './routers/google-drive';
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { setlistRouter } from './routers/setlist';
 export const appRouter = createTRPCRouter({
   song: songRouter,
   setlist: setlistRouter,
+  googleDrive: googleDriveRouter,
 });
 
 // export type definition of API

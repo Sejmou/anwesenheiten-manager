@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { NextPageWithLayout } from 'pages/_app';
 import { getAdminPageLayout } from 'components/layout/get-page-layouts';
@@ -131,8 +131,8 @@ const SongsImport = ({ onImport }: SongImportProps) => {
         text={'Neue Lieder importieren (Textdatei 1 Namen pro Zeile)'}
         onFilesAdded={handleFilesAdded}
         fileTypesAndExtensions={{
-          'text/plain': ['txt', 'log'],
-          'text/csv': ['csv'],
+          'text/plain': ['.txt'],
+          'text/csv': ['.csv'],
         }}
       />
       {importedNames.length > 0 && (

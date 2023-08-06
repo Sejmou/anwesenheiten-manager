@@ -3,7 +3,6 @@ import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
 import { songFile, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { eq } from 'drizzle-orm';
-import type { Song } from 'drizzle/models';
 
 // create input schema
 const songFileInput = createInsertSchema(songFile);
