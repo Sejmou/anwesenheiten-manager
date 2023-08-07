@@ -1,10 +1,11 @@
 import { ZodError, z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { googleDriveFile } from 'drizzle/schema';
+import { googleDriveFile, songFileLink } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { NewGoogleDriveFile } from 'drizzle/models';
 import type { DrizzleDBClient } from 'server/db';
-import { inArray, notInArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
+import { google } from 'googleapis';
 
 const getGoogleAPIKey = () => {
   if (!process.env.GOOGLE_API_KEY) {
@@ -13,7 +14,13 @@ const getGoogleAPIKey = () => {
   return process.env.GOOGLE_API_KEY;
 };
 
+const createDriveAPI = (apiKey: string) => {
+  return google.drive({ version: 'v3', auth: apiKey });
+};
+type DriveAPI = ReturnType<typeof createDriveAPI>;
+
 const GOOGLE_API_KEY = getGoogleAPIKey();
+const drive = createDriveAPI(GOOGLE_API_KEY);
 
 const folderContentsAPIResponse = z.object({
   files: z.array(
@@ -33,6 +40,11 @@ const fileMetadataAPIResponse = z.object({
 // Google Drive API files aren't necessarily actual files, hence I am making this distinction here
 type DriveAPIItem = Awaited<ReturnType<typeof getMetadataForGoogleDriveId>>;
 type DriveAPIFile = Required<DriveAPIItem>;
+type GoogleDriveFolder = {
+  id: string;
+  name: string;
+  subfolders: GoogleDriveFolder[];
+};
 
 const googleDriveFileInput = createInsertSchema(googleDriveFile);
 
@@ -52,26 +64,56 @@ export const googleDriveRouter = createTRPCRouter({
       const file = await storeInDb(input, ctx.db);
       return file;
     }),
-  // new in this context means that the file is not yet stored in the GoogleDriveFile table
-  getNewFilesForFolderId: protectedProcedure
+  getFolderWithAllSubfolders: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      console.log('getting folders for folder id', input);
+      const folder = await createGoogleDriveFolderTree(input, drive);
+      return folder;
+    }),
+  getFilesForFolder: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      console.log('getting new files for folder id', input);
-      const files = await getFilesInFolderRecursively(input);
-      const existingFileIDs = await ctx.db
-        .select({ id: googleDriveFile.id })
+      console.log('getting files for folder id', input);
+      const files = await getFilesInFolder(input);
+      const queryResult = await ctx.db
+        .select({
+          id: googleDriveFile.id,
+          songId: songFileLink.songId,
+          linkLabel: songFileLink.label,
+        })
         .from(googleDriveFile)
         .where(
           inArray(
             googleDriveFile.id,
             files.map(f => f.id)
           )
+        )
+        .leftJoin(
+          songFileLink,
+          eq(googleDriveFile.downloadUrl, songFileLink.url)
         );
-      // convert array of existing file IDs to a set
-      const existingFileIds = new Set(existingFileIDs.map(f => f.id));
-      const newFiles = files.filter(f => !existingFileIds.has(f.id));
-      console.log('new files', newFiles);
-      return newFiles;
+
+      const existingFileIds = new Set(queryResult.map(f => f.id));
+      const existingSongLinks = queryResult.filter(
+        f => f.songId !== null && f.linkLabel !== null
+      ) as { id: string; songId: string; linkLabel: string }[];
+      const songLinksMap = new Map(
+        existingSongLinks.map(f => [
+          f.id,
+          {
+            songId: f.songId,
+            label: f.linkLabel,
+          },
+        ])
+      );
+
+      const filesWithInfo = files.map(f => ({
+        ...f,
+        existsInDB: existingFileIds.has(f.id),
+        songLink: songLinksMap.get(f.id),
+      }));
+      return filesWithInfo;
     }),
 });
 
@@ -86,7 +128,43 @@ function driveFileToDBFile(file: DriveAPIFile): NewGoogleDriveFile {
   };
 }
 
-async function getFilesInFolderRecursively(folderId: string, relPath = '') {
+async function createGoogleDriveFolderTree(folderId: string, drive: DriveAPI) {
+  const { name } = await getMetadataForGoogleDriveId(folderId);
+  const folder = await getAllSubfoldersRecursively(folderId, drive, name);
+  return folder;
+}
+
+async function getAllSubfoldersRecursively(
+  folderId: string,
+  drive: DriveAPI,
+  folderName: string = 'root'
+): Promise<GoogleDriveFolder> {
+  const res = await drive.files.list({
+    q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+    fields: 'files(id, name)',
+  });
+  const resp = folderContentsAPIResponse.parse(res.data);
+  const subfolders = resp.files;
+  if (subfolders.length === 0) {
+    return { name: folderName, id: folderId, subfolders: [] };
+  }
+  const subfolderResults = await Promise.all(
+    subfolders.map(async subfolder =>
+      getAllSubfoldersRecursively(subfolder.id, drive, subfolder.name)
+    )
+  );
+  return {
+    name: folderName,
+    id: folderId,
+    subfolders: subfolderResults,
+  };
+}
+
+async function getFilesInFolder(
+  folderId: string,
+  recursive = false,
+  relPath = ''
+) {
   const folderFilesApiRes = await fetch(
     `https://www.googleapis.com/drive/v3/files?q="${folderId}"+in+parents&key=${GOOGLE_API_KEY}` // try fetching data about Google Drive folder
   );
@@ -120,12 +198,15 @@ async function getFilesInFolderRecursively(folderId: string, relPath = '') {
         );
         continue;
       }
-      console.log('getting files in subfolder', item.name);
-      const subfolderFiles = await getFilesInFolderRecursively(
-        item.id,
-        constructRelativePath(relPath, item.name)
-      );
-      files.push(...subfolderFiles);
+      if (recursive) {
+        console.log('getting files in subfolder', item.name);
+        const subfolderFiles = await getFilesInFolder(
+          item.id,
+          true,
+          constructRelativePath(relPath, item.name)
+        );
+        files.push(...subfolderFiles);
+      }
     }
   }
   return files;

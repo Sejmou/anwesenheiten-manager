@@ -21,6 +21,7 @@ import { songLinkTypeOptions } from 'frontend-utils';
 import { AddLink, LinkOff } from '@mui/icons-material';
 import type { NewGoogleDriveFile, SongFileLink } from 'drizzle/models';
 import { publicFolderId } from 'utils/google-drive';
+import { FolderSelect } from 'components/FolderSelect';
 
 const folderUrl = `https://drive.google.com/drive/folders/${publicFolderId}`;
 
@@ -28,7 +29,9 @@ const Files: NextPageWithLayout = () => {
   const addMessage = useStoreActions(actions => actions.addMessage);
   const getSyncedFiles = api.googleDrive.getLinkedFiles.useQuery();
   const getNewFilesForFolderId =
-    api.googleDrive.getNewFilesForFolderId.useMutation();
+    api.googleDrive.getFilesForFolder.useMutation();
+  const getSubfolders =
+    api.googleDrive.getFolderWithAllSubfolders.useQuery(publicFolderId);
   const addOrUpdateFile = api.googleDrive.addOrUpdateFile.useMutation();
   const getSongs = api.song.getAll.useQuery();
   const addOrUpdateFileLink = api.song.addOrUpdateFileLink.useMutation();
@@ -36,9 +39,14 @@ const Files: NextPageWithLayout = () => {
 
   const songs = getSongs?.data?.songs ?? [];
   const files = getSyncedFiles?.data ?? [];
+  const folderWithAllSubfolders = getSubfolders?.data ?? undefined;
 
   const handleGetNewFilesClick = async () => {
     await getNewFilesForFolderId.mutateAsync(publicFolderId);
+  };
+
+  const handleFolderSelect = async (folderId: string) => {
+    await getNewFilesForFolderId.mutateAsync(folderId);
   };
 
   const handleFileAddOrUpdate = async (file: NewGoogleDriveFile) => {
@@ -96,13 +104,18 @@ const Files: NextPageWithLayout = () => {
           ))}
         </List>
       )}
-      {/* //TODO: this will probably be confusing to users - remove it and setup automated sync instead */}
+      {folderWithAllSubfolders && (
+        <FolderSelect
+          rootFolder={folderWithAllSubfolders}
+          onSelect={handleFolderSelect}
+        />
+      )}
       <Button
         sx={{ mt: 2 }}
         variant="contained"
         onClick={handleGetNewFilesClick}
       >
-        Neue Files verlinken
+        Neue Files finden
       </Button>
     </>
   );

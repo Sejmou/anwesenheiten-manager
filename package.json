@@ -37,7 +37,7 @@
     "drizzle-zod": "^0.4.4",
     "easy-peasy": "^5.0.4",
     "eslint-config-next": "^13.4.12",
-    "googleapis": "^107.0.0",
+    "googleapis": "^123.0.0",
     "moment-timezone": "^0.5.37",
     "next": "^13.4.12",
     "next-auth": "^4.10.3",
