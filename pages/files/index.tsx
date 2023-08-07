@@ -19,15 +19,17 @@ import { useStoreActions } from 'lib/message-store';
 import BasicSelect from 'components/BasicSelect';
 import { songLinkTypeOptions } from 'frontend-utils';
 import { AddLink, LinkOff } from '@mui/icons-material';
-import type { SongFileLink } from 'drizzle/models';
+import type { NewGoogleDriveFile, SongFileLink } from 'drizzle/models';
 import { publicFolderId } from 'utils/google-drive';
 
 const folderUrl = `https://drive.google.com/drive/folders/${publicFolderId}`;
 
 const Files: NextPageWithLayout = () => {
   const addMessage = useStoreActions(actions => actions.addMessage);
-  const getSyncedFiles = api.googleDrive.get.useQuery();
-  const syncFiles = api.googleDrive.sync.useMutation();
+  const getSyncedFiles = api.googleDrive.getLinkedFiles.useQuery();
+  const getNewFilesForFolderId =
+    api.googleDrive.getNewFilesForFolderId.useMutation();
+  const addOrUpdateFile = api.googleDrive.addOrUpdateFile.useMutation();
   const getSongs = api.song.getAll.useQuery();
   const addOrUpdateFileLink = api.song.addOrUpdateFileLink.useMutation();
   const removeFileLink = api.song.removeFileLink.useMutation();
@@ -35,10 +37,13 @@ const Files: NextPageWithLayout = () => {
   const songs = getSongs?.data?.songs ?? [];
   const files = getSyncedFiles?.data ?? [];
 
-  const handleFileSync = async () => {
-    await syncFiles.mutateAsync();
+  const handleGetNewFilesClick = async () => {
+    await getNewFilesForFolderId.mutateAsync(publicFolderId);
+  };
+
+  const handleFileAddOrUpdate = async (file: NewGoogleDriveFile) => {
+    await addOrUpdateFile.mutateAsync(file);
     getSyncedFiles.refetch();
-    addMessage('Files synchronisiert!');
   };
 
   const handleLinkAddOrUpdate = async (newValue: SongFileLink) => {
@@ -92,8 +97,12 @@ const Files: NextPageWithLayout = () => {
         </List>
       )}
       {/* //TODO: this will probably be confusing to users - remove it and setup automated sync instead */}
-      <Button sx={{ mt: 2 }} variant="contained" onClick={handleFileSync}>
-        Files mit Google Drive synchronisieren
+      <Button
+        sx={{ mt: 2 }}
+        variant="contained"
+        onClick={handleGetNewFilesClick}
+      >
+        Neue Files verlinken
       </Button>
     </>
   );

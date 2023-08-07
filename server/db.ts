@@ -20,3 +20,5 @@ export const db = drizzle(client, {
     ...relations,
   },
 });
+
+export type DrizzleDBClient = typeof db;

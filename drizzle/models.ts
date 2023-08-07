@@ -23,3 +23,4 @@ export type GoogleDriveFile = InferModel<typeof googleDriveFile>;
 export type GoogleDriveFileWithSongFileLink = GoogleDriveFile & {
   songFileLink?: SongFileLink; // TODO: figure out how to model optional relationship in drizzle/relations.ts
 };
+export type NewGoogleDriveFile = InferModel<typeof googleDriveFile, 'insert'>;

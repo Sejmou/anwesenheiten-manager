@@ -63,7 +63,7 @@ I don't like the Prisma client interface. I find the syntax quite hard to learn 
 
 Similar to Prisma, drizzle also features a typesafe schema. However, instead of generating a client from the CLI, we generate a schema. Tables, relations etc. from this schema can then be imported in any file that interacts with the DB. The schema is generated from the DB schema using `drizzle-kit`'s `introspect` command. 
 
-To configure drizzle, create a file called `drizzle.config.ts` in the root folder of this project (check out the `drizzle.config.example.ts` file for reference). Then you should be able to run `npx drizzle-kit introspect:pg` to generate the drizzle client schema file.
+Drizzle is configured using a file called `drizzle.config.ts` in the root folder of this project. When running `npx drizzle-kit introspect:pg` to generate the drizzle client schema file, the data from this config file is also used to setup things correctly.
 
 ### Add other required secrets and API keys
 

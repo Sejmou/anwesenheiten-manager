@@ -14,24 +14,20 @@ export const songRelations = relations(song, ({ many }) => ({
   setlistSongInfo: many(setlistSongInfo),
 }));
 
-export const SongFileLinkRelations = relations(songFileLink, ({ one }) => ({
+export const songFileLinkRelations = relations(songFileLink, ({ one }) => ({
   song: one(song, {
     fields: [songFileLink.songId],
     references: [song.id],
-  }),
-  googleDriveFile: one(googleDriveFile, {
-    fields: [songFileLink.googleDriveId],
-    references: [googleDriveFile.id],
   }),
 }));
 
 export const googleDriveFileRelations = relations(
   googleDriveFile,
   ({ one }) => ({
-    // TODO: research how an optional relation can be modeled
+    // TODO: this relation is optional! research how an optional relation can be modeled
     songFileLink: one(songFileLink, {
-      fields: [googleDriveFile.id],
-      references: [songFileLink.googleDriveId],
+      fields: [googleDriveFile.downloadUrl],
+      references: [songFileLink.url],
     }),
   })
 );

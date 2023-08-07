@@ -28,7 +28,6 @@ const Songs: NextPageWithLayout = () => {
   const [song, setSong] = useState<(typeof songs)[0] | null>(null);
 
   const handleFileLinksSave = async (links: SongFileLink[], songId: string) => {
-    console.log(links);
     const update = await updateSongFileLinks.mutateAsync({
       links,
       songId,
@@ -119,7 +118,6 @@ const SongsImport = ({ onImport }: SongImportProps) => {
     const firstFile = files[0];
     if (!firstFile) return;
     const text = await readFileTextContent(firstFile);
-    console.log(text);
     const songNames = text.split('\n').map(s => s.trim());
     const uniqueSongNames = [...new Set(songNames)];
     setImportedNames(uniqueSongNames);
