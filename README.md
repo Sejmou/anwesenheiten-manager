@@ -18,7 +18,7 @@ The main feature is a choir admin dashboard. It includes the following:
 I plan to add public-facing sites for choir members as well. Currently, only a page for the current program is available. It includes a list of songs and links to the corresponding files (sheet music, lyrics, etc.).
 
 ## Live demo with dummy data
-Go to [https://tuwien-chor-dashboard.vercel.app/](https://tuwien-chor-dashboard.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
+Go to the [this site](https://tuwienchor.vercel.app/) and log in with `test.admin@example.com` and password `asdfasdf`.
 
 ## Installing the project
 
