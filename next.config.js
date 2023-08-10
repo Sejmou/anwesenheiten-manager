@@ -4,7 +4,7 @@ module.exports = {
       {
         source: '/',
         destination: '/anwesenheiten',
-        permanent: true,
+        permanent: false,
       },
     ];
   },
