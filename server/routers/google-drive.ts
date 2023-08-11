@@ -1,11 +1,14 @@
-import { ZodError, z } from 'zod';
+import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { googleDriveFile, songFileLink } from 'drizzle/schema';
+import { googleDriveFile, songFileLink, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { NewGoogleDriveFile } from 'drizzle/models';
-import type { DrizzleDBClient } from 'server/db';
-import { eq, inArray } from 'drizzle-orm';
+import { type DrizzleDBClient } from 'server/db';
+import { SQL, eq, inArray, sql } from 'drizzle-orm';
 import { google } from 'googleapis';
+import { PgDialect } from 'drizzle-orm/pg-core';
+
+const pgDialect = new PgDialect();
 
 const getGoogleAPIKey = () => {
   if (!process.env.GOOGLE_API_KEY) {
@@ -67,14 +70,12 @@ export const googleDriveRouter = createTRPCRouter({
   getFolderWithAllSubfolders: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      console.log('getting folders for folder id', input);
       const folder = await createGoogleDriveFolderTree(input, drive);
       return folder;
     }),
   getFilesForFolder: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      console.log('getting files for folder id', input);
       const files = await getFilesInFolder(input);
       const queryResult = await ctx.db
         .select({
@@ -115,6 +116,32 @@ export const googleDriveRouter = createTRPCRouter({
       }));
       return filesWithInfo;
     }),
+  getSongMatchesForSubfolderNames: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const { name } = await getMetadataForGoogleDriveId(input);
+      const folder = await getFolderWithSubfolders(input, drive, name);
+
+      const subfolderNames = folder.subfolders.map(f => f.name);
+      const subFolderIds = folder.subfolders.map(f => f.id);
+      const matches = await fuzzyMatchSongs(subfolderNames, ctx.db);
+
+      const songNames = matches.map(m => m.closestMatch);
+      const songs = await ctx.db
+        .select()
+        .from(song)
+        .where(inArray(song.name, songNames));
+
+      const songMap = new Map(songs.map(s => [s.name, s]));
+
+      const songMatches = matches.map((m, i) => ({
+        name: m.inputString,
+        id: subFolderIds[i],
+        closestMatch: m.closestMatch,
+        song: songMap.get(m.closestMatch)!,
+      }));
+      return songMatches;
+    }),
 });
 
 function driveFileToDBFile(file: DriveAPIFile): NewGoogleDriveFile {
@@ -130,14 +157,15 @@ function driveFileToDBFile(file: DriveAPIFile): NewGoogleDriveFile {
 
 async function createGoogleDriveFolderTree(folderId: string, drive: DriveAPI) {
   const { name } = await getMetadataForGoogleDriveId(folderId);
-  const folder = await getAllSubfoldersRecursively(folderId, drive, name);
+  const folder = await getFolderWithSubfolders(folderId, drive, name, true);
   return folder;
 }
 
-async function getAllSubfoldersRecursively(
+async function getFolderWithSubfolders(
   folderId: string,
   drive: DriveAPI,
-  folderName: string = 'root'
+  folderName: string = 'root',
+  recursive = false
 ): Promise<GoogleDriveFolder> {
   const res = await drive.files.list({
     q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
@@ -148,16 +176,28 @@ async function getAllSubfoldersRecursively(
   if (subfolders.length === 0) {
     return { name: folderName, id: folderId, subfolders: [] };
   }
-  const subfolderResults = await Promise.all(
-    subfolders.map(async subfolder =>
-      getAllSubfoldersRecursively(subfolder.id, drive, subfolder.name)
-    )
-  );
-  return {
-    name: folderName,
-    id: folderId,
-    subfolders: subfolderResults,
-  };
+  if (recursive) {
+    const subfolderResults = await Promise.all(
+      subfolders.map(async subfolder =>
+        getFolderWithSubfolders(subfolder.id, drive, subfolder.name)
+      )
+    );
+    return {
+      name: folderName,
+      id: folderId,
+      subfolders: subfolderResults,
+    };
+  } else {
+    return {
+      name: folderName,
+      id: folderId,
+      subfolders: subfolders.map(f => ({
+        name: f.name,
+        id: f.id,
+        subfolders: [],
+      })),
+    };
+  }
 }
 
 async function getFilesInFolder(
@@ -177,6 +217,7 @@ async function getFilesInFolder(
   if (folderContents.length === 0) {
     return [];
   }
+
   const files: (NewGoogleDriveFile & { path: string })[] = [];
   for (const item of folderContents) {
     // proper files have webContentLink, folders don't
@@ -239,6 +280,38 @@ async function storeInDb(file: NewGoogleDriveFile, db: DrizzleDBClient) {
       },
       target: googleDriveFile.id,
     });
+}
+
+async function fuzzyMatchSongs(names: string[], db: DrizzleDBClient) {
+  // TODO: figure out how to properly create this query with Drizzle (there must be a cleaner way lol)
+  const namesSQL = sql.join(
+    names.map(n => sql`(${n})`),
+    sql.raw(', ')
+  );
+  const { sql: sqlStr, params } = pgDialect.sqlToQuery(namesSQL);
+  const sqlChunks: SQL[] = [
+    sql`
+  SELECT
+  input_string,
+  (
+    SELECT ${song.name}
+    FROM ${song}
+    ORDER BY levenshtein(input_string, ${song.name})
+    LIMIT 1
+  ) AS closest_match
+  FROM (VALUES `,
+    namesSQL,
+    sql`) AS input_strings(input_string);`,
+  ];
+  const query = sql.fromList(sqlChunks);
+  const result = (await db.execute(query)) as {
+    input_string: string;
+    closest_match: string;
+  }[];
+  return result.map(r => ({
+    inputString: r.input_string,
+    closestMatch: r.closest_match,
+  }));
 }
 
 // export type definition of API

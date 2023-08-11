@@ -1,12 +1,12 @@
 {
-  "name": "hello-next",
+  "name": "tuwien-chor-dashboard",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tools for the TU Wien university choir",
   "scripts": {
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "update-schema-and-clients": "prisma db push && prisma generate && drizzle-kit introspect:pg && sed -i '' \"s/mode: 'string'//g\" drizzle/schema.ts",
+    "update-db-and-clients": "prisma db push && ts-node additional-db-config.ts && prisma generate && drizzle-kit introspect:pg && sed -i '' \"s/mode: 'string'//g\" drizzle/schema.ts",
     "generate": "prisma generate",
     "postinstall": "yarn generate"
   },
@@ -37,6 +37,7 @@
     "drizzle-zod": "^0.4.4",
     "easy-peasy": "^5.0.4",
     "eslint-config-next": "^13.4.12",
+    "formik": "^2.4.3",
     "googleapis": "^123.0.0",
     "moment-timezone": "^0.5.37",
     "next": "^13.4.12",
@@ -49,7 +50,9 @@
     "react-dropzone": "^14.2.2",
     "react-markdown": "8.0.0",
     "superjson": "^1.13.1",
-    "zod": "^3.21.4"
+    "ts-node": "^10.9.1",
+    "zod": "^3.21.4",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@types/node": "18.14.0",

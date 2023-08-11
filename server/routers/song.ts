@@ -15,9 +15,7 @@ export const songRouter = createTRPCRouter({
       },
     });
 
-    return {
-      songs,
-    };
+    return songs;
   }),
   add: protectedProcedure
     .input(z.string().array())

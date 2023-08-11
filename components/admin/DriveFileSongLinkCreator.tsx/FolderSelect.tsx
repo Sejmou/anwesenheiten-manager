@@ -1,20 +1,28 @@
-import { useState } from 'react';
-import { Breadcrumbs, List, ListItem, ListItemButton } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+  Breadcrumbs,
+  Link,
+  List,
+  ListItem,
+  ListItemButton,
+  Typography,
+} from '@mui/material';
 import { RouterOutputs } from 'utils/api';
 type GoogleDriveFolder =
   RouterOutputs['googleDrive']['getFolderWithAllSubfolders'];
 
 type Props = {
   rootFolder: GoogleDriveFolder;
-  onSelect: (folderId: string) => void;
+  onSelect: (folder: GoogleDriveFolder) => void;
 };
 
-export const FolderSelect = ({ rootFolder, onSelect }: Props) => {
+export const FolderSelect = ({ rootFolder, onSelect, ...props }: Props) => {
   const [parentFolders, setParentFolders] = useState<GoogleDriveFolder[]>([
     rootFolder,
   ]);
   const [currentFolder, setCurrentFolder] =
     useState<GoogleDriveFolder>(rootFolder);
+
   const [currentLevel, setCurrentLevel] = useState(0);
 
   const handleJumpToParent = (
@@ -32,17 +40,36 @@ export const FolderSelect = ({ rootFolder, onSelect }: Props) => {
     setCurrentLevel(currentLevel + 1);
   };
 
+  useEffect(() => {
+    onSelect(currentFolder);
+  }, [currentFolder]);
+
   return (
     <>
-      <Breadcrumbs>
-        {parentFolders.map((folder, level) => (
-          <span
-            onClick={() => handleJumpToParent(folder, level)}
-            key={folder.id}
-          >
-            {folder.name}
-          </span>
-        ))}
+      <Breadcrumbs
+        sx={{
+          backgroundColor: 'whitesmoke',
+          py: 1,
+          px: 2,
+          borderBottom: '1px solid lightgrey',
+        }}
+      >
+        {parentFolders.map((folder, level) =>
+          level !== parentFolders.length - 1 ? (
+            <Link
+              onClick={() => handleJumpToParent(folder, level)}
+              key={folder.id}
+              underline={level == parentFolders.length - 1 ? 'none' : 'hover'}
+              color="inherit"
+            >
+              {folder.name}
+            </Link>
+          ) : (
+            <Typography color="text.primary" key={folder.id}>
+              {folder.name}
+            </Typography>
+          )
+        )}
       </Breadcrumbs>
       <List disablePadding>
         {currentFolder.subfolders.map(subfolder => (

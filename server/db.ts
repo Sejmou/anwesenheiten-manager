@@ -1,5 +1,3 @@
-// The DB schema to be used for queries with Drizzle
-
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as baseSchema from 'drizzle/schema'; // generated schema (does not include relations)
@@ -13,8 +11,9 @@ const getDatabaseURL = () => {
   return url;
 };
 
-const client = postgres(getDatabaseURL());
-export const db = drizzle(client, {
+const connection = postgres(getDatabaseURL());
+
+export const db = drizzle(connection, {
   schema: {
     ...baseSchema,
     ...relations,

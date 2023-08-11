@@ -102,9 +102,10 @@ Events are synced from the choirs' public Google calendar. Go to the 'Termine' p
 ## Other developer notes
 ### Schema/Model changes
 The Prisma schema file `prisma/schema.prisma` is the source of truth for the database schema (and hence the whole 'data model' of this application). It is used to generate the Prisma client and sync the database with the schema. The drizzle DB client also relies on it indirectly: its schema is generated from the DB schema using `drizzle-kit`'s `introspect` command. So, whenever you change the Prisma schema, you need to 
-- run `npx prisma db push` to sync the "push" the changes in the Prisma schema to the DB (updating its schema),
-- run `npx prisma generate` to update the Prisma client, and
-- run `npx drizzle-kit introspect:pg` to update the drizzle client schema from the updated DB schema.
+1. run `prisma db push` to sync the "push" the changes in the Prisma schema to the DB (updating its schema),
+2. run `ts-node additional-db-config.ts` to configure additional stuff in the DB (as of 8th August 2023 this is only activating the fuzzystrmatch extension)
+3. run `prisma generate` to update the Prisma client, and
+4. run `drizzle-kit introspect:pg` to update the drizzle client schema from the updated DB schema.
 
 Conveniently, there's a script in `package.json` that does all of that: `update-schema-and-clients`. So, whenever you change the Prisma schema, just run `yarn update-schema-and-clients` and you should be good to go.
 

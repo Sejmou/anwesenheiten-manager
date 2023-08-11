@@ -27,5 +27,10 @@
     "frontend-utils": ["frontend-utils/*"]
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS" //required so that ts-node scripts can be run (e.g. additional-db-config.ts)
+    }
+  }
 }
