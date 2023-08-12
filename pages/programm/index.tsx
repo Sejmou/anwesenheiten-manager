@@ -8,27 +8,26 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemSecondaryAction,
   ListItemText,
   Typography,
 } from '@mui/material';
 import PublicPageHead from 'components/layout/PublicPageHead';
 import BasicAccordion, { BasicAccordionItem } from 'components/BasicAccordion';
 import { singularPluralAutoFormat } from 'frontend-utils';
-import { SongWithFileLinks } from 'drizzle/models';
-import SongDetailsDialog from 'components/SongDetailsDialog';
-import InitialNotesPlayButton from 'components/InitialNotesPlayButton';
+import { SongWithAttachments } from 'drizzle/models';
+import SongDetailsDialog from 'components/song/DetailsDialog';
+import AudioPlayButton from 'components/song/AudioPlayButton';
 
 type PageProps = {
   setlists: Awaited<ReturnType<typeof getSetlistsWithSongs>>;
 };
 
 const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
-  const [selectedSong, setSelectedSong] = useState<SongWithFileLinks | null>(
+  const [selectedSong, setSelectedSong] = useState<SongWithAttachments | null>(
     null
   );
 
-  const handleSongClick = (song: SongWithFileLinks) => {
+  const handleSongClick = (song: SongWithAttachments) => {
     setSelectedSong(song);
   };
 
@@ -69,7 +68,7 @@ const SetlistsPage: NextPageWithLayout<PageProps> = ({ setlists }) => {
 
 type SetlistItemProps = {
   setlist: PageProps['setlists'][0];
-  onSongClick: (song: SongWithFileLinks) => void;
+  onSongClick: (song: SongWithAttachments) => void;
   defaultExpanded?: boolean;
 };
 
@@ -103,11 +102,11 @@ const SongItem = ({
   song,
   onSongClick,
 }: {
-  song: SongWithFileLinks;
-  onSongClick: (song: SongWithFileLinks) => void;
+  song: SongWithAttachments;
+  onSongClick: (song: SongWithAttachments) => void;
 }) => {
-  const initialNotesLink = song.fileLinks.find(
-    link => link.type === 'AudioInitialNotes'
+  const initialNotesLink = song.attachments.find(
+    a => a.type === 'AudioInitialNotes'
   );
 
   return (
@@ -116,7 +115,7 @@ const SongItem = ({
         <ListItemText primary={song.name} secondary={getSecondaryText(song)} />
         {initialNotesLink && (
           <Box onClick={e => e.stopPropagation()}>
-            <InitialNotesPlayButton link={initialNotesLink} />
+            <AudioPlayButton audioAttachment={initialNotesLink as any} />
           </Box>
         )}
       </ListItemButton>
@@ -124,8 +123,8 @@ const SongItem = ({
   );
 };
 
-function getSecondaryText(song: SongWithFileLinks) {
-  const filesStr = singularPluralAutoFormat(song.fileLinks, 'File');
+function getSecondaryText(song: SongWithAttachments) {
+  const filesStr = singularPluralAutoFormat(song.attachments, 'File');
   const keyStr = song.key ? `Tonart: ${song.key}` : '';
   return [keyStr, filesStr].filter(str => str !== '').join(', ');
 }
@@ -163,7 +162,7 @@ async function getSetlistsWithSongs() {
         with: {
           song: {
             with: {
-              fileLinks: true,
+              attachments: true,
             },
           },
         },

@@ -2,19 +2,18 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemButton,
   ListItemText,
   Typography,
 } from '@mui/material';
-import { Song, SongFileLink } from 'drizzle/models';
-import BasicDialog from './BasicDialog';
-import TextAttributeDisplay from './TextAttributeDisplay';
-import { Download } from '@mui/icons-material';
+import { Song, SongAttachment } from 'drizzle/models';
+import BasicDialog from '../BasicDialog';
+import TextAttributeDisplay from '../TextAttributeDisplay';
+import SongAttachments from './Attachments';
 
-type SongWithFiles = Song & { fileLinks: SongFileLink[] };
+type SongWithAttachments = Song & { attachments: SongAttachment[] };
 
 type Props = {
-  song: SongWithFiles;
+  song: SongWithAttachments;
   open: boolean;
   onClose: () => void;
 };
@@ -36,19 +35,10 @@ const SongDetailsDialog = ({ song, open, onClose }: Props) => {
         ]}
       />
       <Typography sx={{ fontWeight: 'bold' }}>Files</Typography>
-      {song.fileLinks.length > 0 && (
-        <List>
-          {song.fileLinks.map((link, i) => (
-            <ListItem key={link.songId + link.label}>
-              <ListItemText primary={link.label} />
-              <IconButton href={link.url}>
-                <Download />
-              </IconButton>
-            </ListItem>
-          ))}
-        </List>
+      {song.attachments.length > 0 && (
+        <SongAttachments attachments={song.attachments} />
       )}
-      {song.fileLinks.length === 0 && (
+      {song.attachments.length === 0 && (
         <Typography>Es sind keine Files verlinkt.</Typography>
       )}
     </BasicDialog>

@@ -2,3 +2,6 @@ node_modules/
 .next/
 .DS_STORE
 *.env
+
+# created when running tsc build in VS Code for purpose of quickly figuring out what files are affected by function/file renames or removals during refactors (w/ cmd + shift + b)
+tsconfig.tsbuildinfo

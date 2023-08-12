@@ -3,20 +3,20 @@
 import { relations } from 'drizzle-orm';
 import {
   song,
-  songFileLink,
+  songAttachment,
   setlist,
   setlistSongInfo,
   googleDriveFile,
 } from 'drizzle/schema';
 
 export const songRelations = relations(song, ({ many }) => ({
-  fileLinks: many(songFileLink),
+  attachments: many(songAttachment),
   setlistSongInfo: many(setlistSongInfo),
 }));
 
-export const songFileLinkRelations = relations(songFileLink, ({ one }) => ({
+export const songAttachmentRelations = relations(songAttachment, ({ one }) => ({
   song: one(song, {
-    fields: [songFileLink.songId],
+    fields: [songAttachment.songId],
     references: [song.id],
   }),
 }));
@@ -24,10 +24,9 @@ export const songFileLinkRelations = relations(songFileLink, ({ one }) => ({
 export const googleDriveFileRelations = relations(
   googleDriveFile,
   ({ one }) => ({
-    // TODO: this relation is optional! research how an optional relation can be modeled
-    songFileLink: one(songFileLink, {
-      fields: [googleDriveFile.downloadUrl],
-      references: [songFileLink.url],
+    attachment: one(songAttachment, {
+      fields: [googleDriveFile.attachmentId],
+      references: [songAttachment.id],
     }),
   })
 );

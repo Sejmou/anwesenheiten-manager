@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { googleDriveFile, songFileLink, song } from 'drizzle/schema';
+import { googleDriveFile, songAttachment, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { NewGoogleDriveFile } from 'drizzle/models';
 import { type DrizzleDBClient } from 'server/db';
 import { SQL, eq, inArray, sql } from 'drizzle-orm';
 import { google } from 'googleapis';
@@ -56,7 +55,7 @@ export const googleDriveRouter = createTRPCRouter({
     const files = await ctx.db.query.googleDriveFile.findMany({
       orderBy: f => f.name,
       with: {
-        songFileLink: true,
+        attachment: true,
       },
     });
     return files;
@@ -64,57 +63,13 @@ export const googleDriveRouter = createTRPCRouter({
   addOrUpdateFile: protectedProcedure
     .input(googleDriveFileInput)
     .mutation(async ({ ctx, input }) => {
-      const file = await storeInDb(input, ctx.db);
-      return file;
+      throw new Error('Not implemented');
     }),
   getFolderWithAllSubfolders: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const folder = await createGoogleDriveFolderTree(input, drive);
       return folder;
-    }),
-  getFilesForFolder: protectedProcedure
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      const files = await getFilesInFolder(input);
-      const queryResult = await ctx.db
-        .select({
-          id: googleDriveFile.id,
-          songId: songFileLink.songId,
-          linkLabel: songFileLink.label,
-        })
-        .from(googleDriveFile)
-        .where(
-          inArray(
-            googleDriveFile.id,
-            files.map(f => f.id)
-          )
-        )
-        .leftJoin(
-          songFileLink,
-          eq(googleDriveFile.downloadUrl, songFileLink.url)
-        );
-
-      const existingFileIds = new Set(queryResult.map(f => f.id));
-      const existingSongLinks = queryResult.filter(
-        f => f.songId !== null && f.linkLabel !== null
-      ) as { id: string; songId: string; linkLabel: string }[];
-      const songLinksMap = new Map(
-        existingSongLinks.map(f => [
-          f.id,
-          {
-            songId: f.songId,
-            label: f.linkLabel,
-          },
-        ])
-      );
-
-      const filesWithInfo = files.map(f => ({
-        ...f,
-        existsInDB: existingFileIds.has(f.id),
-        songLink: songLinksMap.get(f.id),
-      }));
-      return filesWithInfo;
     }),
   getSongMatchesForSubfolderNames: protectedProcedure
     .input(z.string())
@@ -144,15 +99,33 @@ export const googleDriveRouter = createTRPCRouter({
     }),
 });
 
-function driveFileToDBFile(file: DriveAPIFile): NewGoogleDriveFile {
+function parseDriveFile(file: DriveAPIFile): DriveFileWithURLs {
   const { id, webContentLink: downloadUrl, mimeType, name } = file;
   return {
     id,
-    downloadUrl,
     mimeType,
     name,
-    lastSyncAt: new Date(),
+    downloadUrl,
+    viewUrl: getViewUrl(id),
   };
+}
+
+type DriveFileWithURLs = {
+  id: string;
+  mimeType: string;
+  name: string;
+  downloadUrl: string;
+  viewUrl: string;
+};
+
+/**
+ * creates a URL that can be used to view a google Drive file in the browser
+ *
+ * @param driveFileId   the ID of the file on Google Drive
+ * @returns
+ */
+function getViewUrl(driveFileId: string) {
+  return `https://drive.google.com/file/d/${driveFileId}`;
 }
 
 async function createGoogleDriveFolderTree(folderId: string, drive: DriveAPI) {
@@ -218,14 +191,14 @@ async function getFilesInFolder(
     return [];
   }
 
-  const files: (NewGoogleDriveFile & { path: string })[] = [];
+  const files: (DriveFileWithURLs & { path: string })[] = [];
   for (const item of folderContents) {
     // proper files have webContentLink, folders don't
     const { webContentLink, ...rest } = await getMetadataForGoogleDriveId(
       item.id
     );
     if (webContentLink) {
-      const file = driveFileToDBFile({
+      const file = parseDriveFile({
         ...rest,
         webContentLink,
       });
@@ -266,20 +239,6 @@ async function getMetadataForGoogleDriveId(id: string) {
   );
   const fileMetadata = fileMetadataAPIResponse.parse(await fileDataRes.json());
   return { ...fileMetadata, id };
-}
-
-async function storeInDb(file: NewGoogleDriveFile, db: DrizzleDBClient) {
-  await db
-    .insert(googleDriveFile)
-    .values(file)
-    .onConflictDoUpdate({
-      set: {
-        name: file.name,
-        downloadUrl: file.downloadUrl,
-        mimeType: file.mimeType,
-      },
-      target: googleDriveFile.id,
-    });
 }
 
 async function fuzzyMatchSongs(names: string[], db: DrizzleDBClient) {

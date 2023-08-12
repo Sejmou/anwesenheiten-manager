@@ -1,17 +1,16 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { songFileLink, song } from 'drizzle/schema';
+import { songAttachment, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
-// create input schema
-const songFileLinkInput = createInsertSchema(songFileLink);
+const attachmentInput = createInsertSchema(songAttachment);
 
 export const songRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const songs = await ctx.db.query.song.findMany({
       with: {
-        fileLinks: true,
+        attachments: true,
       },
     });
 
@@ -34,63 +33,29 @@ export const songRouter = createTRPCRouter({
         failures,
       };
     }),
-  updateFileLinks: protectedProcedure
-    .input(
-      z.object({
-        links: songFileLinkInput.array(),
-        songId: z.string().nonempty(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const { songId } = input;
-      const fileLinks = await ctx.db.transaction(async tx => {
-        await tx
-          .delete(songFileLink)
-          .where(eq(songFileLink.songId, input.songId));
-        if (input.links.length === 0) {
-          return [];
-        }
-        return await tx.insert(songFileLink).values(input.links).returning();
-      });
-      return {
-        fileLinks,
-        songId,
-      };
-    }),
-  addOrUpdateFileLink: protectedProcedure
-    .input(songFileLinkInput)
+  addOrUpdateAttachment: protectedProcedure
+    .input(attachmentInput)
     .mutation(async ({ ctx, input }) => {
       const file = await ctx.db
-        .insert(songFileLink)
+        .insert(songAttachment)
         .values(input)
         .onConflictDoUpdate({
-          target: [songFileLink.songId, songFileLink.label],
+          target: [songAttachment.songId, songAttachment.label],
           set: {
-            url: input.url,
+            downloadUrl: input.downloadUrl,
+            viewUrl: input.viewUrl,
             type: input.type,
           },
         })
         .returning();
       return file[0]!;
     }),
-  removeFileLink: protectedProcedure
-    .input(
-      z.object({
-        songId: z.string().nonempty(),
-        label: z.string().nonempty(),
-      })
-    )
+  removeAttachment: protectedProcedure
+    .input(z.string())
     .mutation(async ({ ctx, input }) => {
-      const { songId, label } = input;
-      await ctx.db
-        .delete(songFileLink)
-        .where(
-          and(eq(songFileLink.songId, songId), eq(songFileLink.label, label))
-        );
-      return {
-        songId,
-        label,
-      };
+      const id = input;
+      await ctx.db.delete(songAttachment).where(eq(songAttachment.id, id));
+      return;
     }),
 });
 

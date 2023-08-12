@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
-import type { SongFileLink } from 'drizzle/models';
+import type { AudioFileAttachment } from 'drizzle/models';
 import { PlayArrow as Play, Stop, MusicNote } from '@mui/icons-material';
 import { Button, SxProps } from '@mui/material';
 
 type NotesPlayButtonProps = {
-  link: SongFileLink;
+  audioAttachment: AudioFileAttachment;
   sx?: SxProps;
 };
 
-const InitialNotesPlayButton = ({ link, sx }: NotesPlayButtonProps) => {
+const AudioPlayButton = ({ audioAttachment, sx }: NotesPlayButtonProps) => {
   const [playing, setPlaying] = useState(false);
   const [audio] = useState<HTMLAudioElement>(
     (typeof Audio !== 'undefined'
-      ? new Audio(link.url)
+      ? new Audio(audioAttachment.downloadUrl)
       : undefined) as HTMLAudioElement
   );
 
@@ -47,4 +47,4 @@ const InitialNotesPlayButton = ({ link, sx }: NotesPlayButtonProps) => {
   );
 };
 
-export default InitialNotesPlayButton;
+export default AudioPlayButton;

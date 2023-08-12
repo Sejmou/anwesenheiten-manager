@@ -107,7 +107,7 @@ model Song {
   key            MusicalKey?
   lyrics         String?
   notes          String?
-  files          SongFileLink[]
+  files          SongAttachment[]
   setlistEntries SetlistSongInfo[]
 }
 
@@ -132,25 +132,27 @@ model SetlistSongInfo {
 }
 
 model GoogleDriveFile {
-  id          String        @id
-  createdAt   DateTime      @default(now()) @db.Timestamptz(6)
-  lastSyncAt  DateTime      @db.Timestamptz(6)
-  name        String
-  mimeType    String
-  downloadUrl String        @unique
-  fileLink    SongFileLink? @relation(fields: [downloadUrl], references: [url])
+  id           String         @id
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  lastSyncAt   DateTime       @db.Timestamptz(6)
+  name         String
+  mimeType     String
+  attachmentId String         @unique @db.Uuid
+  attachment   SongAttachment @relation(fields: [attachmentId], references: [id])
 }
 
-model SongFileLink {
+model SongAttachment {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   songId          String           @db.Uuid
   createdAt       DateTime         @default(now()) @db.Timestamptz(6)
-  type            LinkType
+  type            AttachmentType
   label           String
-  url             String           @unique
+  viewUrl         String           @unique
+  downloadUrl     String?          @unique // not every attachment is (directly) downloadable, e.g. a YouTube video link
   song            Song             @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   googleDriveFile GoogleDriveFile?
 
-  @@id([songId, label], name: "linkId")
+  @@unique([songId, label])
 }
 
 enum VoiceGroup {
@@ -167,12 +169,12 @@ enum VoiceGroup {
   D
 }
 
-enum LinkType {
+enum AttachmentType {
   Audio
   AudioRecording
   AudioPracticeTrack
   AudioInitialNotes
-  Video
+  YouTube
   PDF
   MuseScore
   Other
