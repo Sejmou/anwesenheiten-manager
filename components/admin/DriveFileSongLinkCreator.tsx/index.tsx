@@ -1,74 +1,47 @@
-import { Button, Stack, Stepper, Typography } from '@mui/material';
+import { Button, Stepper } from '@mui/material';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { FolderSelect } from './FolderSelect';
-import { RouterOutputs, api } from 'utils/api';
-import { publicFolderId } from 'utils/google-drive';
-import MatchFolderNamesWithSongs from './MatchFolderNamesWithSongs';
 import { useLinkCreatorStore } from './store';
-
-type GoogleDriveFolder =
-  RouterOutputs['googleDrive']['getFolderWithAllSubfolders'];
 
 type Props = {
   onClose: () => void;
 };
 
-type Step = {
-  title: string;
-  component: React.ReactNode;
-};
-
 const DriveFileSongLinkCreator = ({ onClose }: Props) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const setSongsFolderId = useLinkCreatorStore(state => state.setSongsFolderId);
+  const goToNextStep = useLinkCreatorStore(state => state.goToNextStep);
+  const goToPreviousStep = useLinkCreatorStore(state => state.goToPreviousStep);
+  const canGoToNextStep = useLinkCreatorStore(state => state.canGoToNextStep);
+  const canGoToPreviousStep = useLinkCreatorStore(
+    state => state.canGoToPreviousStep
+  );
+  const steps = useLinkCreatorStore(state => state.steps);
+  const currentStep = useLinkCreatorStore(state => state.currentStep);
+
+  const handleClose = () => {
+    onClose();
+  };
 
   const handleNext = () => {
     if (isFinalStep) {
       handleSave();
     } else {
-      setCurrentStep(currentStep + 1);
+      goToNextStep();
     }
   };
   const handlePrev = () => {
-    if (isFirstStep) onClose();
-    setCurrentStep(currentStep - 1);
+    if (isFirstStep) handleClose();
+    goToPreviousStep();
   };
 
   const handleSave = () => {
     alert('Das ist leider noch nicht ausprogrammiert.');
   };
-  const handleClose = () => {
-    onClose();
-  };
-
-  const handleFolderSelect = (folder: GoogleDriveFolder) => {
-    setSongsFolderId(folder.id);
-  };
 
   const isFirstStep = currentStep === 0;
-  const steps = useMemo<Step[]>(
-    () => [
-      {
-        title: 'Einleitung',
-        component: <IntroStep />,
-      },
-      {
-        title: 'Ordner auswählen',
-        component: <SelectDriveFolderStep onSelect={handleFolderSelect} />,
-      },
-      {
-        title: 'Ordnernamen mit Liedern verknüpfen',
-        component: <MatchFolderNamesStep />,
-      },
-    ],
-    []
-  );
   const isFinalStep = currentStep === steps.length - 1;
 
   return (
@@ -79,10 +52,10 @@ const DriveFileSongLinkCreator = ({ onClose }: Props) => {
         {steps[currentStep]?.component}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handlePrev}>
+        <Button onClick={handlePrev} disabled={!canGoToPreviousStep}>
           {isFirstStep ? 'Abbrechen' : 'Zurück'}
         </Button>
-        <Button onClick={handleNext}>
+        <Button onClick={handleNext} disabled={!canGoToNextStep}>
           {isFinalStep ? 'Speichern' : 'Weiter'}
         </Button>
       </DialogActions>
@@ -91,61 +64,3 @@ const DriveFileSongLinkCreator = ({ onClose }: Props) => {
 };
 
 export default DriveFileSongLinkCreator;
-
-const IntroStep = () => {
-  return (
-    <Stack spacing={1}>
-      <Typography>Willkommen zum Magic File Linker!</Typography>
-      <Typography>
-        Mit diesem Tool kannst du die Files aus dem Google Drive Ordner
-        automatisch mit den Liedern im Repertoire verlinken.
-      </Typography>
-    </Stack>
-  );
-};
-
-type SelectDriveFolderStepProps = {
-  onSelect: (folder: GoogleDriveFolder) => void;
-};
-
-const SelectDriveFolderStep = ({ onSelect }: SelectDriveFolderStepProps) => {
-  const getRootFolder =
-    api.googleDrive.getFolderWithAllSubfolders.useQuery(publicFolderId);
-
-  const rootFolder = getRootFolder.data;
-
-  const isLoading = getRootFolder.isLoading;
-  const isError = getRootFolder.isError;
-
-  return (
-    <Stack spacing={2}>
-      <Typography>
-        Wähle den Ordner aus, der die Ordner für die Lieder enthält, die du
-        importieren möchtest.
-      </Typography>
-      <Typography>
-        In der Ansicht für den Ordnerinhalt sollen die Namen also dem Namen der
-        Lieder entsprechen.
-      </Typography>
-      {isLoading && <Typography>Ordner werden geladen...</Typography>}
-      {isError && <Typography>Ordner konnten nicht geladen werden.</Typography>}
-      {rootFolder && (
-        <FolderSelect rootFolder={rootFolder} onSelect={onSelect} />
-      )}
-    </Stack>
-  );
-};
-
-const MatchFolderNamesStep = () => {
-  const folderId = useLinkCreatorStore(state => state.songsFolderId);
-
-  return (
-    <Stack spacing={1}>
-      <Typography>
-        Hier kannst du sehen, wie der Magic File Linker die Ordnernamen mit
-        Songs gematcht hat. Wenn du Fehler siehst, korrigiere sie bitte.
-      </Typography>
-      {folderId && <MatchFolderNamesWithSongs folderId={folderId} />}
-    </Stack>
-  );
-};
