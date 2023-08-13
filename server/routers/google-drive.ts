@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { publicProcedure, createTRPCRouter, protectedProcedure } from '../trpc';
-import { googleDriveFile, songAttachment, song } from 'drizzle/schema';
+import { googleDriveFile, song } from 'drizzle/schema';
 import { createInsertSchema } from 'drizzle-zod';
 import { type DrizzleDBClient } from 'server/db';
-import { SQL, eq, inArray, sql } from 'drizzle-orm';
+import { SQL, inArray, sql } from 'drizzle-orm';
 import { google } from 'googleapis';
 import { PgDialect } from 'drizzle-orm/pg-core';
+import { FileAttachment } from 'drizzle/models';
 
 const pgDialect = new PgDialect();
 
@@ -48,7 +49,27 @@ type GoogleDriveFolder = {
   subfolders: GoogleDriveFolder[];
 };
 
+type ParsedDriveFile = {
+  id: string;
+  mimeType: string;
+  name: string;
+  downloadUrl: string;
+  viewUrl: string;
+};
+
+type ParsedDriveFileWithPath = ParsedDriveFile & {
+  path: string;
+};
+
 const googleDriveFileInput = createInsertSchema(googleDriveFile);
+
+const folderToSongMappingsInput = z
+  .object({
+    folderName: z.string(),
+    folderId: z.string(),
+    songId: z.string(),
+  })
+  .array();
 
 export const googleDriveRouter = createTRPCRouter({
   getLinkedFiles: publicProcedure.query(async ({ ctx }) => {
@@ -71,7 +92,7 @@ export const googleDriveRouter = createTRPCRouter({
       const folder = await createGoogleDriveFolderTree(input, drive);
       return folder;
     }),
-  getSongMatchesForSubfolderNames: protectedProcedure
+  getSongMappingsForSubfolderNames: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const { name } = await getMetadataForGoogleDriveId(input);
@@ -89,17 +110,31 @@ export const googleDriveRouter = createTRPCRouter({
 
       const songMap = new Map(songs.map(s => [s.name, s]));
 
-      const songMatches = matches.map((m, i) => ({
-        name: m.inputString,
-        id: subFolderIds[i],
-        closestMatch: m.closestMatch,
-        song: songMap.get(m.closestMatch)!,
+      const mappings = matches.map((m, i) => ({
+        folderName: m.inputString,
+        folderId: subFolderIds[i]!,
+        songId: songMap.get(m.closestMatch)!.id,
       }));
-      return songMatches;
+      return mappings;
+    }),
+  getSongFolderFileMappings: protectedProcedure
+    .input(folderToSongMappingsInput)
+    .query(async ({ input }) => {
+      const folderFiles = await Promise.all(
+        input.map(async mapping => {
+          const files = await getFilesInFolder(mapping.folderId, true);
+          return {
+            ...mapping,
+            files,
+          };
+        })
+      );
+      console.log('folderFiles', folderFiles);
+      return folderFiles;
     }),
 });
 
-function parseDriveFile(file: DriveAPIFile): DriveFileWithURLs {
+function parseDriveFile(file: DriveAPIFile): ParsedDriveFile {
   const { id, webContentLink: downloadUrl, mimeType, name } = file;
   return {
     id,
@@ -110,13 +145,23 @@ function parseDriveFile(file: DriveAPIFile): DriveFileWithURLs {
   };
 }
 
-type DriveFileWithURLs = {
-  id: string;
-  mimeType: string;
-  name: string;
-  downloadUrl: string;
-  viewUrl: string;
-};
+// function driveFileInFolderToFileAttachment(
+//   file: ParsedDriveFileWithPath,
+//   songId: string
+// ): FileAttachment & {
+//   fileName: string;
+//   driveId: string;
+// }  {
+//   const { id, mimeType, name, downloadUrl, viewUrl, path } = file;
+//   return {
+//     id,
+//     label: nameWithoutFileExt,
+//     fileName: name,
+//     downloadUrl,
+//     viewUrl,
+//     songId,
+//   };
+// }
 
 /**
  * creates a URL that can be used to view a google Drive file in the browser
@@ -191,7 +236,7 @@ async function getFilesInFolder(
     return [];
   }
 
-  const files: (DriveFileWithURLs & { path: string })[] = [];
+  const files: ParsedDriveFileWithPath[] = [];
   for (const item of folderContents) {
     // proper files have webContentLink, folders don't
     const { webContentLink, ...rest } = await getMetadataForGoogleDriveId(

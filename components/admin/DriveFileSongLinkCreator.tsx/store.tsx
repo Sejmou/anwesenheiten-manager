@@ -3,22 +3,31 @@ import Intro from './steps/Intro';
 import SelectDriveFolder from './steps/SelectDriveFolder';
 import MatchFolderNames from './steps/MatchFolderNames';
 import { computed } from 'zustand-middleware-computed-state';
+import LinkFiles from './steps/LinkFiles';
 
 type Step = {
   id: StepID;
   title: string;
   component: React.ReactNode;
+  notCompletedHint?: string;
+};
+
+export type FolderToSongMapping = {
+  folderId: string;
+  folderName: string;
+  songId?: string;
 };
 
 type BaseStore = {
-  songsFolderId: string | null;
   steps: readonly Step[];
   currentStepIdx: number;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
   handleCancel: () => void; // should be called when the user cancels the process
-  handleStepCompleted: () => void; //should be called by each step when it is completed (useEffect hook is probably the best place for this)
+  songsFolderId: string | null;
   handleFolderSelected: (folderId: string) => void;
+  mappings: FolderToSongMapping[] | null;
+  handleMappingsChange: (mappings: FolderToSongMapping[]) => void;
 };
 
 type ComputedStore = {
@@ -39,7 +48,7 @@ type SetType = (
   replace?: boolean | undefined
 ) => void;
 
-type StepID = 'intro' | 'select-folder' | 'match-names';
+type StepID = 'intro' | 'select-folder' | 'match-names' | 'verify-mappings';
 
 const steps: readonly Step[] = [
   {
@@ -51,20 +60,29 @@ const steps: readonly Step[] = [
     id: 'select-folder',
     title: 'Ordner auswählen',
     component: <SelectDriveFolder />,
+    notCompletedHint: 'Du hast noch keinen Ordner ausgewählt',
   },
   {
     id: 'match-names',
     title: 'Ordnernamen mit Liedern verknüpfen',
     component: <MatchFolderNames />,
+    notCompletedHint: 'Verknüpfe zumindest einen Ordner mit einem Lied',
+  },
+  {
+    id: 'verify-mappings',
+    title: 'Verknüpfungen überprüfen',
+    component: <LinkFiles />,
   },
 ] as const;
 
 const completionCheckers: {
   [key in StepID]: (state: BaseStore) => boolean;
 } = {
-  intro: state => true,
+  intro: () => true,
   'select-folder': state => !!state.songsFolderId,
-  'match-names': state => true,
+  'match-names': state =>
+    !!state.mappings && state.mappings.filter(m => m.songId != null).length > 0,
+  'verify-mappings': () => true,
 };
 
 function computedState(state: BaseStore): ComputedStore {
@@ -88,6 +106,7 @@ export const useLinkCreatorStore = create<LinkCreatorStore>(
   computed<BaseStore, ComputedStore>(
     (set: SetType, get: () => LinkCreatorStore) => ({
       songsFolderId: null,
+      mappings: null,
       steps,
       currentStepIdx: 0,
       goToPreviousStep: () => {
@@ -115,6 +134,11 @@ export const useLinkCreatorStore = create<LinkCreatorStore>(
       handleFolderSelected: folderId => {
         set(() => ({
           songsFolderId: folderId,
+        }));
+      },
+      handleMappingsChange: mappings => {
+        set(() => ({
+          mappings,
         }));
       },
     }),

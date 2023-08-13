@@ -9,8 +9,17 @@ const MatchFolderNamesStep = () => {
     <Stack spacing={1}>
       <Typography>
         Hier kannst du sehen, wie der Magic File Linker die Ordnernamen mit
-        Songs gematcht hat. Wenn du Fehler siehst, korrigiere sie bitte.
+        Songs gematcht hat.
       </Typography>
+      <Stack>
+        <Typography>
+          Überprüfe die Ergebnisse und nimm gegebenenfalls Korrekturen vor.
+        </Typography>
+        <Typography>
+          Möchtest du einen Ordner nicht verlinken, lass einfach das
+          entsprechende Feld in der "Lied"-Spalte leer.
+        </Typography>
+      </Stack>
       {folderId && <MatchFolderNamesWithSongs folderId={folderId} />}
     </Stack>
   );

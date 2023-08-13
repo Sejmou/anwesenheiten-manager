@@ -1,5 +1,7 @@
 import {
+  Alert,
   Autocomplete,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -12,6 +14,9 @@ import {
 } from '@mui/material';
 import { FieldArray, Formik } from 'formik';
 import { RouterOutputs, api } from 'utils/api';
+import { FolderToSongMapping, useLinkCreatorStore } from '../../store';
+import { db } from 'server/db';
+import { use, useEffect, useState } from 'react';
 
 type Props = {
   folderId: string;
@@ -20,52 +25,96 @@ type Props = {
 type Song = RouterOutputs['song']['getAll'][0];
 
 const MatchFolderNamesWithSongs = ({ folderId }: Props) => {
-  const getMatches =
-    api.googleDrive.getSongMatchesForSubfolderNames.useQuery(folderId);
+  const getMappings =
+    api.googleDrive.getSongMappingsForSubfolderNames.useQuery(folderId);
   const getSongs = api.song.getAll.useQuery();
+  const handleMappingsChange = useLinkCreatorStore(
+    state => state.handleMappingsChange
+  );
 
   const songs = getSongs.data ?? [];
-  const matches = getMatches.data ?? [];
+  const dbMappings = getMappings.data ?? [];
+  const userMappings = useLinkCreatorStore(state => state.mappings);
+  const mappings = userMappings ?? dbMappings;
 
-  const loadingData = getMatches.isLoading || getSongs.isLoading;
-  const error = getMatches.error || getSongs.error;
+  const loadingData = getMappings.isLoading || getSongs.isLoading;
+  const error = getMappings.error || getSongs.error;
+
+  const mappingsChangedByUser = !arraysEqual(dbMappings, mappings);
+  const handleResetClick = () => {
+    handleMappingsChange(dbMappings);
+    setRerenderHackKey(rerenderHackKey + 1);
+  };
+  const [rerenderHackKey, setRerenderHackKey] = useState(0); // hack to reset form on reset click - TODO: find better solution
 
   if (error)
     return <Typography color="error">Fehler beim Laden der Daten</Typography>;
   if (loadingData) return <Typography>Lade Daten...</Typography>;
 
   return (
-    <NameMatchForm
-      matchesFromDB={matches.map(m => ({
-        folderId: m.id!,
-        folderName: m.name,
-        songId: m.song.id,
-      }))}
-      songs={songs}
-    />
+    <>
+      {mappingsChangedByUser && (
+        <Alert
+          severity="info"
+          action={
+            <Button size="small" onClick={handleResetClick}>
+              Zurücksetzen
+            </Button>
+          }
+        >
+          Die Zuordnung wurde von dir geändert.{' '}
+        </Alert>
+      )}
+      <NameMappingForm
+        key={rerenderHackKey}
+        initialMappings={mappings}
+        songs={songs}
+        onChange={handleMappingsChange}
+      />
+    </>
   );
 };
+
+function arraysEqual(arr1: any[], arr2: any[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  return arr1.every((item, index) => {
+    return JSON.stringify(item) === JSON.stringify(arr2[index]);
+  });
+}
 
 export default MatchFolderNamesWithSongs;
 
 type NameMatchFormProps = {
-  matchesFromDB: {
-    folderId: string;
-    folderName: string;
-    songId: string;
-  }[];
+  initialMappings: FolderToSongMapping[];
   songs: Song[];
+  onChange: (mappings: FolderToSongMapping[]) => void;
 };
 
-const NameMatchForm = ({ matchesFromDB, songs }: NameMatchFormProps) => {
+const NameMappingForm = ({
+  initialMappings,
+  songs,
+  onChange,
+}: NameMatchFormProps) => {
+  useEffect(() => {
+    // required to make sure values are written to store also if user decides to make no changes at all
+    onChange(initialMappings);
+  }, []);
+
   return (
     <TableContainer component={Paper}>
       <Formik
         initialValues={{
-          matches: matchesFromDB,
+          matches: initialMappings,
         }}
-        onSubmit={values => {
-          console.log(values);
+        validate={values => {
+          // 'abusing validate callback to store changes
+          onChange(values.matches);
+        }}
+        onSubmit={() => {
+          // won't do anything here, but TS complains if we don't add a handler
         }}
       >
         {({ values, setFieldValue }) => (
@@ -95,7 +144,11 @@ const NameMatchForm = ({ matchesFromDB, songs }: NameMatchFormProps) => {
                             renderInput={params => (
                               <TextField
                                 {...params}
-                                label="Verlinktes Lied"
+                                label={
+                                  params.inputProps.value
+                                    ? 'Verlinktes Lied'
+                                    : 'Kein Lied verlinkt'
+                                }
                                 placeholder="Wähle ein Lied aus dem Repertoire"
                                 variant="outlined"
                               />

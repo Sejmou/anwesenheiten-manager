@@ -2,11 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import { FolderSelect } from './FolderSelect';
 import { publicFolderId } from 'utils/google-drive';
 import { api } from 'utils/api';
-import type { RouterOutputs } from 'utils/api';
 import { useLinkCreatorStore } from '../../store';
-
-type GoogleDriveFolder =
-  RouterOutputs['googleDrive']['getFolderWithAllSubfolders'];
 
 const SelectDriveFolderStep = () => {
   const getRootFolder =
@@ -25,12 +21,14 @@ const SelectDriveFolderStep = () => {
         <Typography>
           Wähle den Ordner aus von dem du Files für Lieder importieren möchtest.
           Die Namen der Unterordner sollen ungefähr den Namen der Lieder
-          entsprechen
+          entsprechen.
         </Typography>
         <Typography>
           Der Magic File Linker wird im Anschluss versuchen, die Ordnernamen mit
           den Liedern zu verknüpfen. Du kannst natürlich noch Korrekturen
-          vornehmen.
+          vornehmen. Falls bestimmte Ordner keinem Lied zugeordnet werden
+          sollen, kannst du die entsprechenden Einträge auch einfach später
+          löschen.
         </Typography>
       </Stack>
       {isLoading && <Typography>Ordner werden geladen...</Typography>}
