@@ -1,14 +1,6 @@
 import { Stack, Typography } from '@mui/material';
-import { useLinkCreatorStore } from '../store';
-import { useEffect } from 'react';
 
 const IntroStep = () => {
-  const handleStepCompleted = useLinkCreatorStore(
-    store => store.handleStepCompleted
-  );
-  useEffect(() => {
-    handleStepCompleted();
-  }, []);
   return (
     <Stack spacing={1}>
       <Typography>Willkommen zum Magic File Linker!</Typography>
